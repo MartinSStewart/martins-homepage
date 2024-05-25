@@ -15,11 +15,12 @@ import PagesMsg exposing (PagesMsg)
 import Route
 import RouteBuilder exposing (App, StatelessRoute)
 import Set exposing (Set)
-import Shared
+import Shared exposing (Breakpoints(..))
 import Things exposing (Tag, Thing)
 import Ui
 import Ui.Font
 import Ui.Input
+import Ui.Responsive
 import UrlPath
 import View exposing (View)
 
@@ -202,11 +203,46 @@ view app shared model =
                 Chronologically ->
                     Dict.toList Things.thingsIHaveDone
                         |> List.sortWith (\( _, a ) ( _, b ) -> Date.compare b.releasedAt a.releasedAt)
+
+        filterThings viewFunc ( name, thing ) =
+            if Set.isEmpty filterSet then
+                viewFunc ( name, thing ) |> Just
+
+            else if
+                Array.toList model.filter
+                    |> List.all
+                        (\tag ->
+                            let
+                                tagText =
+                                    Things.tagData tag |> .text
+                            in
+                            List.any
+                                (\tag2 -> Things.tagData tag2 |> .text |> (==) tagText)
+                                thing.tags
+                        )
+            then
+                viewFunc ( name, thing ) |> Just
+
+            else
+                Nothing
     in
     { title = "Martin's homepage"
     , body =
         Ui.column
-            [ Ui.spacing 16, Ui.padding pagePadding, Ui.widthMax contentMaxWidth, Ui.centerX ]
+            [ Ui.spacing 16
+            , Ui.Responsive.padding
+                Shared.breakpoints
+                (\label ->
+                    case label of
+                        Mobile ->
+                            Ui.Responsive.value 8
+
+                        NotMobile ->
+                            Ui.Responsive.value pagePadding
+                )
+            , Ui.widthMax contentMaxWidth
+            , Ui.centerX
+            ]
             [ Ui.el
                 [ Ui.Font.size 32, Ui.Font.bold, Ui.Font.lineHeight 1.1 ]
                 (Ui.text "Stuff I've made or done that I don't want to forget")
@@ -214,32 +250,17 @@ view app shared model =
                 [ Ui.spacing 8 ]
                 [ filterView model
                 , Ui.row
-                    [ Ui.wrap, Ui.spacing tileSpacing, Ui.contentCenterX ]
-                    (List.filterMap
-                        (\( name, thing ) ->
-                            if Set.isEmpty filterSet then
-                                thingsView ( name, thing ) |> Just
-
-                            else if
-                                Array.toList model.filter
-                                    |> List.all
-                                        (\tag ->
-                                            let
-                                                tagText =
-                                                    Things.tagData tag |> .text
-                                            in
-                                            List.any
-                                                (\tag2 -> Things.tagData tag2 |> .text |> (==) tagText)
-                                                thing.tags
-                                        )
-                            then
-                                thingsView ( name, thing ) |> Just
-
-                            else
-                                Nothing
-                        )
-                        thingsSorted
-                    )
+                    [ Ui.wrap
+                    , Ui.spacing tileSpacing
+                    , Ui.contentCenterX
+                    , Ui.Responsive.visible Shared.breakpoints [ NotMobile ]
+                    ]
+                    (List.filterMap (filterThings thingsViewNotMobile) thingsSorted)
+                , Ui.column
+                    [ Ui.spacing tileSpacing
+                    , Ui.Responsive.visible Shared.breakpoints [ Mobile ]
+                    ]
+                    (List.filterMap (filterThings thingsViewMobile) thingsSorted)
                 ]
             ]
             |> Ui.map PagesMsg.fromMsg
@@ -276,53 +297,99 @@ tooltip text =
     Ui.htmlAttribute (Html.Attributes.title text)
 
 
+sortByView : Model -> Ui.Element Msg
+sortByView model =
+    Ui.row
+        [ Ui.width Ui.shrink, Ui.spacing 4, Ui.Font.size 14 ]
+        [ Ui.el [ Ui.Font.bold ] (Ui.text "Sort by")
+        , Ui.row
+            [ Ui.width Ui.shrink ]
+            [ Ui.el
+                (Ui.roundedWith { topLeft = 16, topRight = 0, bottomLeft = 16, bottomRight = 0 }
+                    :: Ui.border 1
+                    :: tooltip "Sort by how important and high quality I think things are"
+                    :: sorByButtonAttributes model.sortBy Quality
+                )
+                (Ui.text "Best to worst")
+            , Ui.el
+                (Ui.borderWith { left = 0, right = 0, top = 1, bottom = 1 }
+                    :: tooltip "Sort by title names"
+                    :: sorByButtonAttributes model.sortBy Alphabetically
+                )
+                (Ui.text "A to Z")
+            , Ui.el
+                (Ui.roundedWith { topLeft = 0, topRight = 16, bottomLeft = 0, bottomRight = 16 }
+                    :: Ui.border 1
+                    :: tooltip "Sort by when things were released. For stuff that doesn't have a clear release date, this is when it first become known to or used by several people"
+                    :: sorByButtonAttributes model.sortBy Chronologically
+                )
+                (Ui.text "Newest to oldest")
+            ]
+        ]
+
+
 filterView : Model -> Ui.Element Msg
 filterView model =
     Ui.row
-        [ Ui.spacing 16 ]
-        [ Ui.row
-            [ Ui.width Ui.shrink, Ui.spacing 4, Ui.Font.size 14 ]
-            [ Ui.el [ Ui.Font.bold ] (Ui.text "Sort by")
-            , Ui.row
-                [ Ui.width Ui.shrink ]
-                [ Ui.el
-                    (Ui.roundedWith { topLeft = 16, topRight = 0, bottomLeft = 16, bottomRight = 0 }
-                        :: Ui.border 1
-                        :: tooltip "Sort by how important and high quality I think things are"
-                        :: sorByButtonAttributes model.sortBy Quality
-                    )
-                    (Ui.text "Quality")
-                , Ui.el
-                    (Ui.borderWith { left = 0, right = 0, top = 1, bottom = 1 }
-                        :: tooltip "Sort by title names"
-                        :: sorByButtonAttributes model.sortBy Alphabetically
-                    )
-                    (Ui.text "Alphabetically")
-                , Ui.el
-                    (Ui.roundedWith { topLeft = 0, topRight = 16, bottomLeft = 0, bottomRight = 16 }
-                        :: Ui.border 1
-                        :: tooltip "Sort by when things were released. For stuff that doesn't have a clear release date, this is when it first become known to or used my several people"
-                        :: sorByButtonAttributes model.sortBy Chronologically
-                    )
-                    (Ui.text "Chronologically")
-                ]
-            ]
+        [ Ui.spacingWith { horizontal = 16, vertical = 8 }, Ui.wrap ]
+        [ sortByView model
         , if Array.isEmpty model.filter then
             Ui.none
 
           else
             Ui.row
-                [ Ui.spacing 4 ]
+                [ Ui.spacing 4, Ui.widthMin 300 ]
                 [ Ui.el [ Ui.Font.size 14, Ui.Font.bold, Ui.width Ui.shrink ] (Ui.text "Filter by")
                 , Array.toList model.filter
                     |> List.map filterTagView
-                    |> Ui.row [ Ui.wrap, Ui.spacing 4 ]
+                    |> Ui.row [ Ui.spacing 4 ]
                 ]
         ]
 
 
-thingsView : ( String, Thing ) -> Ui.Element Msg
-thingsView ( name, thing ) =
+thingsViewMobile : ( String, Thing ) -> Ui.Element Msg
+thingsViewMobile ( name, thing ) =
+    Ui.row
+        [ containerBackground
+        , Ui.borderColor containerBorder
+        , Ui.border 1
+        , Ui.rounded 4
+        , Ui.alignTop
+        , Ui.padding 4
+        , Ui.spacing 4
+        ]
+        [ Ui.image
+            [ Ui.width (Ui.px 100)
+            , Ui.height (Ui.px 100)
+            , Html.Attributes.attribute "elm-pages:prefetch" "" |> Ui.htmlAttribute
+            , Ui.link (Route.toString (Route.Stuff__Slug_ { slug = name }))
+            ]
+            { source = thing.previewImage
+            , description = "Preview image for " ++ thing.name
+            , onLoad = Nothing
+            }
+        , Ui.column
+            [ Ui.height Ui.fill ]
+            [ Ui.el
+                [ Ui.Font.bold
+                , Ui.Font.size 20
+                , Ui.Font.lineHeight 1
+                , Html.Attributes.attribute "elm-pages:prefetch" "" |> Ui.htmlAttribute
+                , Ui.link (Route.toString (Route.Stuff__Slug_ { slug = name }))
+                ]
+                (Ui.text thing.name)
+            , Ui.row
+                [ Ui.wrap
+                , Ui.spacing 4
+                , Ui.alignBottom
+                ]
+                (List.map tagView thing.tags)
+            ]
+        ]
+
+
+thingsViewNotMobile : ( String, Thing ) -> Ui.Element Msg
+thingsViewNotMobile ( name, thing ) =
     Ui.column
         [ Ui.width (Ui.px tileWidth)
         , containerBackground
@@ -341,9 +408,14 @@ thingsView ( name, thing ) =
             , Ui.link (Route.toString (Route.Stuff__Slug_ { slug = name }))
             ]
             (Ui.text thing.name)
-        , Ui.el
-            [ Ui.height (Ui.px 200), Ui.background (Ui.rgb 200 200 200) ]
-            Ui.none
+        , Ui.image
+            [ Html.Attributes.attribute "elm-pages:prefetch" "" |> Ui.htmlAttribute
+            , Ui.link (Route.toString (Route.Stuff__Slug_ { slug = name }))
+            ]
+            { source = thing.previewImage
+            , description = "Preview image for " ++ thing.name
+            , onLoad = Nothing
+            }
         , Ui.row
             [ Ui.wrap
             , Ui.spacing 4

@@ -10,26 +10,26 @@ tagData : Tag -> TagData
 tagData tag =
     case tag of
         Elm ->
-            { text = "Elm", color = Ui.rgb 18 147 216 }
+            { text = "Elm", color = Ui.rgb 18 147 216, tooltip = "Anything created with Elm or related to the Elm community" }
 
         ElmPackage ->
-            { text = "Elm package", color = Ui.rgb 77 174 226 }
+            { text = "Elm package", color = Ui.rgb 77 174 226, tooltip = "Is a published Elm package" }
 
         Game ->
-            { text = "Game", color = Ui.rgb 43 121 34 }
+            { text = "Game", color = Ui.rgb 43 121 34, tooltip = "Is a game or contains games" }
 
         Lamdera ->
-            { text = "Lamdera", color = Ui.rgb 46 51 53 }
+            { text = "Lamdera", color = Ui.rgb 46 51 53, tooltip = "Created with Lamdera" }
 
         Complete ->
-            { text = "Complete", color = Ui.rgb 105 22 168 }
+            { text = "Complete", color = Ui.rgb 105 22 168, tooltip = "Has reached some sort of 1.0 status. Doesn't necessarily mean there won't be future changes though." }
 
         Podcast ->
-            { text = "Podcast", color = Ui.rgb 150 74 8 }
+            { text = "Podcast", color = Ui.rgb 150 74 8, tooltip = "A podcast I've been invited to" }
 
 
 type alias TagData =
-    { text : String, color : Ui.Color }
+    { text : String, color : Ui.Color, tooltip : String }
 
 
 elmPackage : String -> String -> String -> Date -> Date -> ( String, Thing )
@@ -47,7 +47,9 @@ elmPackage user packageName description lastUpdated releasedAt =
       , tags = [ Elm, ElmPackage ]
       , description = description
       , pageLastUpdated = lastUpdated
+      , pageCreatedAt = lastUpdated
       , releasedAt = releasedAt
+      , previewImage = "/elm-package-preview.png"
       }
     )
 
@@ -66,7 +68,9 @@ thingsIHaveDone =
         , tags = [ Elm, Game, Lamdera ]
         , description = "A game I've been working on, inspired by an old childrens game called Lego Loco"
         , pageLastUpdated = date 2024 May 25
+        , pageCreatedAt = date 2024 May 25
         , releasedAt = date 2023 Feb 11
+        , previewImage = "/discord-bot-preview.png"
         }
       )
     , ( "ascii-collab"
@@ -76,7 +80,9 @@ thingsIHaveDone =
         , tags = [ Elm, Game, Lamdera, Complete ]
         , description = "An infinite canvas that people can draw ascii art on together"
         , pageLastUpdated = date 2024 May 25
+        , pageCreatedAt = date 2024 May 25
         , releasedAt = date 2020 Sep 12
+        , previewImage = "/discord-bot-preview.png"
         }
       )
     , ( "meetdown"
@@ -86,7 +92,9 @@ thingsIHaveDone =
         , tags = [ Elm, Lamdera, Complete ]
         , description = ""
         , pageLastUpdated = date 2024 May 25
+        , pageCreatedAt = date 2024 May 25
         , releasedAt = date 2021 Jun 27
+        , previewImage = "/discord-bot-preview.png"
         }
       )
     , ( "circuit-breaker"
@@ -96,7 +104,9 @@ thingsIHaveDone =
         , tags = [ Elm, Game, Complete ]
         , description = ""
         , pageLastUpdated = date 2024 May 25
+        , pageCreatedAt = date 2024 May 25
         , releasedAt = date 2019 Dec 17
+        , previewImage = "/discord-bot-preview.png"
         }
       )
     , elmPackage "MartinSStewart" "elm-audio" "" (date 2024 May 25) (date 2020 Mar 11)
@@ -107,7 +117,9 @@ thingsIHaveDone =
         , tags = [ Elm, Lamdera ]
         , description = ""
         , pageLastUpdated = date 2024 May 25
+        , pageCreatedAt = date 2024 May 25
         , releasedAt = date 2021 Aug 24
+        , previewImage = "/discord-bot-preview.png"
         }
       )
     , ( "state-of-elm"
@@ -117,7 +129,9 @@ thingsIHaveDone =
         , tags = [ Elm, Lamdera ]
         , description = ""
         , pageLastUpdated = date 2024 May 25
+        , pageCreatedAt = date 2024 May 25
         , releasedAt = date 2022 May 1
+        , previewImage = "/discord-bot-preview.png"
         }
       )
     , elmPackage "MartinSStewart" "elm-serialize" "" (date 2024 May 25) (date 2020 Jul 30)
@@ -128,7 +142,9 @@ thingsIHaveDone =
         , tags = [ Elm, Complete ]
         , description = ""
         , pageLastUpdated = date 2024 May 25
+        , pageCreatedAt = date 2024 May 25
         , releasedAt = date 2023 Aug 27
+        , previewImage = "/discord-bot-preview.png"
         }
       )
     , ( "lamdera-backend-debugger"
@@ -138,17 +154,21 @@ thingsIHaveDone =
         , tags = [ Elm, Lamdera, Complete ]
         , description = ""
         , pageLastUpdated = date 2024 May 25
+        , pageCreatedAt = date 2024 May 25
         , releasedAt = date 2023 Jul 20
+        , previewImage = "/discord-bot-preview.png"
         }
       )
     , ( "discord-bot"
       , { name = "discord-bot"
         , website = Nothing
         , repo = Nothing
-        , tags = [ Elm, Game, Complete ]
+        , tags = [ Elm, Game, Lamdera, Complete ]
         , description = ""
         , pageLastUpdated = date 2024 May 25
+        , pageCreatedAt = date 2024 May 25
         , releasedAt = date 2020 Mar 21
+        , previewImage = "/discord-bot-preview.png"
         }
       )
     , ( "elm-pdf"
@@ -158,7 +178,9 @@ thingsIHaveDone =
         , tags = [ Elm ]
         , description = ""
         , pageLastUpdated = date 2024 May 25
+        , pageCreatedAt = date 2024 May 25
         , releasedAt = date 2020 Oct 29
+        , previewImage = "/discord-bot-preview.png"
         }
       )
     , elmPackage "MartinSStewart" "send-grid" "" (date 2024 May 25) (date 2020 Feb 15)
@@ -169,7 +191,9 @@ thingsIHaveDone =
         , tags = [ Elm, Lamdera, Complete ]
         , description = ""
         , pageLastUpdated = date 2024 May 25
+        , pageCreatedAt = date 2024 May 25
         , releasedAt = date 2023 Jul 5
+        , previewImage = "/discord-bot-preview.png"
         }
       )
     , ( "translation-editor"
@@ -179,7 +203,9 @@ thingsIHaveDone =
         , tags = [ Elm, Lamdera, Complete ]
         , description = ""
         , pageLastUpdated = date 2024 May 25
+        , pageCreatedAt = date 2024 May 25
         , releasedAt = date 2023 Feb 27
+        , previewImage = "/discord-bot-preview.png"
         }
       )
     , ( "elm-map"
@@ -189,7 +215,9 @@ thingsIHaveDone =
         , tags = [ Elm ]
         , description = ""
         , pageLastUpdated = date 2024 May 25
+        , pageCreatedAt = date 2024 May 25
         , releasedAt = date 2023 May 17
+        , previewImage = "/discord-bot-preview.png"
         }
       )
     , ( "simple-survey"
@@ -199,7 +227,9 @@ thingsIHaveDone =
         , tags = [ Elm, Lamdera, Complete ]
         , description = ""
         , pageLastUpdated = date 2024 May 25
+        , pageCreatedAt = date 2024 May 25
         , releasedAt = date 2023 May 21
+        , previewImage = "/discord-bot-preview.png"
         }
       )
     , ( "sheep-game"
@@ -209,7 +239,9 @@ thingsIHaveDone =
         , tags = [ Elm, Lamdera, Complete ]
         , description = ""
         , pageLastUpdated = date 2024 May 25
+        , pageCreatedAt = date 2024 May 25
         , releasedAt = date 2022 Jun 13
+        , previewImage = "/discord-bot-preview.png"
         }
       )
     , ( "air-hockey-racing"
@@ -219,7 +251,9 @@ thingsIHaveDone =
         , tags = [ Elm, Lamdera ]
         , description = ""
         , pageLastUpdated = date 2024 May 25
+        , pageCreatedAt = date 2024 May 25
         , releasedAt = date 2022 Jun 14
+        , previewImage = "/discord-bot-preview.png"
         }
       )
     , ( "elm-town-48"
@@ -229,7 +263,9 @@ thingsIHaveDone =
         , tags = [ Elm, Podcast ]
         , description = ""
         , pageLastUpdated = date 2024 May 25
+        , pageCreatedAt = date 2024 May 25
         , releasedAt = date 2020 Jan 11
+        , previewImage = "/discord-bot-preview.png"
         }
       )
     , ( "elm-town-64"
@@ -239,7 +275,9 @@ thingsIHaveDone =
         , tags = [ Elm, Podcast ]
         , description = ""
         , pageLastUpdated = date 2024 May 25
+        , pageCreatedAt = date 2024 May 25
         , releasedAt = date 2023 Sep 5
+        , previewImage = "/discord-bot-preview.png"
         }
       )
     , ( "elm-radio-57"
@@ -249,7 +287,9 @@ thingsIHaveDone =
         , tags = [ Elm, Podcast ]
         , description = ""
         , pageLastUpdated = date 2024 May 25
+        , pageCreatedAt = date 2024 May 25
         , releasedAt = date 2022 May 23
+        , previewImage = "/discord-bot-preview.png"
         }
       )
     ]
@@ -260,9 +300,9 @@ thingsIHaveDone =
 -}
 qualityOrder : List String
 qualityOrder =
-    [ "town-collab"
-    , "ascii-collab"
+    [ "ascii-collab"
     , "meetdown"
+    , "town-collab"
     , "elm-audio"
     , "elm-serialize"
     , "discord-bot"
@@ -301,6 +341,8 @@ type alias Thing =
     , tags : List Tag
     , description : String
     , pageLastUpdated : Date
+    , pageCreatedAt : Date
     , -- Very imprecise due to it being unclear what counts as "released at". If there isn't a clear release date, pick something that counts as when the thing became usable for or known to several people.
       releasedAt : Date
+    , previewImage : String
     }

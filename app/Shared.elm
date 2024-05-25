@@ -1,15 +1,15 @@
-module Shared exposing (Data, Model, Msg(..), SharedMsg(..), template)
+module Shared exposing (Breakpoints(..), Data, Model, Msg(..), SharedMsg(..), breakpoints, template)
 
 import BackendTask exposing (BackendTask)
 import Effect exposing (Effect)
 import FatalError exposing (FatalError)
 import Html exposing (Html)
-import Html.Events
 import Pages.Flags
 import Pages.PageUrl exposing (PageUrl)
 import Route exposing (Route)
 import SharedTemplate exposing (SharedTemplate)
-import Ui
+import Ui.Anim
+import Ui.Responsive
 import UrlPath exposing (UrlPath)
 import View exposing (View)
 
@@ -28,6 +28,7 @@ template =
 type Msg
     = SharedMsg SharedMsg
     | MenuClicked
+    | UiAnimMsg Ui.Anim.Msg
 
 
 type alias Data =
@@ -40,6 +41,7 @@ type SharedMsg
 
 type alias Model =
     { showMenu : Bool
+    , uiAnimModel : Ui.Anim.State
     }
 
 
@@ -57,7 +59,7 @@ init :
             }
     -> ( Model, Effect Msg )
 init flags maybePagePath =
-    ( { showMenu = False }
+    ( { showMenu = False, uiAnimModel = Ui.Anim.init }
     , Effect.none
     )
 
@@ -70,6 +72,9 @@ update msg model =
 
         MenuClicked ->
             ( { model | showMenu = not model.showMenu }, Effect.none )
+
+        UiAnimMsg uiAnimMsg ->
+            ( { model | uiAnimModel = Ui.Anim.update UiAnimMsg uiAnimMsg model.uiAnimModel }, Effect.none )
 
 
 subscriptions : UrlPath -> Model -> Sub Msg
@@ -93,6 +98,25 @@ view :
     -> View msg
     -> { body : List (Html msg), title : String }
 view sharedData page model toMsg pageView =
-    { body = [ Ui.layout [] pageView.body ]
+    { body =
+        [ Ui.Anim.layout
+            { options = []
+            , toMsg = \msg -> UiAnimMsg msg |> toMsg
+            , breakpoints = Just breakpoints
+            }
+            model.uiAnimModel
+            []
+            pageView.body
+        ]
     , title = pageView.title
     }
+
+
+type Breakpoints
+    = Mobile
+    | NotMobile
+
+
+breakpoints : Ui.Responsive.Breakpoints Breakpoints
+breakpoints =
+    Ui.Responsive.breakpoints Mobile [ ( 500, NotMobile ) ]
