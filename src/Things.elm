@@ -21,12 +21,19 @@ tagData tag =
         Lamdera ->
             { text = "Lamdera", color = Ui.rgb 46 51 53 }
 
+        Complete ->
+            { text = "Complete", color = Ui.rgb 105 22 168 }
+
+        Podcast ->
+            { text = "Podcast", color = Ui.rgb 150 74 8 }
+
 
 type alias TagData =
     { text : String, color : Ui.Color }
 
 
-elmPackage user packageName description lastUpdated =
+elmPackage : String -> String -> String -> Date -> Date -> ( String, Thing )
+elmPackage user packageName description lastUpdated releasedAt =
     ( packageName
     , { name = packageName
       , website =
@@ -38,10 +45,16 @@ elmPackage user packageName description lastUpdated =
                 |> Just
       , repo = "https://github.com/" ++ user ++ "/" ++ packageName |> Just
       , tags = [ Elm, ElmPackage ]
-      , description = "A game I've been working on, inspired by an old childrens game called Lego Loco"
-      , lastUpdated = Date.fromCalendarDate 2024 May 25
+      , description = description
+      , pageLastUpdated = lastUpdated
+      , releasedAt = releasedAt
       }
     )
+
+
+date : Int -> Date.Month -> Int -> Date
+date =
+    Date.fromCalendarDate
 
 
 thingsIHaveDone : Dict String Thing
@@ -52,44 +65,49 @@ thingsIHaveDone =
         , repo = Just "https://github.com/MartinSStewart/town-collab"
         , tags = [ Elm, Game, Lamdera ]
         , description = "A game I've been working on, inspired by an old childrens game called Lego Loco"
-        , lastUpdated = Date.fromCalendarDate 2024 May 25
+        , pageLastUpdated = date 2024 May 25
+        , releasedAt = date 2023 Feb 11
         }
       )
     , ( "ascii-collab"
       , { name = "ascii-collab"
         , website = Just "https://ascii-collab.app/"
         , repo = Just "https://github.com/MartinSStewart/ascii-collab"
-        , tags = [ Elm, Game, Lamdera ]
+        , tags = [ Elm, Game, Lamdera, Complete ]
         , description = "An infinite canvas that people can draw ascii art on together"
-        , lastUpdated = Date.fromCalendarDate 2024 May 25
+        , pageLastUpdated = date 2024 May 25
+        , releasedAt = date 2020 Sep 12
         }
       )
     , ( "meetdown"
-      , { name = "meetdown"
+      , { name = "Meetdown"
         , website = Just "https://meetdown.app/"
         , repo = Just "https://github.com/MartinSStewart/meetdown"
-        , tags = [ Elm, Lamdera ]
+        , tags = [ Elm, Lamdera, Complete ]
         , description = ""
-        , lastUpdated = Date.fromCalendarDate 2024 May 25
+        , pageLastUpdated = date 2024 May 25
+        , releasedAt = date 2021 Jun 27
         }
       )
     , ( "circuit-breaker"
       , { name = "Circuit Breaker"
         , website = Just "https://martinsstewart.gitlab.io/hackman/"
         , repo = Just "https://gitlab.com/MartinSStewart/hackman"
-        , tags = [ Elm, Game ]
+        , tags = [ Elm, Game, Complete ]
         , description = ""
-        , lastUpdated = Date.fromCalendarDate 2024 May 25
+        , pageLastUpdated = date 2024 May 25
+        , releasedAt = date 2019 Dec 17
         }
       )
-    , elmPackage "MartinSStewart" "elm-audio" "" (Date.fromCalendarDate 2024 May 25)
+    , elmPackage "MartinSStewart" "elm-audio" "" (date 2024 May 25) (date 2020 Mar 11)
     , ( "elm-review-bot"
       , { name = "elm-review-bot"
         , website = Nothing
         , repo = Just "https://github.com/MartinSStewart/elm-review-bot"
         , tags = [ Elm, Lamdera ]
         , description = ""
-        , lastUpdated = Date.fromCalendarDate 2024 May 25
+        , pageLastUpdated = date 2024 May 25
+        , releasedAt = date 2021 Aug 24
         }
       )
     , ( "state-of-elm"
@@ -98,35 +116,39 @@ thingsIHaveDone =
         , repo = Just "https://github.com/MartinSStewart/state-of-elm"
         , tags = [ Elm, Lamdera ]
         , description = ""
-        , lastUpdated = Date.fromCalendarDate 2024 May 25
+        , pageLastUpdated = date 2024 May 25
+        , releasedAt = date 2022 May 1
         }
       )
-    , elmPackage "MartinSStewart" "elm-serialize" "" (Date.fromCalendarDate 2024 May 25)
+    , elmPackage "MartinSStewart" "elm-serialize" "" (date 2024 May 25) (date 2020 Jul 30)
     , ( "elm-review-elm-ui-upgrade"
       , { name = "elm-review-elm-ui-upgrade"
         , website = Nothing
         , repo = Just "https://github.com/MartinSStewart/elm-review-elm-ui-upgrade"
-        , tags = [ Elm, ElmPackage ]
+        , tags = [ Elm, Complete ]
         , description = ""
-        , lastUpdated = Date.fromCalendarDate 2024 May 25
+        , pageLastUpdated = date 2024 May 25
+        , releasedAt = date 2023 Aug 27
         }
       )
     , ( "lamdera-backend-debugger"
       , { name = "Lamdera backend debugger"
         , website = Just "https://backend-debugger.lamdera.app/"
         , repo = Just "https://github.com/MartinSStewart/lamdera-backend-debugger"
-        , tags = [ Elm, Lamdera ]
+        , tags = [ Elm, Lamdera, Complete ]
         , description = ""
-        , lastUpdated = Date.fromCalendarDate 2024 May 25
+        , pageLastUpdated = date 2024 May 25
+        , releasedAt = date 2023 Jul 20
         }
       )
     , ( "discord-bot"
       , { name = "discord-bot"
         , website = Nothing
         , repo = Nothing
-        , tags = [ Elm, Game ]
+        , tags = [ Elm, Game, Complete ]
         , description = ""
-        , lastUpdated = Date.fromCalendarDate 2024 May 25
+        , pageLastUpdated = date 2024 May 25
+        , releasedAt = date 2020 Mar 21
         }
       )
     , ( "elm-pdf"
@@ -135,53 +157,59 @@ thingsIHaveDone =
         , repo = Just "https://github.com/MartinSStewart/elm-pdf"
         , tags = [ Elm ]
         , description = ""
-        , lastUpdated = Date.fromCalendarDate 2024 May 25
+        , pageLastUpdated = date 2024 May 25
+        , releasedAt = date 2020 Oct 29
         }
       )
-    , elmPackage "MartinSStewart" "send-grid" "" (Date.fromCalendarDate 2024 May 25)
+    , elmPackage "MartinSStewart" "send-grid" "" (date 2024 May 25) (date 2020 Feb 15)
     , ( "postmark-email-client"
       , { name = "Postmark email client"
         , website = Just "https://postmark-email-client.lamdera.app/"
         , repo = Just "https://github.com/MartinSStewart/postmark-email-client"
-        , tags = [ Elm, Lamdera ]
+        , tags = [ Elm, Lamdera, Complete ]
         , description = ""
-        , lastUpdated = Date.fromCalendarDate 2024 May 25
+        , pageLastUpdated = date 2024 May 25
+        , releasedAt = date 2023 Jul 5
         }
       )
     , ( "translation-editor"
-      , { name = "translation-editor"
+      , { name = "Translation editor"
         , website = Just "https://translations-editor.lamdera.app/"
         , repo = Just "https://github.com/MartinSStewart/translation-editor"
-        , tags = [ Elm, Lamdera ]
+        , tags = [ Elm, Lamdera, Complete ]
         , description = ""
-        , lastUpdated = Date.fromCalendarDate 2024 May 25
+        , pageLastUpdated = date 2024 May 25
+        , releasedAt = date 2023 Feb 27
         }
       )
     , ( "elm-map"
       , { name = "elm-map"
         , website = Nothing
         , repo = Just "https://github.com/MartinSStewart/elm-map"
-        , tags = [ Elm, ElmPackage ]
+        , tags = [ Elm ]
         , description = ""
-        , lastUpdated = Date.fromCalendarDate 2024 May 25
+        , pageLastUpdated = date 2024 May 25
+        , releasedAt = date 2023 May 17
         }
       )
     , ( "simple-survey"
       , { name = "simple-survey"
         , website = Just "https://simple-survey.lamdera.app/"
         , repo = Just "https://github.com/MartinSStewart/simple-survey"
-        , tags = [ Elm, Lamdera ]
+        , tags = [ Elm, Lamdera, Complete ]
         , description = ""
-        , lastUpdated = Date.fromCalendarDate 2024 May 25
+        , pageLastUpdated = date 2024 May 25
+        , releasedAt = date 2023 May 21
         }
       )
     , ( "sheep-game"
-      , { name = "sheep-game"
+      , { name = "Sheep game"
         , website = Just "https://sheep-game.lamdera.app/"
         , repo = Just ""
-        , tags = [ Elm, Lamdera ]
+        , tags = [ Elm, Lamdera, Complete ]
         , description = ""
-        , lastUpdated = Date.fromCalendarDate 2024 May 25
+        , pageLastUpdated = date 2024 May 25
+        , releasedAt = date 2022 Jun 13
         }
       )
     , ( "air-hockey-racing"
@@ -190,11 +218,71 @@ thingsIHaveDone =
         , repo = Just ""
         , tags = [ Elm, Lamdera ]
         , description = ""
-        , lastUpdated = Date.fromCalendarDate 2024 May 25
+        , pageLastUpdated = date 2024 May 25
+        , releasedAt = date 2022 Jun 14
+        }
+      )
+    , ( "elm-town-48"
+      , { name = "Elm Town episode 48"
+        , website = Just "https://elm.town/episodes/making-little-games-like-presents"
+        , repo = Just ""
+        , tags = [ Elm, Podcast ]
+        , description = ""
+        , pageLastUpdated = date 2024 May 25
+        , releasedAt = date 2020 Jan 11
+        }
+      )
+    , ( "elm-town-64"
+      , { name = "Elm Town episode 64"
+        , website = Just "https://elm.town/episodes/elm-town-64-the-network-effect"
+        , repo = Just ""
+        , tags = [ Elm, Podcast ]
+        , description = ""
+        , pageLastUpdated = date 2024 May 25
+        , releasedAt = date 2023 Sep 5
+        }
+      )
+    , ( "elm-radio-57"
+      , { name = "Elm Radio episode 57"
+        , website = Just "https://elm-radio.com/episode/state-of-elm-2022"
+        , repo = Just ""
+        , tags = [ Elm, Podcast ]
+        , description = ""
+        , pageLastUpdated = date 2024 May 25
+        , releasedAt = date 2022 May 23
         }
       )
     ]
         |> Dict.fromList
+
+
+{-| Best at the top
+-}
+qualityOrder : List String
+qualityOrder =
+    [ "town-collab"
+    , "ascii-collab"
+    , "meetdown"
+    , "elm-audio"
+    , "elm-serialize"
+    , "discord-bot"
+    , "circuit-breaker"
+    , "elm-map"
+    , "state-of-elm"
+    , "sheep-game"
+    , "air-hockey-racing"
+    , "elm-town-48"
+    , "elm-town-64"
+    , "elm-radio-57"
+    , "send-grid"
+    , "elm-review-elm-ui-upgrade"
+    , "elm-review-bot"
+    , "lamdera-backend-debugger"
+    , "elm-pdf"
+    , "postmark-email-client"
+    , "simple-survey"
+    , "translation-editor"
+    ]
 
 
 type Tag
@@ -202,6 +290,8 @@ type Tag
     | ElmPackage
     | Game
     | Lamdera
+    | Complete
+    | Podcast
 
 
 type alias Thing =
@@ -210,5 +300,7 @@ type alias Thing =
     , repo : Maybe String
     , tags : List Tag
     , description : String
-    , lastUpdated : Date
+    , pageLastUpdated : Date
+    , -- Very imprecise due to it being unclear what counts as "released at". If there isn't a clear release date, pick something that counts as when the thing became usable for or known to several people.
+      releasedAt : Date
     }

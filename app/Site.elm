@@ -16,6 +16,7 @@ config =
 head : BackendTask FatalError (List Head.Tag)
 head =
     [ Head.metaName "viewport" (Head.raw "width=device-width,initial-scale=1")
+    , Head.metaName "apple-mobile-web-app-capable" (Head.raw "content=\"yes\"")
     , Head.sitemapLink "/sitemap.xml"
     ]
         |> BackendTask.succeed

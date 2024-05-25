@@ -100,7 +100,7 @@ view app sharedModel =
         Ui.column
             [ Ui.padding 16 ]
             [ Ui.el [ Ui.Font.size 36 ] (Ui.text thing.name)
-            , Ui.text ("Last updated at " ++ Date.toIsoString thing.lastUpdated)
+            , Ui.text ("Last updated at " ++ Date.toIsoString thing.pageLastUpdated)
             , if app.data.description == "" then
                 Ui.text "TODO"
 
