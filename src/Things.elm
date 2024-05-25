@@ -257,7 +257,7 @@ thingsIHaveDone =
         }
       )
     , ( "elm-town-48"
-      , { name = "Elm Town episode 48"
+      , { name = "Elm Town episode\u{00A0}48"
         , website = Just "https://elm.town/episodes/making-little-games-like-presents"
         , repo = Just ""
         , tags = [ Elm, Podcast ]
@@ -265,11 +265,11 @@ thingsIHaveDone =
         , pageLastUpdated = date 2024 May 25
         , pageCreatedAt = date 2024 May 25
         , releasedAt = date 2020 Jan 11
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/elm-town-preview.png"
         }
       )
     , ( "elm-town-64"
-      , { name = "Elm Town episode 64"
+      , { name = "Elm Town episode\u{00A0}64"
         , website = Just "https://elm.town/episodes/elm-town-64-the-network-effect"
         , repo = Just ""
         , tags = [ Elm, Podcast ]
@@ -277,11 +277,11 @@ thingsIHaveDone =
         , pageLastUpdated = date 2024 May 25
         , pageCreatedAt = date 2024 May 25
         , releasedAt = date 2023 Sep 5
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/elm-town-preview.png"
         }
       )
     , ( "elm-radio-57"
-      , { name = "Elm Radio episode 57"
+      , { name = "Elm Radio episode\u{00A0}57"
         , website = Just "https://elm-radio.com/episode/state-of-elm-2022"
         , repo = Just ""
         , tags = [ Elm, Podcast ]
@@ -289,7 +289,7 @@ thingsIHaveDone =
         , pageLastUpdated = date 2024 May 25
         , pageCreatedAt = date 2024 May 25
         , releasedAt = date 2022 May 23
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/elm-radio-preview.svg"
         }
       )
     ]

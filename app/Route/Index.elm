@@ -143,7 +143,7 @@ head app =
 
 maxColumns : number
 maxColumns =
-    5
+    6
 
 
 contentMaxWidth : number
@@ -158,7 +158,7 @@ pagePadding =
 
 tileWidth : number
 tileWidth =
-    210
+    190
 
 
 tileSpacing : number
