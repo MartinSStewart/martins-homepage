@@ -83,19 +83,15 @@ view :
 view app shared =
     { title = "Martin's homepage"
     , body =
-        [ Ui.layout
-            []
-            (Ui.column
-                [ Ui.spacing 16, Ui.padding 8 ]
-                [ Ui.el
-                    [ Ui.Font.size 32, Ui.Font.bold ]
-                    (Ui.text "Things I've created or done that I don't want to forget")
-                , Ui.row
-                    [ Ui.wrap, Ui.spacing 8 ]
-                    (List.map thingsView (Dict.toList Things.thingsIHaveDone))
-                ]
-            )
-        ]
+        Ui.column
+            [ Ui.spacing 16, Ui.padding 8 ]
+            [ Ui.el
+                [ Ui.Font.size 32, Ui.Font.bold ]
+                (Ui.text "Things I've created or done that I don't want to forget")
+            , Ui.row
+                [ Ui.wrap, Ui.spacing 8 ]
+                (List.map thingsView (Dict.toList Things.thingsIHaveDone))
+            ]
 
     --[ Html.h1 [] [ Html.text "elm-pages is up and running!" ]
     --, Html.p []

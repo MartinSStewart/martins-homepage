@@ -9,6 +9,7 @@ import Pages.Flags
 import Pages.PageUrl exposing (PageUrl)
 import Route exposing (Route)
 import SharedTemplate exposing (SharedTemplate)
+import Ui
 import UrlPath exposing (UrlPath)
 import View exposing (View)
 
@@ -92,6 +93,6 @@ view :
     -> View msg
     -> { body : List (Html msg), title : String }
 view sharedData page model toMsg pageView =
-    { body = [ Html.main_ [] pageView.body ]
+    { body = [ Ui.layout [] pageView.body ]
     , title = pageView.title
     }

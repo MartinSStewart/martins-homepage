@@ -1,11 +1,11 @@
 module Route.Stuff.Slug_ exposing (ActionData, Data, Model, Msg, route)
 
 import BackendTask exposing (BackendTask)
+import Date
 import Dict
 import FatalError exposing (FatalError)
 import Head
 import Head.Seo as Seo
-import Html
 import MarkdownThemed
 import Pages.Url
 import PagesMsg exposing (PagesMsg)
@@ -91,19 +91,20 @@ view :
     -> Shared.Model
     -> View (PagesMsg Msg)
 view app sharedModel =
-    { title = ""
+    let
+        thing =
+            app.data
+    in
+    { title = thing.name
     , body =
-        [ Ui.layout
-            []
-            (Ui.column
-                [ Ui.padding 16 ]
-                [ Ui.el [ Ui.Font.size 36 ] (Ui.text app.data.name)
-                , if app.data.description == "" then
-                    Ui.text "TODO"
+        Ui.column
+            [ Ui.padding 16 ]
+            [ Ui.el [ Ui.Font.size 36 ] (Ui.text thing.name)
+            , Ui.text ("Last updated at " ++ Date.toIsoString thing.lastUpdated)
+            , if app.data.description == "" then
+                Ui.text "TODO"
 
-                  else
-                    MarkdownThemed.renderFull app.data.description
-                ]
-            )
-        ]
+              else
+                MarkdownThemed.renderFull thing.description
+            ]
     }
