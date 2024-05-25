@@ -241,7 +241,7 @@ thingsIHaveDone =
         , pageLastUpdated = date 2024 May 25
         , pageCreatedAt = date 2024 May 25
         , releasedAt = date 2022 Jun 13
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/sheep-game-preview.png"
         }
       )
     , ( "air-hockey-racing"
