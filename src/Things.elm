@@ -1,4 +1,4 @@
-module Things exposing (Tag(..), Thing, tagData, thingsIHaveDone)
+module Things exposing (Tag(..), Thing, qualityOrder, tagData, thingsIHaveDone)
 
 import Date exposing (Date)
 import Dict exposing (Dict)

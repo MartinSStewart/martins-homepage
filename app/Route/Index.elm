@@ -86,7 +86,38 @@ update _ _ msg model =
 
 data : BackendTask FatalError Data
 data =
-    BackendTask.succeed {}
+    let
+        set : Set String
+        set =
+            Set.fromList (Dict.keys Things.thingsIHaveDone)
+
+        set2 : Set String
+        set2 =
+            Set.fromList Things.qualityOrder
+
+        missing : Set String
+        missing =
+            Set.diff set set2
+
+        extra : Set String
+        extra =
+            Set.diff set2 set
+    in
+    case ( Set.isEmpty missing, Set.isEmpty extra ) of
+        ( True, True ) ->
+            BackendTask.succeed {}
+
+        ( False, _ ) ->
+            String.join ", " (Set.toList missing)
+                ++ " are missing from Things.qualityOrder"
+                |> FatalError.fromString
+                |> BackendTask.fail
+
+        ( True, False ) ->
+            String.join ", " (Set.toList extra)
+                ++ " in Things.qualityOrder don't exist in Things.thingsIHaveDone"
+                |> FatalError.fromString
+                |> BackendTask.fail
 
 
 head :
@@ -119,6 +150,7 @@ contentMaxWidth =
     tileWidth * maxColumns + tileSpacing * (maxColumns - 1) + pagePadding * 2
 
 
+pagePadding : number
 pagePadding =
     16
 
@@ -147,13 +179,24 @@ view app shared model =
                 (Array.toList model.filter)
                 |> Set.fromList
 
+        thingsSorted : List ( String, Thing )
         thingsSorted =
             case model.sortBy of
                 Alphabetically ->
                     Dict.toList Things.thingsIHaveDone
 
                 Quality ->
-                    Dict.toList Things.thingsIHaveDone
+                    List.foldl
+                        (\name list ->
+                            case Dict.get name Things.thingsIHaveDone of
+                                Just thing ->
+                                    ( name, thing ) :: list
+
+                                Nothing ->
+                                    list
+                        )
+                        []
+                        Things.qualityOrder
 
                 Chronologically ->
                     Dict.toList Things.thingsIHaveDone
@@ -227,6 +270,7 @@ sorByButtonAttributes selected sortBy =
            )
 
 
+tooltip : String -> Ui.Attribute msg
 tooltip text =
     Ui.htmlAttribute (Html.Attributes.title text)
 
