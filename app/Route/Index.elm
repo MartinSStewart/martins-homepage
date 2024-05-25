@@ -197,6 +197,7 @@ view app shared model =
                         )
                         []
                         Things.qualityOrder
+                        |> List.reverse
 
                 Chronologically ->
                     Dict.toList Things.thingsIHaveDone
