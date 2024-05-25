@@ -20,7 +20,7 @@ manifest : Manifest.Config
 manifest =
     Manifest.init
         { name = "Site Name"
-        , description = "Description"
+        , description = "Martin's personal website"
         , startUrl = Route.Index |> Route.toPath
         , icons = []
         }

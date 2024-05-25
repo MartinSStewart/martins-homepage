@@ -1,14 +1,19 @@
-module Route.Blog.Slug_ exposing (ActionData, Data, Model, Msg, route)
+module Route.Stuff.Slug_ exposing (ActionData, Data, Model, Msg, route)
 
 import BackendTask exposing (BackendTask)
+import Dict
 import FatalError exposing (FatalError)
 import Head
 import Head.Seo as Seo
 import Html
+import MarkdownThemed
 import Pages.Url
 import PagesMsg exposing (PagesMsg)
 import RouteBuilder exposing (App, StatelessRoute)
 import Shared
+import Things exposing (Thing)
+import Ui
+import Ui.Font
 import View exposing (View)
 
 
@@ -37,13 +42,14 @@ route =
 pages : BackendTask FatalError (List RouteParams)
 pages =
     BackendTask.succeed
-        [ { slug = "hello" }
-        ]
+        (List.map
+            (\( name, _ ) -> { slug = name })
+            (Dict.toList Things.thingsIHaveDone)
+        )
 
 
 type alias Data =
-    { something : String
-    }
+    Thing
 
 
 type alias ActionData =
@@ -52,8 +58,12 @@ type alias ActionData =
 
 data : RouteParams -> BackendTask FatalError Data
 data routeParams =
-    BackendTask.map Data
-        (BackendTask.succeed "Hi")
+    case Dict.get routeParams.slug Things.thingsIHaveDone of
+        Just thing ->
+            BackendTask.succeed thing
+
+        Nothing ->
+            BackendTask.fail (FatalError.fromString "Page not found")
 
 
 head :
@@ -62,16 +72,16 @@ head :
 head app =
     Seo.summary
         { canonicalUrlOverride = Nothing
-        , siteName = "elm-pages"
+        , siteName = "Martin's homepage"
         , image =
             { url = Pages.Url.external "TODO"
             , alt = "elm-pages logo"
             , dimensions = Nothing
             , mimeType = Nothing
             }
-        , description = "TODO"
+        , description = app.data.description
         , locale = Nothing
-        , title = "TODO title" -- metadata.title -- TODO
+        , title = app.data.name
         }
         |> Seo.website
 
@@ -81,6 +91,19 @@ view :
     -> Shared.Model
     -> View (PagesMsg Msg)
 view app sharedModel =
-    { title = "Placeholder - Blog.Slug_"
-    , body = [ Html.text "You're on the page Blog.Slug_" ]
+    { title = ""
+    , body =
+        [ Ui.layout
+            []
+            (Ui.column
+                [ Ui.padding 16 ]
+                [ Ui.el [ Ui.Font.size 36 ] (Ui.text app.data.name)
+                , if app.data.description == "" then
+                    Ui.text "TODO"
+
+                  else
+                    MarkdownThemed.renderFull app.data.description
+                ]
+            )
+        ]
     }

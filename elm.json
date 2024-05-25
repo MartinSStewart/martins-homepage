@@ -3,7 +3,9 @@
     "source-directories": [
         "src",
         "app",
-        ".elm-pages"
+        ".elm-pages",
+        "vendored/mdgriffith/elm-ui-2/src",
+        "vendored/mdgriffith/elm-animator-2/src"
     ],
     "elm-version": "0.19.1",
     "dependencies": {
@@ -31,6 +33,7 @@
             "elm-community/result-extra": "2.4.0",
             "jluckyiv/elm-utc-date-strings": "1.0.0",
             "justinmimbs/date": "4.1.0",
+            "mdgriffith/elm-bezier": "1.0.0",
             "mdgriffith/elm-codegen": "4.2.1",
             "miniBill/elm-codec": "2.1.0",
             "noahzgordon/elm-color-extra": "1.0.2",
