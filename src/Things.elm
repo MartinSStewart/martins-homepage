@@ -27,6 +27,9 @@ tagData tag =
         Podcast ->
             { text = "Podcast", color = Ui.rgb 150 74 8, tooltip = "A podcast I've been invited to" }
 
+        GameMaker ->
+            { text = "Game Maker", color = Ui.rgb 182 6 6, tooltip = "Made with Game Maker 7/8/Studio" }
+
 
 type alias TagData =
     { text : String, color : Ui.Color, tooltip : String }
@@ -55,8 +58,13 @@ elmPackage user packageName description lastUpdated releasedAt =
 
 
 date : Int -> Date.Month -> Int -> Date
-date =
-    Date.fromCalendarDate
+date y m d =
+    Date.fromCalendarDate y m d
+
+
+websiteCreatedAt : Date
+websiteCreatedAt =
+    date 2024 Jun 27
 
 
 thingsIHaveDone : Dict String Thing
@@ -67,8 +75,8 @@ thingsIHaveDone =
         , repo = Just "https://github.com/MartinSStewart/town-collab"
         , tags = [ Elm, Game, Lamdera ]
         , description = "A game I've been working on, inspired by an old childrens game called Lego Loco"
-        , pageLastUpdated = date 2024 May 25
-        , pageCreatedAt = date 2024 May 25
+        , pageLastUpdated = websiteCreatedAt
+        , pageCreatedAt = websiteCreatedAt
         , releasedAt = date 2023 Feb 11
         , previewImage = "/discord-bot-preview.png"
         }
@@ -79,8 +87,8 @@ thingsIHaveDone =
         , repo = Just "https://github.com/MartinSStewart/ascii-collab"
         , tags = [ Elm, Game, Lamdera, Complete ]
         , description = "An infinite canvas that people can draw ascii art on together"
-        , pageLastUpdated = date 2024 May 25
-        , pageCreatedAt = date 2024 May 25
+        , pageLastUpdated = websiteCreatedAt
+        , pageCreatedAt = websiteCreatedAt
         , releasedAt = date 2020 Sep 12
         , previewImage = "/discord-bot-preview.png"
         }
@@ -91,8 +99,8 @@ thingsIHaveDone =
         , repo = Just "https://github.com/MartinSStewart/meetdown"
         , tags = [ Elm, Lamdera, Complete ]
         , description = ""
-        , pageLastUpdated = date 2024 May 25
-        , pageCreatedAt = date 2024 May 25
+        , pageLastUpdated = websiteCreatedAt
+        , pageCreatedAt = websiteCreatedAt
         , releasedAt = date 2021 Jun 27
         , previewImage = "/discord-bot-preview.png"
         }
@@ -103,21 +111,21 @@ thingsIHaveDone =
         , repo = Just "https://gitlab.com/MartinSStewart/hackman"
         , tags = [ Elm, Game, Complete ]
         , description = ""
-        , pageLastUpdated = date 2024 May 25
-        , pageCreatedAt = date 2024 May 25
+        , pageLastUpdated = websiteCreatedAt
+        , pageCreatedAt = websiteCreatedAt
         , releasedAt = date 2019 Dec 17
         , previewImage = "/discord-bot-preview.png"
         }
       )
-    , elmPackage "MartinSStewart" "elm-audio" "" (date 2024 May 25) (date 2020 Mar 11)
+    , elmPackage "MartinSStewart" "elm-audio" "" websiteCreatedAt (date 2020 Mar 11)
     , ( "elm-review-bot"
       , { name = "elm-review-bot"
         , website = Nothing
         , repo = Just "https://github.com/MartinSStewart/elm-review-bot"
         , tags = [ Elm, Lamdera ]
         , description = ""
-        , pageLastUpdated = date 2024 May 25
-        , pageCreatedAt = date 2024 May 25
+        , pageLastUpdated = websiteCreatedAt
+        , pageCreatedAt = websiteCreatedAt
         , releasedAt = date 2021 Aug 24
         , previewImage = "/discord-bot-preview.png"
         }
@@ -128,21 +136,21 @@ thingsIHaveDone =
         , repo = Just "https://github.com/MartinSStewart/state-of-elm"
         , tags = [ Elm, Lamdera ]
         , description = ""
-        , pageLastUpdated = date 2024 May 25
-        , pageCreatedAt = date 2024 May 25
+        , pageLastUpdated = websiteCreatedAt
+        , pageCreatedAt = websiteCreatedAt
         , releasedAt = date 2022 May 1
         , previewImage = "/discord-bot-preview.png"
         }
       )
-    , elmPackage "MartinSStewart" "elm-serialize" "" (date 2024 May 25) (date 2020 Jul 30)
+    , elmPackage "MartinSStewart" "elm-serialize" "" websiteCreatedAt (date 2020 Jul 30)
     , ( "elm-review-elm-ui-upgrade"
       , { name = "elm-review-elm-ui-upgrade"
         , website = Nothing
         , repo = Just "https://github.com/MartinSStewart/elm-review-elm-ui-upgrade"
         , tags = [ Elm, Complete ]
         , description = ""
-        , pageLastUpdated = date 2024 May 25
-        , pageCreatedAt = date 2024 May 25
+        , pageLastUpdated = websiteCreatedAt
+        , pageCreatedAt = websiteCreatedAt
         , releasedAt = date 2023 Aug 27
         , previewImage = "/discord-bot-preview.png"
         }
@@ -153,8 +161,8 @@ thingsIHaveDone =
         , repo = Just "https://github.com/MartinSStewart/lamdera-backend-debugger"
         , tags = [ Elm, Lamdera, Complete ]
         , description = ""
-        , pageLastUpdated = date 2024 May 25
-        , pageCreatedAt = date 2024 May 25
+        , pageLastUpdated = websiteCreatedAt
+        , pageCreatedAt = websiteCreatedAt
         , releasedAt = date 2023 Jul 20
         , previewImage = "/discord-bot-preview.png"
         }
@@ -165,8 +173,8 @@ thingsIHaveDone =
         , repo = Nothing
         , tags = [ Elm, Game, Lamdera, Complete ]
         , description = ""
-        , pageLastUpdated = date 2024 May 25
-        , pageCreatedAt = date 2024 May 25
+        , pageLastUpdated = websiteCreatedAt
+        , pageCreatedAt = websiteCreatedAt
         , releasedAt = date 2020 Mar 21
         , previewImage = "/discord-bot-preview.png"
         }
@@ -177,21 +185,21 @@ thingsIHaveDone =
         , repo = Just "https://github.com/MartinSStewart/elm-pdf"
         , tags = [ Elm ]
         , description = ""
-        , pageLastUpdated = date 2024 May 25
-        , pageCreatedAt = date 2024 May 25
+        , pageLastUpdated = websiteCreatedAt
+        , pageCreatedAt = websiteCreatedAt
         , releasedAt = date 2020 Oct 29
         , previewImage = "/discord-bot-preview.png"
         }
       )
-    , elmPackage "MartinSStewart" "send-grid" "" (date 2024 May 25) (date 2020 Feb 15)
+    , elmPackage "MartinSStewart" "send-grid" "" websiteCreatedAt (date 2020 Feb 15)
     , ( "postmark-email-client"
       , { name = "Postmark email client"
         , website = Just "https://postmark-email-client.lamdera.app/"
         , repo = Just "https://github.com/MartinSStewart/postmark-email-client"
         , tags = [ Elm, Lamdera, Complete ]
         , description = ""
-        , pageLastUpdated = date 2024 May 25
-        , pageCreatedAt = date 2024 May 25
+        , pageLastUpdated = websiteCreatedAt
+        , pageCreatedAt = websiteCreatedAt
         , releasedAt = date 2023 Jul 5
         , previewImage = "/discord-bot-preview.png"
         }
@@ -202,8 +210,8 @@ thingsIHaveDone =
         , repo = Just "https://github.com/MartinSStewart/translation-editor"
         , tags = [ Elm, Lamdera, Complete ]
         , description = ""
-        , pageLastUpdated = date 2024 May 25
-        , pageCreatedAt = date 2024 May 25
+        , pageLastUpdated = websiteCreatedAt
+        , pageCreatedAt = websiteCreatedAt
         , releasedAt = date 2023 Feb 27
         , previewImage = "/discord-bot-preview.png"
         }
@@ -214,8 +222,8 @@ thingsIHaveDone =
         , repo = Just "https://github.com/MartinSStewart/elm-map"
         , tags = [ Elm ]
         , description = ""
-        , pageLastUpdated = date 2024 May 25
-        , pageCreatedAt = date 2024 May 25
+        , pageLastUpdated = websiteCreatedAt
+        , pageCreatedAt = websiteCreatedAt
         , releasedAt = date 2023 May 17
         , previewImage = "/discord-bot-preview.png"
         }
@@ -226,8 +234,8 @@ thingsIHaveDone =
         , repo = Just "https://github.com/MartinSStewart/simple-survey"
         , tags = [ Elm, Lamdera, Complete ]
         , description = ""
-        , pageLastUpdated = date 2024 May 25
-        , pageCreatedAt = date 2024 May 25
+        , pageLastUpdated = websiteCreatedAt
+        , pageCreatedAt = websiteCreatedAt
         , releasedAt = date 2023 May 21
         , previewImage = "/discord-bot-preview.png"
         }
@@ -238,8 +246,8 @@ thingsIHaveDone =
         , repo = Just ""
         , tags = [ Elm, Lamdera, Complete ]
         , description = ""
-        , pageLastUpdated = date 2024 May 25
-        , pageCreatedAt = date 2024 May 25
+        , pageLastUpdated = websiteCreatedAt
+        , pageCreatedAt = websiteCreatedAt
         , releasedAt = date 2022 Jun 13
         , previewImage = "/sheep-game-preview.png"
         }
@@ -250,8 +258,8 @@ thingsIHaveDone =
         , repo = Just ""
         , tags = [ Elm, Lamdera ]
         , description = ""
-        , pageLastUpdated = date 2024 May 25
-        , pageCreatedAt = date 2024 May 25
+        , pageLastUpdated = websiteCreatedAt
+        , pageCreatedAt = websiteCreatedAt
         , releasedAt = date 2022 Jun 14
         , previewImage = "/discord-bot-preview.png"
         }
@@ -262,8 +270,8 @@ thingsIHaveDone =
         , repo = Just ""
         , tags = [ Elm, Podcast ]
         , description = ""
-        , pageLastUpdated = date 2024 May 25
-        , pageCreatedAt = date 2024 May 25
+        , pageLastUpdated = websiteCreatedAt
+        , pageCreatedAt = websiteCreatedAt
         , releasedAt = date 2020 Jan 11
         , previewImage = "/elm-town-preview.png"
         }
@@ -274,8 +282,8 @@ thingsIHaveDone =
         , repo = Just ""
         , tags = [ Elm, Podcast ]
         , description = ""
-        , pageLastUpdated = date 2024 May 25
-        , pageCreatedAt = date 2024 May 25
+        , pageLastUpdated = websiteCreatedAt
+        , pageCreatedAt = websiteCreatedAt
         , releasedAt = date 2023 Sep 5
         , previewImage = "/elm-town-preview.png"
         }
@@ -286,10 +294,46 @@ thingsIHaveDone =
         , repo = Just ""
         , tags = [ Elm, Podcast ]
         , description = ""
-        , pageLastUpdated = date 2024 May 25
-        , pageCreatedAt = date 2024 May 25
+        , pageLastUpdated = websiteCreatedAt
+        , pageCreatedAt = websiteCreatedAt
         , releasedAt = date 2022 May 23
         , previewImage = "/elm-radio-preview.svg"
+        }
+      )
+    , ( "vector-rockets"
+      , { name = "Vector Rockets"
+        , website = Nothing
+        , repo = Nothing
+        , tags = [ Game, GameMaker ]
+        , description = ""
+        , pageLastUpdated = websiteCreatedAt
+        , pageCreatedAt = websiteCreatedAt
+        , releasedAt = date 2022 May 23
+        , previewImage = "/game-maker-preview.svg"
+        }
+      )
+    , ( "code-breakers"
+      , { name = "Code Breakers"
+        , website = Nothing
+        , repo = Nothing
+        , tags = [ Game, GameMaker ]
+        , description = ""
+        , pageLastUpdated = websiteCreatedAt
+        , pageCreatedAt = websiteCreatedAt
+        , releasedAt = date 2014 Oct 28
+        , previewImage = "/game-maker-preview.svg"
+        }
+      )
+    , ( "sanctum"
+      , { name = "Sanctum"
+        , website = Nothing
+        , repo = Nothing
+        , tags = [ Game, GameMaker ]
+        , description = ""
+        , pageLastUpdated = websiteCreatedAt
+        , pageCreatedAt = websiteCreatedAt
+        , releasedAt = date 2011 Aug 2
+        , previewImage = "/game-maker-preview.svg"
         }
       )
     ]
@@ -332,6 +376,7 @@ type Tag
     | Lamdera
     | Complete
     | Podcast
+    | GameMaker
 
 
 type alias Thing =
