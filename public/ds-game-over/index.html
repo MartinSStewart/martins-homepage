@@ -1,0 +1,43 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<style media="screen" type="text/css">
+* {margin:0; padding:0; } /* to remove the top and left whitespace */
+
+html, body { width:100%; height:100%; background-color:black;} /* just to be sure these are full screen*/
+
+centerCanvas
+{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  margin-left: -600px;
+  margin-top: -400px;
+  padding: 0px;
+  border: 0px;
+}
+
+offScreenCanvas
+{
+  position: fixed;
+  top: 50%;
+  left: -100%;
+  margin-left: 0px;
+  margin-top: 0px;
+  padding: 0px;
+  border: 0px;
+}
+canvas { display:block; } /* To remove the scrollbars */
+
+</style>
+
+</head>
+<body>
+
+<centerCanvas>
+<canvas id="canvas" width=1200px height=800px>This text is displayed if your browser does not support HTML5 Canvas. Lame!</canvas>
+</centerCanvas>
+<script src="game.js"> </script>
+</body>
+</html>
