@@ -4,10 +4,12 @@ import BackendTask exposing (BackendTask)
 import Effect exposing (Effect)
 import FatalError exposing (FatalError)
 import Html exposing (Html)
+import Html.Attributes
 import Pages.Flags
 import Pages.PageUrl exposing (PageUrl)
 import Route exposing (Route)
 import SharedTemplate exposing (SharedTemplate)
+import Ui
 import Ui.Anim
 import Ui.Responsive
 import UrlPath exposing (UrlPath)
@@ -106,7 +108,12 @@ view sharedData page model toMsg pageView =
             }
             model.uiAnimModel
             []
-            pageView.body
+            (Ui.column
+                []
+                [ header
+                , pageView.body
+                ]
+            )
         ]
     , title = pageView.title
     }
@@ -115,6 +122,26 @@ view sharedData page model toMsg pageView =
 type Breakpoints
     = Mobile
     | NotMobile
+
+
+header =
+    Ui.row
+        [ Ui.background (Ui.rgb 200 200 200) ]
+        [ Ui.el
+            [ Html.Attributes.attribute "elm-pages:prefetch" "" |> Ui.htmlAttribute
+            , Ui.link (Route.toString Route.Index)
+            , Ui.paddingXY 8 4
+            , Ui.width Ui.shrink
+            ]
+            (Ui.text "Martin's homepage")
+
+        --, Ui.el
+        --    [ Html.Attributes.attribute "elm-pages:prefetch" "" |> Ui.htmlAttribute
+        --    , Ui.link (Route.toString Route.AboutMe)
+        --    , Ui.alignRight
+        --    ]
+        --    (Ui.text "About me")
+        ]
 
 
 breakpoints : Ui.Responsive.Breakpoints Breakpoints

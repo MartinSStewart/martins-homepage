@@ -44,11 +44,7 @@ route =
 
 pages : BackendTask FatalError (List RouteParams)
 pages =
-    BackendTask.succeed
-        (List.map
-            (\( name, _ ) -> { slug = name })
-            (Dict.toList Things.thingsIHaveDone)
-        )
+    BackendTask.succeed (List.map (\name -> { slug = name }) Things.qualityOrder)
 
 
 type alias Data =

@@ -13,15 +13,12 @@ import Ui.Prose
 
 render : List Block -> Ui.Element msg
 render blocks =
-    Markdown.Renderer.render renderer blocks
-        |> (\res ->
-                case res of
-                    Ok elements ->
-                        Ui.column [ Ui.spacing 20 ] elements
+    case Markdown.Renderer.render renderer blocks of
+        Ok elements ->
+            Ui.column [ Ui.spacing 20 ] elements
 
-                    Err _ ->
-                        Ui.none
-           )
+        Err _ ->
+            Ui.none
 
 
 renderer : Markdown.Renderer.Renderer (Element msg)
@@ -209,17 +206,3 @@ rawTextToId rawText =
         |> String.toLower
         |> String.replace " " "-"
         |> String.replace "." ""
-
-
-justs : List (Maybe a) -> List a
-justs =
-    List.foldl
-        (\v acc ->
-            case v of
-                Just el ->
-                    el :: acc
-
-                Nothing ->
-                    acc
-        )
-        []

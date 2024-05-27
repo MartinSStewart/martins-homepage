@@ -309,7 +309,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteCreatedAt
         , pageCreatedAt = websiteCreatedAt
         , releasedAt = date 2022 May 23
-        , previewImage = "/game-maker-preview.svg"
+        , previewImage = "/game-maker-preview.png"
         }
       )
     , ( "code-breakers"
@@ -321,7 +321,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteCreatedAt
         , pageCreatedAt = websiteCreatedAt
         , releasedAt = date 2014 Oct 28
-        , previewImage = "/game-maker-preview.svg"
+        , previewImage = "/game-maker-preview.png"
         }
       )
     , ( "sanctum"
@@ -333,7 +333,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteCreatedAt
         , pageCreatedAt = websiteCreatedAt
         , releasedAt = date 2011 Aug 2
-        , previewImage = "/game-maker-preview.svg"
+        , previewImage = "/game-maker-preview.png"
         }
       )
     , ( "tetherball-extreme-zombie-edition"
@@ -345,7 +345,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteCreatedAt
         , pageCreatedAt = websiteCreatedAt
         , releasedAt = date 2012 Mar 3
-        , previewImage = "/game-maker-preview.svg"
+        , previewImage = "/game-maker-preview.png"
         }
       )
     ]
