@@ -2,21 +2,22 @@ module Route.Index exposing (ActionData, Data, Model, Msg, route)
 
 import Array exposing (Array)
 import BackendTask exposing (BackendTask)
-import Date
-import Dict
+import Date exposing (Date)
+import Dict exposing (Dict)
 import Effect exposing (Effect)
 import FatalError exposing (FatalError)
 import Head
 import Head.Seo as Seo
 import Html
 import Html.Attributes
+import Markdown.Block exposing (Block)
 import Pages.Url
 import PagesMsg exposing (PagesMsg)
 import Route
 import RouteBuilder exposing (App, StatelessRoute)
 import Set exposing (Set)
 import Shared exposing (Breakpoints(..))
-import Things exposing (Tag, Thing)
+import Things exposing (Tag)
 import Ui
 import Ui.Font
 import Ui.Input
@@ -46,7 +47,15 @@ type alias RouteParams =
 
 
 type alias Data =
-    {}
+    { thingsIHaveDone : Dict String Thing }
+
+
+type alias Thing =
+    { name : String
+    , tags : List Tag
+    , releasedAt : Date
+    , previewImage : String
+    }
 
 
 type alias ActionData =
@@ -87,6 +96,25 @@ update _ _ msg model =
 
 data : BackendTask FatalError Data
 data =
+    validateQualityOrder
+        |> BackendTask.map
+            (\() ->
+                { thingsIHaveDone =
+                    Dict.map
+                        (\_ thing ->
+                            { name = thing.name
+                            , tags = thing.tags
+                            , releasedAt = thing.releasedAt
+                            , previewImage = thing.previewImage
+                            }
+                        )
+                        Things.thingsIHaveDone
+                }
+            )
+
+
+validateQualityOrder : BackendTask FatalError ()
+validateQualityOrder =
     let
         set : Set String
         set =
@@ -106,7 +134,7 @@ data =
     in
     case ( Set.isEmpty missing, Set.isEmpty extra ) of
         ( True, True ) ->
-            BackendTask.succeed {}
+            BackendTask.succeed ()
 
         ( False, _ ) ->
             String.join ", " (Set.toList missing)
@@ -171,8 +199,11 @@ view :
     -> Shared.Model
     -> Model
     -> View (PagesMsg Msg)
-view app shared model =
+view app _ model =
     let
+        thingsDone =
+            app.data.thingsIHaveDone
+
         filterSet : Set String
         filterSet =
             List.map
@@ -184,12 +215,12 @@ view app shared model =
         thingsSorted =
             case model.sortBy of
                 Alphabetically ->
-                    Dict.toList Things.thingsIHaveDone
+                    Dict.toList thingsDone
 
                 Quality ->
                     List.foldl
                         (\name list ->
-                            case Dict.get name Things.thingsIHaveDone of
+                            case Dict.get name thingsDone of
                                 Just thing ->
                                     ( name, thing ) :: list
 
@@ -201,7 +232,7 @@ view app shared model =
                         |> List.reverse
 
                 Chronologically ->
-                    Dict.toList Things.thingsIHaveDone
+                    Dict.toList thingsDone
                         |> List.sortWith (\( _, a ) ( _, b ) -> Date.compare b.releasedAt a.releasedAt)
 
         filterThings viewFunc ( name, thing ) =

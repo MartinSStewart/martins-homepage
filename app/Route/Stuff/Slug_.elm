@@ -1,17 +1,20 @@
 module Route.Stuff.Slug_ exposing (ActionData, Data, Model, Msg, route)
 
 import BackendTask exposing (BackendTask)
-import Date
+import Date exposing (Date)
 import Dict
 import FatalError exposing (FatalError)
 import Head
 import Head.Seo as Seo
+import Markdown.Block exposing (Block)
+import Markdown.Parser
 import MarkdownThemed
 import Pages.Url
 import PagesMsg exposing (PagesMsg)
+import ParserUtils
 import RouteBuilder exposing (App, StatelessRoute)
 import Shared
-import Things exposing (Thing)
+import Things exposing (Tag)
 import Ui
 import Ui.Font
 import View exposing (View)
@@ -49,7 +52,19 @@ pages =
 
 
 type alias Data =
-    Thing
+    { thing : Thing }
+
+
+type alias Thing =
+    { name : String
+    , website : Maybe String
+    , repo : Maybe String
+    , tags : List Tag
+    , description : List Block
+    , pageLastUpdated : Date
+    , pageCreatedAt : Date
+    , releasedAt : Date
+    }
 
 
 type alias ActionData =
@@ -60,15 +75,29 @@ data : RouteParams -> BackendTask FatalError Data
 data routeParams =
     case Dict.get routeParams.slug Things.thingsIHaveDone of
         Just thing ->
-            BackendTask.succeed thing
+            case Markdown.Parser.parse thing.description of
+                Ok description ->
+                    BackendTask.succeed
+                        { thing =
+                            { name = thing.name
+                            , website = thing.website
+                            , repo = thing.repo
+                            , tags = thing.tags
+                            , description = description
+                            , pageLastUpdated = thing.pageLastUpdated
+                            , pageCreatedAt = thing.pageCreatedAt
+                            , releasedAt = thing.releasedAt
+                            }
+                        }
+
+                Err error ->
+                    FatalError.fromString (ParserUtils.errorsToString "Things.elm" error) |> BackendTask.fail
 
         Nothing ->
             BackendTask.fail (FatalError.fromString "Page not found")
 
 
-head :
-    App Data ActionData RouteParams
-    -> List Head.Tag
+head : App Data ActionData RouteParams -> List Head.Tag
 head app =
     Seo.summary
         { canonicalUrlOverride = Nothing
@@ -79,9 +108,9 @@ head app =
             , dimensions = Nothing
             , mimeType = Nothing
             }
-        , description = app.data.description
+        , description = ""
         , locale = Nothing
-        , title = app.data.name
+        , title = app.data.thing.name
         }
         |> Seo.website
 
@@ -92,19 +121,29 @@ view :
     -> View (PagesMsg Msg)
 view app sharedModel =
     let
+        thing : Thing
         thing =
-            app.data
+            app.data.thing
     in
     { title = thing.name
     , body =
         Ui.column
             [ Ui.padding 16 ]
             [ Ui.el [ Ui.Font.size 36 ] (Ui.text thing.name)
-            , Ui.text ("Last updated at " ++ Date.toIsoString thing.pageLastUpdated)
-            , if app.data.description == "" then
+            , Ui.text
+                ("Created at "
+                    ++ Date.toIsoString thing.pageCreatedAt
+                    ++ (if thing.pageLastUpdated == thing.pageCreatedAt then
+                            ""
+
+                        else
+                            " " ++ "(updated at " ++ Date.toIsoString thing.pageLastUpdated ++ ")"
+                       )
+                )
+            , if List.isEmpty thing.description then
                 Ui.text "TODO"
 
               else
-                MarkdownThemed.renderFull thing.description
+                MarkdownThemed.render thing.description
             ]
     }

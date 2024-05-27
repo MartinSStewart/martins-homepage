@@ -1,10 +1,9 @@
-module MarkdownThemed exposing (renderFull)
+module MarkdownThemed exposing (render)
 
 import Html
 import Html.Attributes
-import Markdown.Block exposing (HeadingLevel(..), ListItem(..))
+import Markdown.Block exposing (Block, HeadingLevel(..), ListItem(..))
 import Markdown.Html
-import Markdown.Parser
 import Markdown.Renderer
 import Ui exposing (Element)
 import Ui.Accessibility
@@ -12,27 +11,16 @@ import Ui.Font
 import Ui.Prose
 
 
-renderFull : String -> Ui.Element msg
-renderFull markdownBody =
-    render renderer markdownBody |> Result.withDefault (Ui.text "Invalid markdown")
+render : List Block -> Ui.Element msg
+render blocks =
+    Markdown.Renderer.render renderer blocks
+        |> (\res ->
+                case res of
+                    Ok elements ->
+                        Ui.column [ Ui.spacing 20 ] elements
 
-
-render : Markdown.Renderer.Renderer (Element msg) -> String -> Result String (Ui.Element msg)
-render chosenRenderer markdownBody =
-    Markdown.Parser.parse markdownBody
-        -- @TODO show markdown parsing errors, i.e. malformed html?
-        |> Result.withDefault []
-        |> (\parsed ->
-                parsed
-                    |> Markdown.Renderer.render chosenRenderer
-                    |> (\res ->
-                            case res of
-                                Ok elements ->
-                                    Ui.column [ Ui.spacing 20 ] elements |> Ok
-
-                                Err err ->
-                                    Err err
-                       )
+                    Err _ ->
+                        Ui.none
            )
 
 
@@ -61,67 +49,66 @@ renderer =
     , hardLineBreak = Ui.html (Html.br [] [])
     , link =
         \{ title, destination } list ->
-            Ui.el
+            Ui.Prose.paragraph
                 [ Ui.link destination
                 , Ui.Font.underline
                 , Ui.Font.color theme.link
                 ]
                 (case title of
                     Maybe.Just title_ ->
-                        Ui.text title_
+                        [ Ui.text title_ ]
 
                     Maybe.Nothing ->
-                        Ui.Prose.paragraph [ Ui.width Ui.shrink ] list
+                        list
                 )
     , image =
         \{ alt, src, title } ->
-            let
-                attrs =
-                    [ title |> Maybe.map (\title_ -> Ui.htmlAttribute (Html.Attributes.attribute "title" title_)) ]
-                        |> justs
-            in
             Ui.image
-                -- Containers now width fill by default (instead of width shrink). I couldn't update that here so I recommend you review these attributes
-                attrs
-                { source = src
-                , description = alt
-                , onLoad = Nothing
-                }
+                (case title of
+                    Just title2 ->
+                        [ Ui.htmlAttribute (Html.Attributes.attribute "title" title2) ]
+
+                    Nothing ->
+                        []
+                )
+                { source = src, description = alt, onLoad = Nothing }
     , unorderedList =
         \items ->
-            Ui.column [ Ui.spacing 15 ]
-                (items
-                    |> List.map
-                        (\listItem ->
-                            case listItem of
-                                ListItem _ children ->
-                                    Ui.row
-                                        [ Ui.spacing 5
-                                        , Ui.paddingWith { top = 0, right = 0, bottom = 0, left = 20 }
-                                        , Ui.wrap
-                                        ]
-                                        [ Ui.Prose.paragraph
-                                            [ Ui.width Ui.shrink, Ui.alignTop ]
-                                            (Ui.text " • " :: children)
-                                        ]
-                        )
+            Ui.column
+                [ Ui.spacing 15 ]
+                (List.map
+                    (\listItem ->
+                        case listItem of
+                            ListItem _ children ->
+                                Ui.row
+                                    [ Ui.spacing 5
+                                    , Ui.paddingWith { top = 0, right = 0, bottom = 0, left = 20 }
+                                    , Ui.wrap
+                                    ]
+                                    [ Ui.Prose.paragraph
+                                        [ Ui.width Ui.shrink, Ui.alignTop ]
+                                        (Ui.text " • " :: children)
+                                    ]
+                    )
+                    items
                 )
     , orderedList =
         \startingIndex items ->
-            Ui.column [ Ui.spacing 15 ]
-                (items
-                    |> List.indexedMap
-                        (\index itemBlocks ->
-                            Ui.row
-                                [ Ui.spacing 5
-                                , Ui.paddingWith { top = 0, right = 0, bottom = 0, left = 20 }
-                                , Ui.wrap
-                                ]
-                                [ Ui.Prose.paragraph
-                                    [ Ui.width Ui.shrink, Ui.alignTop ]
-                                    (Ui.text (String.fromInt (startingIndex + index) ++ ". ") :: itemBlocks)
-                                ]
-                        )
+            Ui.column
+                [ Ui.spacing 15 ]
+                (List.indexedMap
+                    (\index itemBlocks ->
+                        Ui.row
+                            [ Ui.spacing 5
+                            , Ui.paddingWith { top = 0, right = 0, bottom = 0, left = 20 }
+                            , Ui.wrap
+                            ]
+                            [ Ui.Prose.paragraph
+                                [ Ui.width Ui.shrink, Ui.alignTop ]
+                                (Ui.text (String.fromInt (startingIndex + index) ++ ". ") :: itemBlocks)
+                            ]
+                    )
+                    items
                 )
     , codeBlock =
         \{ body } ->
@@ -133,8 +120,7 @@ renderer =
                 , Ui.htmlAttribute (Html.Attributes.class "preserve-white-space")
                 , Ui.scrollableX
                 ]
-                [ Ui.html (Html.text body)
-                ]
+                [ Ui.html (Html.text body) ]
     , thematicBreak = Ui.none
     , table = \children -> Ui.column [] children
     , tableHeader = \children -> Ui.column [ Ui.width Ui.shrink ] children
