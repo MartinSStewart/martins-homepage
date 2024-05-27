@@ -21,8 +21,8 @@ tagData tag =
         Lamdera ->
             { text = "Lamdera", color = Ui.rgb 46 51 53, tooltip = "Created with Lamdera" }
 
-        Complete ->
-            { text = "Complete", color = Ui.rgb 105 22 168, tooltip = "Has reached some sort of 1.0 status. Doesn't necessarily mean there won't be future changes though." }
+        Wip ->
+            { text = "WIP", color = Ui.rgb 105 22 168, tooltip = "Is being worked on" }
 
         Podcast ->
             { text = "Podcast", color = Ui.rgb 150 74 8, tooltip = "A podcast I've been invited to" }
@@ -73,7 +73,7 @@ thingsIHaveDone =
       , { name = "town-collab"
         , website = Just "https://town-collab.app/"
         , repo = Just "https://github.com/MartinSStewart/town-collab"
-        , tags = [ Elm, Game, Lamdera ]
+        , tags = [ Elm, Game, Lamdera, Wip ]
         , description = "A game I've been working on, inspired by an old childrens game called Lego Loco"
         , pageLastUpdated = websiteCreatedAt
         , pageCreatedAt = websiteCreatedAt
@@ -85,7 +85,7 @@ thingsIHaveDone =
       , { name = "ascii-collab"
         , website = Just "https://ascii-collab.app/"
         , repo = Just "https://github.com/MartinSStewart/ascii-collab"
-        , tags = [ Elm, Game, Lamdera, Complete ]
+        , tags = [ Elm, Game, Lamdera ]
         , description = "An infinite canvas that people can draw ascii art on together"
         , pageLastUpdated = websiteCreatedAt
         , pageCreatedAt = websiteCreatedAt
@@ -97,7 +97,7 @@ thingsIHaveDone =
       , { name = "Meetdown"
         , website = Just "https://meetdown.app/"
         , repo = Just "https://github.com/MartinSStewart/meetdown"
-        , tags = [ Elm, Lamdera, Complete ]
+        , tags = [ Elm, Lamdera ]
         , description = ""
         , pageLastUpdated = websiteCreatedAt
         , pageCreatedAt = websiteCreatedAt
@@ -109,7 +109,7 @@ thingsIHaveDone =
       , { name = "Circuit Breaker"
         , website = Just "https://martinsstewart.gitlab.io/hackman/"
         , repo = Just "https://gitlab.com/MartinSStewart/hackman"
-        , tags = [ Elm, Game, Complete ]
+        , tags = [ Elm, Game ]
         , description = ""
         , pageLastUpdated = websiteCreatedAt
         , pageCreatedAt = websiteCreatedAt
@@ -147,7 +147,7 @@ thingsIHaveDone =
       , { name = "elm-review-elm-ui-upgrade"
         , website = Nothing
         , repo = Just "https://github.com/MartinSStewart/elm-review-elm-ui-upgrade"
-        , tags = [ Elm, Complete ]
+        , tags = [ Elm ]
         , description = ""
         , pageLastUpdated = websiteCreatedAt
         , pageCreatedAt = websiteCreatedAt
@@ -159,7 +159,7 @@ thingsIHaveDone =
       , { name = "Lamdera backend debugger"
         , website = Just "https://backend-debugger.lamdera.app/"
         , repo = Just "https://github.com/MartinSStewart/lamdera-backend-debugger"
-        , tags = [ Elm, Lamdera, Complete ]
+        , tags = [ Elm, Lamdera ]
         , description = ""
         , pageLastUpdated = websiteCreatedAt
         , pageCreatedAt = websiteCreatedAt
@@ -171,7 +171,7 @@ thingsIHaveDone =
       , { name = "discord-bot"
         , website = Nothing
         , repo = Nothing
-        , tags = [ Elm, Game, Lamdera, Complete ]
+        , tags = [ Elm, Game, Lamdera ]
         , description = ""
         , pageLastUpdated = websiteCreatedAt
         , pageCreatedAt = websiteCreatedAt
@@ -196,7 +196,7 @@ thingsIHaveDone =
       , { name = "Postmark email client"
         , website = Just "https://postmark-email-client.lamdera.app/"
         , repo = Just "https://github.com/MartinSStewart/postmark-email-client"
-        , tags = [ Elm, Lamdera, Complete ]
+        , tags = [ Elm, Lamdera ]
         , description = ""
         , pageLastUpdated = websiteCreatedAt
         , pageCreatedAt = websiteCreatedAt
@@ -208,7 +208,7 @@ thingsIHaveDone =
       , { name = "Translation editor"
         , website = Just "https://translations-editor.lamdera.app/"
         , repo = Just "https://github.com/MartinSStewart/translation-editor"
-        , tags = [ Elm, Lamdera, Complete ]
+        , tags = [ Elm, Lamdera ]
         , description = ""
         , pageLastUpdated = websiteCreatedAt
         , pageCreatedAt = websiteCreatedAt
@@ -232,7 +232,7 @@ thingsIHaveDone =
       , { name = "simple-survey"
         , website = Just "https://simple-survey.lamdera.app/"
         , repo = Just "https://github.com/MartinSStewart/simple-survey"
-        , tags = [ Elm, Lamdera, Complete ]
+        , tags = [ Elm, Lamdera ]
         , description = ""
         , pageLastUpdated = websiteCreatedAt
         , pageCreatedAt = websiteCreatedAt
@@ -244,7 +244,7 @@ thingsIHaveDone =
       , { name = "Sheep game"
         , website = Just "https://sheep-game.lamdera.app/"
         , repo = Just ""
-        , tags = [ Elm, Lamdera, Complete ]
+        , tags = [ Elm, Lamdera ]
         , description = ""
         , pageLastUpdated = websiteCreatedAt
         , pageCreatedAt = websiteCreatedAt
@@ -329,10 +329,22 @@ thingsIHaveDone =
         , website = Nothing
         , repo = Nothing
         , tags = [ Game, GameMaker ]
-        , description = ""
+        , description = "I created this for the Game Maker Community game jam #3. Everyone had 3 days to make a game themed around the word \"live\". There were 56 entries and I placed 16th."
         , pageLastUpdated = websiteCreatedAt
         , pageCreatedAt = websiteCreatedAt
         , releasedAt = date 2011 Aug 2
+        , previewImage = "/game-maker-preview.svg"
+        }
+      )
+    , ( "tetherball-extreme-zombie-edition"
+      , { name = "Tetherball EXTREME Zombie Edition"
+        , website = Nothing
+        , repo = Nothing
+        , tags = [ Game, GameMaker ]
+        , description = "I finished this before [Sanctum](/stuff/sanctum) but due to it being part of the Game Maker Community Game it didn't get released until later."
+        , pageLastUpdated = websiteCreatedAt
+        , pageCreatedAt = websiteCreatedAt
+        , releasedAt = date 2012 Mar 3
         , previewImage = "/game-maker-preview.svg"
         }
       )
@@ -374,9 +386,9 @@ type Tag
     | ElmPackage
     | Game
     | Lamdera
-    | Complete
     | Podcast
     | GameMaker
+    | Wip
 
 
 type alias Thing =
