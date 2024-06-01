@@ -14,7 +14,7 @@ import PagesMsg exposing (PagesMsg)
 import ParserUtils
 import RouteBuilder exposing (App, StatelessRoute)
 import Shared
-import Things exposing (Tag)
+import Things exposing (Tag, ThingType)
 import Ui
 import Ui.Font
 import View exposing (View)
@@ -54,12 +54,11 @@ type alias Data =
 type alias Thing =
     { name : String
     , website : Maybe String
-    , repo : Maybe String
     , tags : List Tag
     , description : List Block
     , pageLastUpdated : Date
     , pageCreatedAt : Date
-    , releasedAt : Date
+    , thingType : ThingType
     }
 
 
@@ -77,12 +76,11 @@ data routeParams =
                         { thing =
                             { name = thing.name
                             , website = thing.website
-                            , repo = thing.repo
                             , tags = thing.tags
                             , description = description
                             , pageLastUpdated = thing.pageLastUpdated
                             , pageCreatedAt = thing.pageCreatedAt
-                            , releasedAt = thing.releasedAt
+                            , thingType = thing.thingType
                             }
                         }
 

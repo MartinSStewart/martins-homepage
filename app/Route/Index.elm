@@ -17,7 +17,7 @@ import Route
 import RouteBuilder exposing (App, StatelessRoute)
 import Set exposing (Set)
 import Shared exposing (Breakpoints(..))
-import Things exposing (Tag)
+import Things exposing (Tag, ThingType(..))
 import Ui
 import Ui.Font
 import Ui.Input
@@ -53,8 +53,8 @@ type alias Data =
 type alias Thing =
     { name : String
     , tags : List Tag
-    , releasedAt : Date
     , previewImage : String
+    , thingType : ThingType
     }
 
 
@@ -104,8 +104,8 @@ data =
                         (\_ thing ->
                             { name = thing.name
                             , tags = thing.tags
-                            , releasedAt = thing.releasedAt
                             , previewImage = thing.previewImage
+                            , thingType = thing.thingType
                             }
                         )
                         Things.thingsIHaveDone
@@ -137,13 +137,13 @@ validateQualityOrder =
             BackendTask.succeed ()
 
         ( False, _ ) ->
-            String.join ", " (Set.toList missing)
+            String.join ", " (List.map (\a -> "\"" ++ a ++ "\"") (Set.toList missing))
                 ++ " are missing from Things.qualityOrder"
                 |> FatalError.fromString
                 |> BackendTask.fail
 
         ( True, False ) ->
-            String.join ", " (Set.toList extra)
+            String.join ", " (List.map (\a -> "\"" ++ a ++ "\"") (Set.toList extra))
                 ++ " in Things.qualityOrder don't exist in Things.thingsIHaveDone"
                 |> FatalError.fromString
                 |> BackendTask.fail
@@ -194,6 +194,19 @@ tileSpacing =
     8
 
 
+thingDate : Thing -> Date
+thingDate thing =
+    case thing.thingType of
+        JobThing record ->
+            record.startedAt
+
+        OtherThing record ->
+            record.releasedAt
+
+        PodcastThing record ->
+            record.releasedAt
+
+
 view :
     App Data ActionData RouteParams
     -> Shared.Model
@@ -233,7 +246,7 @@ view app _ model =
 
                 Chronologically ->
                     Dict.toList thingsDone
-                        |> List.sortWith (\( _, a ) ( _, b ) -> Date.compare b.releasedAt a.releasedAt)
+                        |> List.sortWith (\( _, a ) ( _, b ) -> Date.compare (thingDate b) (thingDate a))
 
         filterThings viewFunc ( name, thing ) =
             if Set.isEmpty filterSet then
