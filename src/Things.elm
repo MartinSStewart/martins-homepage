@@ -513,14 +513,29 @@ thingsIHaveDone =
                 }
         }
       )
-    , ( "aventyr"
-      , { name = "aventyr"
-        , website = Just "https://www.youtube.com/watch?v=Y_ExX2LT_bw"
-        , tags = [ Game, CSharp ]
+    , ( "enough-portals"
+      , { name = "enough-portals"
+        , website = Nothing
+        , tags = [ Game, GameMaker ]
         , description = ""
         , pageLastUpdated = websiteCreatedAt
         , pageCreatedAt = websiteCreatedAt
         , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2016 Sep 22
+                , repo = Nothing
+                }
+        }
+      )
+    , ( "aventyr"
+      , { name = "aventyr"
+        , website = Just "https://www.youtube.com/watch?v=Y_ExX2LT_bw"
+        , tags = [ Game, CSharp ]
+        , description = "A 2d portal game I worked on and off on for a couple years. Really it was attempt four at a 2d portal game. The first three attempts were in Game Maker (which includes [enough-portals](/stuff/enough-portals)). It wasn't suited to the complexity or performance requirements so eventually I switched to using C#. I never got close to finishing this game but it's largely responsible for teaching me C# and helping me independently realize that inheritence is bad and pure functions and immutable data are good.\n\nThis is where my profile image originated. I picked [an icon](https://thenounproject.com/icon/work-in-progress-42732/) for Aventyr's exe file to indicate that it's a work in progress. Then for some reason I started using that icon for profile images (assuming I can be bothered with setting a profile image)"
+        , pageLastUpdated = websiteCreatedAt
+        , pageCreatedAt = websiteCreatedAt
+        , previewImage = "/profile.png"
         , thingType =
             OtherThing
                 { releasedAt = date 2016 Sep 22
@@ -671,6 +686,7 @@ qualityOrder =
     , "simple-survey"
     , "translation-editor"
     , "starship-corporation"
+    , "enough-portals"
     , "crivia"
     ]
 

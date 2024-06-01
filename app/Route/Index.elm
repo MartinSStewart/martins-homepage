@@ -289,7 +289,7 @@ view app _ model =
             ]
             [ Ui.el
                 [ Ui.Font.size 32, Ui.Font.bold, Ui.Font.lineHeight 1.1 ]
-                (Ui.text "Stuff I've made or done that I don't want to forget")
+                (Ui.text "Stuff I've done that I don't want to forget")
             , Ui.column
                 [ Ui.spacing 8 ]
                 [ filterView model
