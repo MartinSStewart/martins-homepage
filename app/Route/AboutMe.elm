@@ -11,7 +11,11 @@ import Effect
 import FatalError
 import Head
 import Html
+import Markdown.Block exposing (Block)
+import Markdown.Parser
+import MarkdownThemed
 import PagesMsg
+import ParserUtils
 import RouteBuilder
 import Shared
 import Ui
@@ -69,7 +73,7 @@ subscriptions routeParams path shared model =
 
 
 type alias Data =
-    {}
+    { description : List Block }
 
 
 type alias ActionData =
@@ -78,7 +82,16 @@ type alias ActionData =
 
 data : BackendTask.BackendTask FatalError.FatalError Data
 data =
-    BackendTask.succeed {}
+    let
+        descriptionResult =
+            Markdown.Parser.parse "I'm Martin Stewart! I like making things, mostly computer programs, and this website is an attempt at keeping track of stuff that I've made. Some of that stuff is cool, other stuff is [cringey garbage](/stuff/demon-clutched-walkaround) but still worth remembering.\n\nIn order the counter-balance against all the time I spend in front of a computer, I also like biking, jogging, walking, bouldering, and board games (ordered by velocity)"
+    in
+    case descriptionResult of
+        Ok description ->
+            BackendTask.succeed { description = description }
+
+        Err error ->
+            FatalError.fromString (ParserUtils.errorsToString "" error) |> BackendTask.fail
 
 
 head : RouteBuilder.App Data ActionData RouteParams -> List Head.Tag
@@ -92,4 +105,4 @@ view :
     -> Model
     -> View.View (PagesMsg.PagesMsg Msg)
 view app shared model =
-    { title = "About", body = Ui.none }
+    { title = "About me", body = MarkdownThemed.render app.data.description }

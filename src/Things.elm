@@ -39,6 +39,9 @@ tagData tag =
         FSharp ->
             { text = "F#", color = Ui.rgb 55 139 186, tooltip = "Worked with F#" }
 
+        ElmPages ->
+            { text = "Elm", color = Ui.rgb 24 151 218, tooltip = "Anything created with Elm or related to the Elm community" }
+
 
 type alias TagData =
     { text : String, color : Ui.Color, tooltip : String }
@@ -93,8 +96,8 @@ date y m d =
     Date.fromCalendarDate y m d
 
 
-websiteCreatedAt : Date
-websiteCreatedAt =
+websiteReleasedAt : Date
+websiteReleasedAt =
     date 2024 Jun 27
 
 
@@ -105,8 +108,8 @@ thingsIHaveDone =
         , website = Just "https://town-collab.app/"
         , tags = [ Elm, Game, Lamdera ]
         , description = "A game I've been working on, inspired by an old childrens game called Lego Loco"
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             OtherThing
@@ -120,8 +123,8 @@ thingsIHaveDone =
         , website = Just "https://ascii-collab.app/"
         , tags = [ Elm, Game, Lamdera ]
         , description = "An infinite canvas that people can draw ascii art on together"
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             OtherThing
@@ -135,8 +138,8 @@ thingsIHaveDone =
         , website = Just "https://meetdown.app/"
         , tags = [ Elm, Lamdera ]
         , description = ""
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             OtherThing
@@ -150,8 +153,8 @@ thingsIHaveDone =
         , website = Just "https://martinsstewart.gitlab.io/hackman/"
         , tags = [ Elm, Game ]
         , description = ""
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             OtherThing
@@ -160,14 +163,14 @@ thingsIHaveDone =
                 }
         }
       )
-    , elmPackage "MartinSStewart" "elm-audio" "" websiteCreatedAt (date 2020 Mar 11)
+    , elmPackage "MartinSStewart" "elm-audio" "" websiteReleasedAt (date 2020 Mar 11)
     , ( "elm-review-bot"
       , { name = "elm-review-bot"
         , website = Nothing
         , tags = [ Elm, Lamdera ]
         , description = ""
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             OtherThing
@@ -181,8 +184,8 @@ thingsIHaveDone =
         , website = Just "https://state-of-elm.com/2022"
         , tags = [ Elm, Lamdera ]
         , description = ""
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             OtherThing
@@ -191,14 +194,14 @@ thingsIHaveDone =
                 }
         }
       )
-    , elmPackage "MartinSStewart" "elm-serialize" "" websiteCreatedAt (date 2020 Jul 30)
+    , elmPackage "MartinSStewart" "elm-serialize" "" websiteReleasedAt (date 2020 Jul 30)
     , ( "elm-review-elm-ui-upgrade"
       , { name = "elm-review-elm-ui-upgrade"
         , website = Nothing
         , tags = [ Elm ]
         , description = ""
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             OtherThing
@@ -212,8 +215,8 @@ thingsIHaveDone =
         , website = Just "https://backend-debugger.lamdera.app/"
         , tags = [ Elm, Lamdera ]
         , description = ""
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             OtherThing
@@ -227,8 +230,8 @@ thingsIHaveDone =
         , website = Nothing
         , tags = [ Elm, Game, Lamdera ]
         , description = ""
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             OtherThing
@@ -242,8 +245,8 @@ thingsIHaveDone =
         , website = Nothing
         , tags = [ Elm ]
         , description = ""
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             OtherThing
@@ -252,14 +255,14 @@ thingsIHaveDone =
                 }
         }
       )
-    , elmPackage "MartinSStewart" "send-grid" "" websiteCreatedAt (date 2020 Feb 15)
+    , elmPackage "MartinSStewart" "send-grid" "" websiteReleasedAt (date 2020 Feb 15)
     , ( "postmark-email-client"
       , { name = "Postmark email client"
         , website = Just "https://postmark-email-client.lamdera.app/"
         , tags = [ Elm, Lamdera ]
         , description = ""
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             OtherThing
@@ -273,8 +276,8 @@ thingsIHaveDone =
         , website = Just "https://translations-editor.lamdera.app/"
         , tags = [ Elm, Lamdera ]
         , description = ""
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             OtherThing
@@ -288,8 +291,8 @@ thingsIHaveDone =
         , website = Nothing
         , tags = [ Elm ]
         , description = ""
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             OtherThing
@@ -303,8 +306,8 @@ thingsIHaveDone =
         , website = Just "https://simple-survey.lamdera.app/"
         , tags = [ Elm, Lamdera ]
         , description = ""
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             OtherThing
@@ -318,8 +321,8 @@ thingsIHaveDone =
         , website = Just "https://sheep-game.lamdera.app/"
         , tags = [ Elm, Lamdera ]
         , description = ""
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/sheep-game-preview.png"
         , thingType =
             OtherThing
@@ -333,8 +336,8 @@ thingsIHaveDone =
         , website = Just "https://air-hockey-racing.lamdera.app/"
         , tags = [ Elm, Lamdera ]
         , description = ""
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             OtherThing
@@ -348,8 +351,8 @@ thingsIHaveDone =
         , website = Just "https://elm.town/episodes/making-little-games-like-presents"
         , tags = [ Elm, Podcast ]
         , description = ""
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/elm-town-preview.png"
         , thingType = PodcastThing { releasedAt = date 2020 Jan 11 }
         }
@@ -359,8 +362,8 @@ thingsIHaveDone =
         , website = Just "https://elm.town/episodes/elm-town-64-the-network-effect"
         , tags = [ Elm, Podcast ]
         , description = ""
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/elm-town-preview.png"
         , thingType = PodcastThing { releasedAt = date 2023 Sep 5 }
         }
@@ -370,8 +373,8 @@ thingsIHaveDone =
         , website = Just "https://elm-radio.com/episode/state-of-elm-2022"
         , tags = [ Elm, Podcast ]
         , description = ""
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/elm-radio-preview.svg"
         , thingType = PodcastThing { releasedAt = date 2022 May 23 }
         }
@@ -381,8 +384,8 @@ thingsIHaveDone =
         , website = Nothing
         , tags = [ Game, GameMaker ]
         , description = ""
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/game-maker-preview.png"
         , thingType =
             OtherThing
@@ -396,8 +399,8 @@ thingsIHaveDone =
         , website = Nothing
         , tags = [ Game, GameMaker ]
         , description = ""
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/game-maker-preview.png"
         , thingType =
             OtherThing
@@ -411,8 +414,8 @@ thingsIHaveDone =
         , website = Nothing
         , tags = [ Game, GameMaker ]
         , description = "I created this for the Game Maker Community game jam #3. Everyone had 3 days to make a game themed around the word \"live\". There were 56 entries and I placed 16th."
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/game-maker-preview.png"
         , thingType =
             OtherThing
@@ -426,8 +429,8 @@ thingsIHaveDone =
         , website = Nothing
         , tags = [ Game, GameMaker ]
         , description = "I finished this before [Sanctum](/stuff/sanctum) but due to it being part of the Game Maker Community Game it didn't get released until later."
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/game-maker-preview.png"
         , thingType =
             OtherThing
@@ -436,15 +439,15 @@ thingsIHaveDone =
                 }
         }
       )
-    , lamderaPackage "websocket" "" websiteCreatedAt (date 2021 May 16)
-    , lamderaPackage "program-test" "" websiteCreatedAt (date 2021 Jul 7)
+    , lamderaPackage "websocket" "" websiteReleasedAt (date 2021 May 16)
+    , lamderaPackage "program-test" "" websiteReleasedAt (date 2021 Jul 7)
     , ( "making-a-game-with-elm-and-lamdera"
       , { name = "Making a game with Elm and Lamdera"
         , website = Just "https://www.youtube.com/watch?v=pZ_WqwRwwao"
         , tags = [ Game, Elm, Lamdera, Presentation ]
         , description = ""
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             OtherThing
@@ -458,8 +461,8 @@ thingsIHaveDone =
         , website = Just "https://www.youtube.com/watch?v=3Nn5meBieh4"
         , tags = [ Elm, Lamdera, Presentation ]
         , description = ""
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             OtherThing
@@ -473,8 +476,8 @@ thingsIHaveDone =
         , website = Just "https://www.youtube.com/watch?v=o7M0JxgDfhE"
         , tags = [ Elm, Lamdera, Presentation ]
         , description = ""
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             OtherThing
@@ -488,8 +491,8 @@ thingsIHaveDone =
         , website = Just "https://www.youtube.com/watch?v=o7M0JxgDfhE"
         , tags = [ Elm, Lamdera, Presentation ]
         , description = ""
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             OtherThing
@@ -503,8 +506,8 @@ thingsIHaveDone =
         , website = Nothing
         , tags = [ Elm, Presentation ]
         , description = ""
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             OtherThing
@@ -518,8 +521,8 @@ thingsIHaveDone =
         , website = Nothing
         , tags = [ Game, GameMaker ]
         , description = ""
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             OtherThing
@@ -533,8 +536,8 @@ thingsIHaveDone =
         , website = Just "https://www.youtube.com/watch?v=Y_ExX2LT_bw"
         , tags = [ Game, CSharp ]
         , description = "A 2d portal game I worked on and off on for a couple years. Really it was attempt four at a 2d portal game. The first three attempts were in Game Maker (which includes [enough-portals](/stuff/enough-portals)). It wasn't suited to the complexity or performance requirements so eventually I switched to using C#. I never got close to finishing this game but it's largely responsible for teaching me C# and helping me independently realize that inheritence is bad and pure functions and immutable data are good.\n\nThis is where my profile image originated. I picked [an icon](https://thenounproject.com/icon/work-in-progress-42732/) for Aventyr's exe file to indicate that it's a work in progress. Then for some reason I started using that icon for profile images (assuming I can be bothered with setting a profile image)"
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/profile.png"
         , thingType =
             OtherThing
@@ -548,8 +551,8 @@ thingsIHaveDone =
         , website = Just "https://store.steampowered.com/app/292330/Starship_Corporation/"
         , tags = [ Game, GameMaker, Job ]
         , description = ""
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             JobThing
@@ -564,8 +567,8 @@ thingsIHaveDone =
         , website = Just "https://www.cliftonbazaar.games/games.php?game=crivia"
         , tags = [ Game, GameMaker, Job ]
         , description = "A game I was hired to make for a guy named James Clifton. Crivia or Cricket Trivia is a game about answering trivia questions about the sport Cricket. I was only paid like 60 USD for on and off work spanning 3 years so this kind of stretches the definition of a job but I think at the time I was more concerned with experience and resume building. The game was made in Game Maker with a tiny amount of PHP used for saving highscores to James' website."
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             JobThing
@@ -580,8 +583,8 @@ thingsIHaveDone =
         , website = Just "https://www.tretton37.com/"
         , tags = [ CSharp, Elm, Job ]
         , description = ""
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             JobThing
@@ -596,8 +599,8 @@ thingsIHaveDone =
         , website = Just "https://insurello.se/"
         , tags = [ FSharp, Elm, Job ]
         , description = ""
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             JobThing
@@ -612,8 +615,8 @@ thingsIHaveDone =
         , website = Just "https://realia.se/"
         , tags = [ Elm, Lamdera, Job ]
         , description = ""
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             JobThing
@@ -628,14 +631,44 @@ thingsIHaveDone =
         , website = Just "https://ambue.com/"
         , tags = [ Elm, Lamdera, Job ]
         , description = ""
-        , pageLastUpdated = websiteCreatedAt
-        , pageCreatedAt = websiteCreatedAt
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             JobThing
                 { startedAt = date 2023 Aug 15
                 , endedAt = Nothing
                 , elmPercentage = 100
+                }
+        }
+      )
+    , ( "demon-clutched-walkaround"
+      , { name = "Demon Clutched walkaround"
+        , website = Just "https://ambue.com/"
+        , tags = [ Game, GameMaker ]
+        , description = ""
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2012 Oct 5
+                , repo = Nothing
+                }
+        }
+      )
+    , ( "this-website"
+      , { name = "This website!"
+        , website = Just "https://martinstewart.dev/"
+        , tags = [ Elm, ElmPages ]
+        , description = ""
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = websiteReleasedAt
+                , repo = Just "https://github.com/MartinSStewart/martins-homepage"
                 }
         }
       )
@@ -649,6 +682,7 @@ qualityOrder : List String
 qualityOrder =
     [ "ascii-collab"
     , "ambue"
+    , "this-website"
     , "meetdown"
     , "town-collab"
     , "elm-audio"
@@ -675,6 +709,7 @@ qualityOrder =
     , "code-breakers"
     , "send-grid"
     , "elm-audio-presentation"
+    , "demon-clutched-walkaround"
     , "tetherball-extreme-zombie-edition"
     , "sanctum"
     , "elm-review-elm-ui-upgrade"
@@ -694,6 +729,7 @@ qualityOrder =
 type Tag
     = Elm
     | ElmPackage
+    | ElmPages
     | Game
     | Lamdera
     | Podcast

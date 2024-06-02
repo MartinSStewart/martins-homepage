@@ -146,16 +146,10 @@ header =
         , Ui.el
             [ Ui.alignRight
             , Ui.paddingXY 8 2
+            , Html.Attributes.attribute "elm-pages:prefetch" "" |> Ui.htmlAttribute
             , Ui.link (Route.toString Route.AboutMe)
             ]
             (Ui.text "About me")
-
-        --, Ui.el
-        --    [ Html.Attributes.attribute "elm-pages:prefetch" "" |> Ui.htmlAttribute
-        --    , Ui.link (Route.toString Route.AboutMe)
-        --    , Ui.alignRight
-        --    ]
-        --    (Ui.text "About me")
         ]
 
 
