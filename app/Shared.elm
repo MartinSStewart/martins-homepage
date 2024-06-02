@@ -111,7 +111,7 @@ view sharedData page model toMsg pageView =
             []
             (Ui.column
                 []
-                [ header
+                [ header page.route
                 , Ui.el
                     [ Ui.widthMax contentMaxWidth
                     , Ui.centerX
@@ -164,16 +164,30 @@ type Breakpoints
     | NotMobile
 
 
-header : Ui.Element msg
-header =
+header : Maybe Route -> Ui.Element msg
+header maybeRoute =
     Ui.row
         [ Ui.background (Ui.rgb 0 0 0), Ui.Font.bold, Ui.Font.color (Ui.rgb 255 255 255) ]
         [ Ui.row
             [ Html.Attributes.attribute "elm-pages:prefetch" "" |> Ui.htmlAttribute
             , Ui.link (Route.toString Route.Index)
-            , Ui.paddingXY 8 2
+            , Ui.Responsive.paddingXY
+                breakpoints
+                (\label ->
+                    case label of
+                        Mobile ->
+                            { x = Ui.Responsive.value 8, y = Ui.Responsive.value 2 }
+
+                        NotMobile ->
+                            { x = Ui.Responsive.value 16, y = Ui.Responsive.value 2 }
+                )
             , Ui.width Ui.shrink
             , Ui.spacing 4
+            , if maybeRoute == Just Route.Index then
+                Ui.Font.underline
+
+              else
+                Ui.noAttr
             ]
             [ Ui.image [ Ui.width (Ui.px 26) ]
                 { source = "/profile.png"
@@ -184,9 +198,23 @@ header =
             ]
         , Ui.el
             [ Ui.alignRight
-            , Ui.paddingXY 8 2
+            , Ui.Responsive.paddingXY
+                breakpoints
+                (\label ->
+                    case label of
+                        Mobile ->
+                            { x = Ui.Responsive.value 8, y = Ui.Responsive.value 2 }
+
+                        NotMobile ->
+                            { x = Ui.Responsive.value 16, y = Ui.Responsive.value 2 }
+                )
             , Html.Attributes.attribute "elm-pages:prefetch" "" |> Ui.htmlAttribute
             , Ui.link (Route.toString Route.AboutMe)
+            , if maybeRoute == Just Route.AboutMe then
+                Ui.Font.underline
+
+              else
+                Ui.noAttr
             ]
             (Ui.text "About me")
         ]
