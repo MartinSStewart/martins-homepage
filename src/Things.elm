@@ -260,7 +260,7 @@ thingsIHaveDone =
         }
       )
     , elmPackage "MartinSStewart" "send-grid" "" websiteReleasedAt (date 2020 Feb 15)
-    , elmPackage "MartinSStewart" "elm-bayer-matrix" "A package for generating [bayer matrices](https://en.wikipedia.org/wiki/Ordered_dithering). These are useful for producing a dithering effect for partially transparent images. I used it for [surface-voyage](/stuff/surface-voyage) to fade out objects tooo close to the camera. That said, in hindsight it was silly to make a package for 50 lines of code though." websiteReleasedAt (date 2020 Feb 15)
+    , elmPackage "MartinSStewart" "elm-bayer-matrix" "A package for generating [bayer matrices](https://en.wikipedia.org/wiki/Ordered_dithering). These are useful for producing a dithering effect for partially transparent images. I used it for [surface-voyage](/stuff/surface-voyage) to fade out objects too close to the camera. That said, in hindsight it was silly to make a package for 50 lines of code though." websiteReleasedAt (date 2020 Feb 15)
     , elmPackage "MartinSStewart" "elm-box-packing" "" websiteReleasedAt (date 2020 Apr 25)
     , elmPackage "MartinSStewart" "elm-codec-bytes" "" websiteReleasedAt (date 2020 Feb 15)
     , elmPackage "MartinSStewart" "elm-geometry-serialize" "" websiteReleasedAt (date 2020 Jul 31)
