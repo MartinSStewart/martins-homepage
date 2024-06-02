@@ -2,6 +2,7 @@ module Things exposing (Tag(..), Thing, ThingType(..), qualityOrder, tagData, th
 
 import Date exposing (Date)
 import Dict exposing (Dict)
+import Set exposing (Set)
 import Time exposing (Month(..))
 import Ui
 
@@ -28,7 +29,7 @@ tagData tag =
             { text = "Game Maker", color = Ui.rgb 182 6 6, tooltip = "Made with Game Maker 7/8/Studio" }
 
         Presentation ->
-            { text = "Presentation", color = Ui.rgb 168 168 0, tooltip = "Presented to a live audience" }
+            { text = "Presentation", color = Ui.rgb 120 168 0, tooltip = "Presented to a live audience" }
 
         Job ->
             { text = "Job", color = Ui.rgb 168 116 116, tooltip = "Full time or part time job" }
@@ -40,7 +41,10 @@ tagData tag =
             { text = "F#", color = Ui.rgb 55 139 186, tooltip = "Worked with F#" }
 
         ElmPages ->
-            { text = "Elm", color = Ui.rgb 24 151 218, tooltip = "Anything created with Elm or related to the Elm community" }
+            { text = "elm-pages", color = Ui.rgb 24 151 218, tooltip = "Anything created with Elm or related to the Elm community" }
+
+        Javascript ->
+            { text = "JavaScript", color = Ui.rgb 217 197 70, tooltip = "Made using JavaScript" }
 
 
 type alias TagData =
@@ -256,6 +260,11 @@ thingsIHaveDone =
         }
       )
     , elmPackage "MartinSStewart" "send-grid" "" websiteReleasedAt (date 2020 Feb 15)
+    , elmPackage "MartinSStewart" "elm-bayer-matrix" "A package for generating [bayer matrices](https://en.wikipedia.org/wiki/Ordered_dithering). These are useful for producing a dithering effect for partially transparent images. I used it for [surface-voyage](/stuff/surface-voyage) to fade out objects tooo close to the camera. That said, in hindsight it was silly to make a package for 50 lines of code though." websiteReleasedAt (date 2020 Feb 15)
+    , elmPackage "MartinSStewart" "elm-box-packing" "" websiteReleasedAt (date 2020 Apr 25)
+    , elmPackage "MartinSStewart" "elm-codec-bytes" "" websiteReleasedAt (date 2020 Feb 15)
+    , elmPackage "MartinSStewart" "elm-geometry-serialize" "" websiteReleasedAt (date 2020 Jul 31)
+    , elmPackage "MartinSStewart" "elm-nonempty-string" "" websiteReleasedAt (date 2020 Feb 15)
     , ( "postmark-email-client"
       , { name = "Postmark email client"
         , website = Just "https://postmark-email-client.lamdera.app/"
@@ -471,8 +480,8 @@ thingsIHaveDone =
                 }
         }
       )
-    , ( "hobby-scale-making-web-apps-with-minimal-fuss-func-prog-sweden"
-      , { name = "Hobby scale: making web apps with minimal fuss (Func Prog Sweden)"
+    , ( "hobby-scale-func-prog-sweden"
+      , { name = "Hobby scale (Func\u{00A0}Prog\u{00A0}Sweden)"
         , website = Just "https://www.youtube.com/watch?v=o7M0JxgDfhE"
         , tags = [ Elm, Lamdera, Presentation ]
         , description = ""
@@ -486,8 +495,8 @@ thingsIHaveDone =
                 }
         }
       )
-    , ( "hobby-scale-making-web-apps-with-minimal-fuss-goto-aarhus"
-      , { name = "Hobby scale: making web apps with minimal fuss (GOTO Aarhus)"
+    , ( "hobby-scale-goto-aarhus"
+      , { name = "Hobby scale (GOTO\u{00A0}Aarhus)"
         , website = Just "https://www.youtube.com/watch?v=o7M0JxgDfhE"
         , tags = [ Elm, Lamdera, Presentation ]
         , description = ""
@@ -672,6 +681,186 @@ thingsIHaveDone =
                 }
         }
       )
+    , ( "culminating-game"
+      , { name = "Culminating game"
+        , website = Nothing
+        , tags = [ Game, GameMaker ]
+        , description = ""
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2010 Mar 10
+                , repo = Nothing
+                }
+        }
+      )
+    , ( "ds-game-over"
+      , { name = "DS game over"
+        , website = Nothing
+        , tags = [ Javascript ]
+        , description = ""
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2014 Mar 1
+                , repo = Nothing
+                }
+        }
+      )
+    , ( "fake-key-gen"
+      , { name = "Fake key gen"
+        , website = Nothing
+        , tags = [ GameMaker ]
+        , description = ""
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2014 Mar 1
+                , repo = Nothing
+                }
+        }
+      )
+    , ( "stewart-everybody-net"
+      , { name = "stewart-everybody.net"
+        , website = Nothing
+        , tags = [ Javascript ]
+        , description = ""
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2015 Mar 5
+                , repo = Nothing
+                }
+        }
+      )
+    , ( "surface-voyage"
+      , { name = "Surface voyage"
+        , website = Nothing
+        , tags = [ Elm, Game ]
+        , description = ""
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2020 Jan 14
+                , repo = Just "https://gitlab.com/MartinSStewart/surface-voyage"
+                }
+        }
+      )
+    , ( "gmc-jam-7-animation"
+      , { name = "GMC jam 7 animation"
+        , website = Nothing
+        , tags = [ Game, GameMaker ]
+        , description = ""
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2012 Jul 30
+                , repo = Nothing
+                }
+        }
+      )
+    , ( "german-game"
+      , { name = "German game"
+        , website = Nothing
+        , tags = [ Game, GameMaker ]
+        , description = ""
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2012 Jun 8
+                , repo = Nothing
+                }
+        }
+      )
+    , ( "zig-zag"
+      , { name = "Zig Zag"
+        , website = Nothing
+        , tags = [ Game, GameMaker ]
+        , description = ""
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2012 Jun 25
+                , repo = Nothing
+                }
+        }
+      )
+    , ( "hyperboggling"
+      , { name = "Hyperboggling"
+        , website = Nothing
+        , tags = [ Game, GameMaker ]
+        , description = ""
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2014 Feb 5
+                , repo = Nothing
+                }
+        }
+      )
+    , ( "minmacro"
+      , { name = "Minmacro"
+        , website = Nothing
+        , tags = [ Game, GameMaker ]
+        , description = ""
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2011 Jun 25
+                , repo = Nothing
+                }
+        }
+      )
+    , ( "break-the-facade"
+      , { name = "Break the facade"
+        , website = Nothing
+        , tags = [ Game, GameMaker ]
+        , description = ""
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2012 Jan 30
+                , repo = Nothing
+                }
+        }
+      )
+    , ( "secret-santa-game"
+      , { name = "Secret santa game"
+        , website = Nothing
+        , tags = [ Game, GameMaker ]
+        , description = "I participated in a secret santa event where everyone made a little game for another randomly chosen participant. This is the game I made and in my opinion it's the has by far the highest fun to effort ratio of anything I've ever made."
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2015 Mar 7
+                , repo = Nothing
+                }
+        }
+      )
     ]
         |> Dict.fromList
 
@@ -692,26 +881,34 @@ qualityOrder =
     , "circuit-breaker"
     , "realia"
     , "elm-map"
+    , "elm-codec-bytes"
+    , "break-the-facade"
     , "state-of-elm"
     , "sheep-game"
+    , "secret-santa-game"
     , "air-hockey-racing"
     , "lamdera-websocket"
-    , "hobby-scale-making-web-apps-with-minimal-fuss-goto-aarhus"
+    , "elm-geometry-serialize"
+    , "hobby-scale-goto-aarhus"
     , "making-a-game-with-elm-and-lamdera"
     , "elm-town-48"
     , "elm-town-64"
     , "elm-radio-57"
+    , "elm-nonempty-string"
     , "insurello"
     , "tretton37"
     , "aventyr"
-    , "hobby-scale-making-web-apps-with-minimal-fuss-func-prog-sweden"
+    , "hobby-scale-func-prog-sweden"
+    , "zig-zag"
     , "vector-rockets"
     , "code-breakers"
+    , "surface-voyage"
     , "send-grid"
+    , "ds-game-over"
+    , "elm-box-packing"
     , "elm-audio-presentation"
     , "demon-clutched-walkaround"
     , "tetherball-extreme-zombie-edition"
-    , "sanctum"
     , "elm-review-elm-ui-upgrade"
     , "elm-review-bot"
     , "lamdera-backend-debugger"
@@ -721,8 +918,17 @@ qualityOrder =
     , "simple-survey"
     , "translation-editor"
     , "starship-corporation"
+    , "sanctum"
+    , "culminating-game"
+    , "stewart-everybody-net"
+    , "german-game"
+    , "elm-bayer-matrix"
+    , "fake-key-gen"
     , "enough-portals"
+    , "hyperboggling"
     , "crivia"
+    , "gmc-jam-7-animation"
+    , "minmacro"
     ]
 
 
@@ -738,6 +944,7 @@ type Tag
     | Job
     | CSharp
     | FSharp
+    | Javascript
 
 
 type alias Thing =
