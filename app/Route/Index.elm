@@ -169,31 +169,6 @@ head app =
         |> Seo.website
 
 
-maxColumns : number
-maxColumns =
-    6
-
-
-contentMaxWidth : number
-contentMaxWidth =
-    tileWidth * maxColumns + tileSpacing * (maxColumns - 1) + pagePadding * 2
-
-
-pagePadding : number
-pagePadding =
-    16
-
-
-tileWidth : number
-tileWidth =
-    190
-
-
-tileSpacing : number
-tileSpacing =
-    8
-
-
 thingDate : Thing -> Date
 thingDate thing =
     case thing.thingType of
@@ -274,18 +249,7 @@ view app _ model =
     , body =
         Ui.column
             [ Ui.spacing 16
-            , Ui.Responsive.padding
-                Shared.breakpoints
-                (\label ->
-                    case label of
-                        Mobile ->
-                            Ui.Responsive.value 8
-
-                        NotMobile ->
-                            Ui.Responsive.value pagePadding
-                )
-            , Ui.widthMax contentMaxWidth
-            , Ui.centerX
+            , Ui.paddingXY 0 16
             ]
             [ Ui.el
                 [ Ui.Font.size 32, Ui.Font.bold, Ui.Font.lineHeight 1.1 ]
@@ -295,13 +259,13 @@ view app _ model =
                 [ filterView model
                 , Ui.row
                     [ Ui.wrap
-                    , Ui.spacing tileSpacing
+                    , Ui.spacing Shared.tileSpacing
                     , Ui.contentCenterX
                     , Ui.Responsive.visible Shared.breakpoints [ NotMobile ]
                     ]
                     (List.filterMap (filterThings thingsViewNotMobile) thingsSorted)
                 , Ui.column
-                    [ Ui.spacing tileSpacing
+                    [ Ui.spacing Shared.tileSpacing
                     , Ui.Responsive.visible Shared.breakpoints [ Mobile ]
                     ]
                     (List.filterMap (filterThings thingsViewMobile) thingsSorted)
@@ -435,7 +399,7 @@ thingsViewMobile ( name, thing ) =
 thingsViewNotMobile : ( String, Thing ) -> Ui.Element Msg
 thingsViewNotMobile ( name, thing ) =
     Ui.column
-        [ Ui.width (Ui.px tileWidth)
+        [ Ui.width (Ui.px Shared.tileWidth)
         , containerBackground
         , Ui.borderColor containerBorder
         , Ui.border 1

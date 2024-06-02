@@ -1,4 +1,4 @@
-module Shared exposing (Breakpoints(..), Data, Model, Msg(..), SharedMsg(..), breakpoints, template)
+module Shared exposing (Breakpoints(..), Data, Model, Msg(..), SharedMsg(..), breakpoints, template, tileSpacing, tileWidth)
 
 import BackendTask exposing (BackendTask)
 import Effect exposing (Effect)
@@ -112,12 +112,51 @@ view sharedData page model toMsg pageView =
             (Ui.column
                 []
                 [ header
-                , pageView.body
+                , Ui.el
+                    [ Ui.widthMax contentMaxWidth
+                    , Ui.centerX
+                    , Ui.Responsive.paddingXY
+                        breakpoints
+                        (\label ->
+                            case label of
+                                Mobile ->
+                                    { x = Ui.Responsive.value 8, y = Ui.Responsive.value 0 }
+
+                                NotMobile ->
+                                    { x = Ui.Responsive.value pagePadding, y = Ui.Responsive.value 0 }
+                        )
+                    ]
+                    pageView.body
                 ]
             )
         ]
     , title = pageView.title
     }
+
+
+maxColumns : number
+maxColumns =
+    6
+
+
+contentMaxWidth : number
+contentMaxWidth =
+    tileWidth * maxColumns + tileSpacing * (maxColumns - 1) + pagePadding * 2
+
+
+pagePadding : number
+pagePadding =
+    16
+
+
+tileWidth : number
+tileWidth =
+    190
+
+
+tileSpacing : number
+tileSpacing =
+    8
 
 
 type Breakpoints
@@ -155,4 +194,4 @@ header =
 
 breakpoints : Ui.Responsive.Breakpoints Breakpoints
 breakpoints =
-    Ui.Responsive.breakpoints Mobile [ ( 500, NotMobile ) ]
+    Ui.Responsive.breakpoints Mobile [ ( 550, NotMobile ) ]
