@@ -108,19 +108,20 @@ view sharedData page model toMsg pageView =
             , breakpoints = Just breakpoints
             }
             model.uiAnimModel
-            []
+            [ Ui.height Ui.fill ]
             (Ui.column
-                []
+                [ Ui.height Ui.fill ]
                 [ header page.route
                 , Ui.el
                     [ Ui.widthMax contentMaxWidth
                     , Ui.centerX
+                    , Ui.height Ui.fill
                     , Ui.Responsive.paddingXY
                         breakpoints
                         (\label ->
                             case label of
                                 Mobile ->
-                                    { x = Ui.Responsive.value 8, y = Ui.Responsive.value 0 }
+                                    { x = Ui.Responsive.value 0, y = Ui.Responsive.value 0 }
 
                                 NotMobile ->
                                     { x = Ui.Responsive.value pagePadding, y = Ui.Responsive.value 0 }

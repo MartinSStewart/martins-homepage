@@ -38,7 +38,7 @@ renderer =
                 ]
                 children
     , html = Markdown.Html.oneOf []
-    , text = \s -> Ui.el [ Ui.width Ui.shrink ] (Ui.text s)
+    , text = \s -> Ui.el [ Ui.width Ui.shrink, Ui.Font.size 18 ] (Ui.text s)
     , codeSpan =
         \content -> Ui.html (Html.code [] [ Html.text content ])
     , strong = \list -> Ui.Prose.paragraph [ Ui.width Ui.shrink, Ui.Font.bold ] list

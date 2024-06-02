@@ -87,7 +87,7 @@ data : BackendTask.BackendTask FatalError.FatalError Data
 data =
     let
         descriptionResult =
-            Markdown.Parser.parse "I'm Martin Stewart! I like making things, mostly computer programs, and this website is an attempt at keeping track of stuff that I've made. Some of that stuff is [cool](/stuff/circuit-breaker), other stuff is [cringey garbage](/stuff/demon-clutched-walkaround) but worth remembering anyway.\n\nI also like biking, jogging, walking, bouldering, and board games (ordered by velocity).\n\nIf you want to say hello, I'm Martin Stewart on Elm Slack and [MartinS](https://discourse.elm-lang.org/u/martins) on Elm Discourse."
+            Markdown.Parser.parse "I'm Martin Stewart! I'm a Swedish American (American Swede?) living in Stockholm.\n\nI like making things, mostly computer programs, and this website is an attempt at keeping track of stuff that I've made. Some of that stuff is [cool](/stuff/circuit-breaker), other stuff is [cringey garbage](/stuff/demon-clutched-walkaround) but worth remembering anyway.\n\nI also like biking, jogging, walking, bouldering, and board games (ordered by velocity).\n\nIf you want to say hello, I'm Martin Stewart on Elm Slack and [MartinS](https://discourse.elm-lang.org/u/martins) on Elm Discourse."
     in
     case descriptionResult of
         Ok description ->
@@ -111,34 +111,41 @@ view app shared model =
     { title = "About me"
     , body =
         Ui.row
-            [ Ui.widthMax 1000, Ui.centerX, Ui.contentTop ]
-            [ Ui.el
-                [ Ui.width Ui.fill ]
-                (Ui.image
-                    [ Ui.widthMin 250
-                    , Ui.Responsive.visible Shared.breakpoints [ NotMobile ]
+            [ Ui.widthMax 1000, Ui.centerX, Ui.contentTop, Ui.height Ui.fill ]
+            [ Ui.image
+                [ Ui.widthMin 250
+                , Ui.Responsive.visible Shared.breakpoints [ NotMobile ]
+                ]
+                { source = "/about-me.jpg"
+                , description = "A photo of me pretending to steal a bag of money from someone's house"
+                , onLoad = Nothing
+                }
+            , Ui.column
+                [ Ui.spacing 64, Ui.height Ui.fill ]
+                [ Ui.column
+                    [ Ui.Responsive.paddingXY
+                        Shared.breakpoints
+                        (\label ->
+                            case label of
+                                Mobile ->
+                                    { x = Ui.Responsive.value 8, y = Ui.Responsive.value 16 }
+
+                                NotMobile ->
+                                    { x = Ui.Responsive.value 0, y = Ui.Responsive.value 32 }
+                        )
+                    , Ui.spacing 16
                     ]
-                    { source = "/about-me.jpg"
+                    [ Ui.el [ Ui.Font.size 32, Ui.Font.bold, Ui.Font.lineHeight 1.1 ] (Ui.text "About me")
+                    , MarkdownThemed.render app.data.description
+                    ]
+                , Ui.image
+                    [ Ui.Responsive.visible Shared.breakpoints [ Mobile ]
+                    , Ui.alignBottom
+                    ]
+                    { source = "/about-me-mobile.jpg"
                     , description = "A photo of me pretending to steal a bag of money from someone's house"
                     , onLoad = Nothing
                     }
-                )
-            , Ui.column
-                [ Ui.spacing 16
-                , Ui.Responsive.paddingXY
-                    Shared.breakpoints
-                    (\label ->
-                        case label of
-                            Mobile ->
-                                { x = Ui.Responsive.value 0, y = Ui.Responsive.value 16 }
-
-                            NotMobile ->
-                                { x = Ui.Responsive.value 0, y = Ui.Responsive.value 32 }
-                    )
-                , Ui.width Ui.fill
-                ]
-                [ Ui.el [ Ui.Font.size 32, Ui.Font.bold, Ui.Font.lineHeight 1.1 ] (Ui.text "About me")
-                , MarkdownThemed.render app.data.description
                 ]
             ]
     }

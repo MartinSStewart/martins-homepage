@@ -249,7 +249,16 @@ view app _ model =
     , body =
         Ui.column
             [ Ui.spacing 16
-            , Ui.paddingXY 0 16
+            , Ui.Responsive.paddingXY
+                Shared.breakpoints
+                (\label ->
+                    case label of
+                        Mobile ->
+                            { x = Ui.Responsive.value 8, y = Ui.Responsive.value 16 }
+
+                        NotMobile ->
+                            { x = Ui.Responsive.value 16, y = Ui.Responsive.value 16 }
+                )
             ]
             [ Ui.el
                 [ Ui.Font.size 32, Ui.Font.bold, Ui.Font.lineHeight 1.1 ]
