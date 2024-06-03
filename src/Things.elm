@@ -835,7 +835,7 @@ thingsIHaveDone =
       , { name = "Break the facade"
         , website = Nothing
         , tags = [ Game, GameMaker ]
-        , description = ""
+        , description = "A game I made for the 5th Game Maker Community game jam (aka GMC Jam). We had 3 days to make a game themed around the word \"facade\". [Last time I participated](/stuff/sanctum) I got 16th place, but this time I tied for 1st! As a result, I won a Mr. Karoshi tshirt ![Mr. Karoshi is a puzzle game where you help an office worker kill themselves](/break-the-facade/mr-karoshi.jpg), a coffee mug with YoYo Games branding, and free copy of Game Maker Studio pro (which let me export games to HTML5)!"
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
@@ -851,6 +851,21 @@ thingsIHaveDone =
         , website = Nothing
         , tags = [ Game, GameMaker ]
         , description = "I participated in a secret santa event where everyone made a little game for another randomly chosen participant. This is the game I made and in my opinion it's the has by far the highest fun to effort ratio of anything I've ever made."
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2015 Mar 7
+                , repo = Nothing
+                }
+        }
+      )
+    , ( "ssrpg"
+      , { name = "SSRPG"
+        , website = Nothing
+        , tags = [ Game, GameMaker ]
+        , description = "I tried making a hex grid based fire emblem style game with a friend who went by the name SS (no, not *that* SS). Another friend named FQ drew the hex grid art. Unfortunately for them, I didn't get very far with this. Just a very basic turn based movement and combat system."
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
@@ -928,6 +943,7 @@ qualityOrder =
     , "hyperboggling"
     , "crivia"
     , "gmc-jam-7-animation"
+    , "ssrpg"
     , "minmacro"
     ]
 
