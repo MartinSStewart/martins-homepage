@@ -116,16 +116,6 @@ view sharedData page model toMsg pageView =
                     [ Ui.widthMax contentMaxWidth
                     , Ui.centerX
                     , Ui.height Ui.fill
-                    , Ui.Responsive.paddingXY
-                        breakpoints
-                        (\label ->
-                            case label of
-                                Mobile ->
-                                    { x = Ui.Responsive.value 0, y = Ui.Responsive.value 0 }
-
-                                NotMobile ->
-                                    { x = Ui.Responsive.value pagePadding, y = Ui.Responsive.value 0 }
-                        )
                     ]
                     pageView.body
                 ]
