@@ -257,7 +257,7 @@ view app _ model =
                             { x = Ui.Responsive.value 8, y = Ui.Responsive.value 16 }
 
                         NotMobile ->
-                            { x = Ui.Responsive.value 16, y = Ui.Responsive.value 16 }
+                            { x = Ui.Responsive.value Shared.pagePadding, y = Ui.Responsive.value 16 }
                 )
             ]
             [ Ui.el

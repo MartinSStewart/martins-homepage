@@ -28,6 +28,9 @@ tagData tag =
         GameMaker ->
             { text = "Game Maker", color = Ui.rgb 182 6 6, tooltip = "Made with Game Maker 7/8/Studio" }
 
+        GameJam ->
+            { text = "Game jam", color = Ui.rgb 154 20 20, tooltip = "Made with Game Maker 7/8/Studio" }
+
         Presentation ->
             { text = "Presentation", color = Ui.rgb 120 168 0, tooltip = "Presented to a live audience" }
 
@@ -406,7 +409,7 @@ thingsIHaveDone =
     , ( "code-breakers"
       , { name = "Code Breakers"
         , website = Nothing
-        , tags = [ Game, GameMaker ]
+        , tags = [ Game, GameMaker, GameJam ]
         , description = ""
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
@@ -421,7 +424,7 @@ thingsIHaveDone =
     , ( "sanctum"
       , { name = "Sanctum"
         , website = Nothing
-        , tags = [ Game, GameMaker ]
+        , tags = [ Game, GameMaker, GameJam ]
         , description = "I created this for the Game Maker Community game jam #3. Everyone had 3 days to make a game themed around the word \"live\". There were 56 entries and I placed 16th."
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
@@ -528,11 +531,11 @@ thingsIHaveDone =
     , ( "enough-portals"
       , { name = "enough-portals"
         , website = Nothing
-        , tags = [ Game, GameMaker ]
+        , tags = [ Game, GameMaker, GameJam ]
         , description = ""
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/game-maker-preview.png"
         , thingType =
             OtherThing
                 { releasedAt = date 2016 Sep 22
@@ -562,7 +565,7 @@ thingsIHaveDone =
         , description = ""
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/game-maker-preview.png"
         , thingType =
             JobThing
                 { startedAt = date 2014 Apr 1
@@ -578,7 +581,7 @@ thingsIHaveDone =
         , description = "A game I was hired to make for a guy named James Clifton. Crivia or Cricket Trivia is a game about answering trivia questions about the sport Cricket. I was only paid like 60 USD for on and off work spanning 3 years so this kind of stretches the definition of a job but I think at the time I was more concerned with experience and resume building. The game was made in Game Maker with a tiny amount of PHP used for saving highscores to James' website."
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/game-maker-preview.png"
         , thingType =
             JobThing
                 { startedAt = date 2013 Jun 4
@@ -658,7 +661,7 @@ thingsIHaveDone =
         , description = ""
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/game-maker-preview.png"
         , thingType =
             OtherThing
                 { releasedAt = date 2012 Oct 5
@@ -688,7 +691,7 @@ thingsIHaveDone =
         , description = ""
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/game-maker-preview.png"
         , thingType =
             OtherThing
                 { releasedAt = date 2010 Mar 10
@@ -718,7 +721,7 @@ thingsIHaveDone =
         , description = ""
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/game-maker-preview.png"
         , thingType =
             OtherThing
                 { releasedAt = date 2014 Mar 1
@@ -759,11 +762,11 @@ thingsIHaveDone =
     , ( "gmc-jam-7-animation"
       , { name = "GMC jam 7 animation"
         , website = Nothing
-        , tags = [ Game, GameMaker ]
+        , tags = [ Game, GameMaker, GameJam ]
         , description = ""
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/game-maker-preview.png"
         , thingType =
             OtherThing
                 { releasedAt = date 2012 Jul 30
@@ -778,7 +781,7 @@ thingsIHaveDone =
         , description = ""
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/game-maker-preview.png"
         , thingType =
             OtherThing
                 { releasedAt = date 2012 Jun 8
@@ -793,7 +796,7 @@ thingsIHaveDone =
         , description = ""
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/game-maker-preview.png"
         , thingType =
             OtherThing
                 { releasedAt = date 2012 Jun 25
@@ -804,7 +807,7 @@ thingsIHaveDone =
     , ( "hyperboggling"
       , { name = "Hyperboggling"
         , website = Nothing
-        , tags = [ Game, GameMaker ]
+        , tags = [ Javascript ]
         , description = ""
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
@@ -823,7 +826,7 @@ thingsIHaveDone =
         , description = ""
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/game-maker-preview.png"
         , thingType =
             OtherThing
                 { releasedAt = date 2011 Jun 25
@@ -834,11 +837,11 @@ thingsIHaveDone =
     , ( "break-the-facade"
       , { name = "Break the facade"
         , website = Nothing
-        , tags = [ Game, GameMaker ]
+        , tags = [ Game, GameMaker, GameJam ]
         , description = "A game I made for the 5th Game Maker Community game jam (aka GMC Jam). We had 3 days to make a game themed around the word \"facade\". [Last time I participated](/stuff/sanctum) I got 16th place, but this time I tied for 1st! As a result, I won a Mr. Karoshi tshirt ![Mr. Karoshi is a puzzle game where you help an office worker kill themselves](/break-the-facade/mr-karoshi.jpg), a coffee mug with YoYo Games branding, and free copy of Game Maker Studio pro (which let me export games to HTML5)!"
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/game-maker-preview.png"
         , thingType =
             OtherThing
                 { releasedAt = date 2012 Jan 30
@@ -853,7 +856,7 @@ thingsIHaveDone =
         , description = "I participated in a secret santa event where everyone made a little game for another randomly chosen participant. This is the game I made and in my opinion it's the has by far the highest fun to effort ratio of anything I've ever made."
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/game-maker-preview.png"
         , thingType =
             OtherThing
                 { releasedAt = date 2015 Mar 7
@@ -868,11 +871,266 @@ thingsIHaveDone =
         , description = "I tried making a hex grid based fire emblem style game with a friend who went by the name SS (no, not *that* SS). Another friend named FQ drew the hex grid art. Unfortunately for them, I didn't get very far with this. Just a very basic turn based movement and combat system."
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/game-maker-preview.png"
         , thingType =
             OtherThing
                 { releasedAt = date 2015 Mar 7
                 , repo = Nothing
+                }
+        }
+      )
+    , ( "memo-2020-credits"
+      , { name = "Memo 2020 credits"
+        , website = Just "https://memo-2020-credits.lamdera.app/"
+        , tags = [ Elm, Lamdera ]
+        , description = ""
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2020 Dec 31
+                , repo = Just "https://github.com/MartinSStewart/memo-credits-2020"
+                }
+        }
+      )
+    , ( "memo-lounge-3am"
+      , { name = "Memo lounge 3am"
+        , website = Just "https://martinsstewart.gitlab.io/memo-lounge-3am/"
+        , tags = [ Elm ]
+        , description = ""
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2019 Dec 31
+                , repo = Just "https://gitlab.com/MartinSStewart/memo-lounge-3am"
+                }
+        }
+      )
+    , ( "birthday-list"
+      , { name = "Birthday list"
+        , website = Nothing
+        , tags = [ Elm ]
+        , description = "I made a simple website that lists my friends birthdays ordered by how soon it will be. When it is someone's birthday, the website will show \"Happy Birthday <name>!\" with a image of a party hat. For a while me and my friends used this. Eventually though [my discord bot](/stuff/discord-bot) took over keeping track of birthdays.\n\nUnfortunately I can't show the website itself or the code since it has personal information."
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2019 Jun 14
+                , repo = Nothing
+                }
+        }
+      )
+    , ( "tile-editor"
+      , { name = "Tile editor"
+        , website = Just "https://martinsstewart.gitlab.io/tile-editor/"
+        , tags = [ Elm ]
+        , description = "For one Christmas I asked for a level tileset as a present and my sister made me one! Then I made this tile editor so that I could make some kind of map with that tileset (just for admiring, you can't interact with it in any way).\n\nHere's a level my sister drew using it ![a level drawn with her tileset and my editor](/tile-editor/level.png)"
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2018 Dec 30
+                , repo = Just "https://gitlab.com/MartinSStewart/tile-editor"
+                }
+        }
+      )
+    , ( "how-many-words-jo"
+      , { name = "How many words Jo"
+        , website = Just "https://martinsstewart.gitlab.io/how-many-words-jo/"
+        , tags = [ Elm ]
+        , description = "A friend (named Jo) participates in NaNoWriMo (National Novel Writing Month) each year. I made a website that would track how many words she would need to have written during the month to be on pace to meet her desired word count of 220k (aka a lot of words)."
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2019 Nov 1
+                , repo = Just "https://gitlab.com/MartinSStewart/tile-editor"
+                }
+        }
+      )
+    , ( "summer-home-website"
+      , { name = "Summer home website"
+        , website = Nothing
+        , tags = [ Elm ]
+        , description = "My extended family shares ownership of a summer home in Sweden. I decided to make a website that would help people book a visit. And by that I mean, it would just let people pick a start and end date to their visit and then generate an email they could send to the person actually responsible for keep track of who was visiting. There's no link to the website or the code since it contains someone's email address and info about where the house is located. You're not missing out on much though. I did a terrible job of hosting images and the website looks like this now ![a website with broken image links](/summer-home/website.png)"
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2018 Dec 23
+                , repo = Nothing
+                }
+        }
+      )
+    , ( "tretton37-game-jam"
+      , { name = "tretton37 game jam"
+        , website = Nothing
+        , tags = [ Elm, Game, GameJam ]
+        , description = ""
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2012 Jul 30
+                , repo = Just "https://github.com/MartinSStewart/tretton37-game-jam"
+                }
+        }
+      )
+    , ( "the-best-color"
+      , { name = "The best color"
+        , website = Just "https://the-best-color.lamdera.app/"
+        , tags = [ Elm, Game, Lamdera ]
+        , description = ""
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2020 Jan 27
+                , repo = Just "https://github.com/MartinSStewart/best-color"
+                }
+        }
+      )
+    , ( "elm-online-survey"
+      , { name = "Elm Online survey"
+        , website = Just "https://audience-questions.lamdera.app/"
+        , tags = [ Elm, Lamdera ]
+        , description = ""
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2021 Oct 6
+                , repo = Just "https://github.com/MartinSStewart/elm-online-survey"
+                }
+        }
+      )
+    , ( "time-loop-inc"
+      , { name = "Time loop inc."
+        , website = Just "https://time-travel-game.lamdera.app/"
+        , tags = [ Elm, Game, Lamdera ]
+        , description = ""
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2022 Jul 27
+                , repo = Just "https://github.com/MartinSStewart/time-loop-inc"
+                }
+        }
+      )
+    , ( "question-and-answer"
+      , { name = "Question and Answer"
+        , website = Just "https://question-and-answer.lamdera.app/"
+        , tags = [ Elm, Lamdera ]
+        , description = ""
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2021 Oct 26
+                , repo = Just "https://github.com/MartinSStewart/elm-qna"
+                }
+        }
+      )
+    , ( "elm-review-remove-duplicate-code"
+      , { name = "elm-review-remove-duplicate-code"
+        , website = Nothing
+        , tags = [ Elm ]
+        , description = ""
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2021 Jul 14
+                , repo = Just "https://github.com/MartinSStewart/elm-review-remove-duplicate-code"
+                }
+        }
+      )
+    , ( "moment-of-the-month"
+      , { name = "Moment of the Month"
+        , website = Just "moment-of-the-month.lamdera.app"
+        , tags = [ Elm, Lamdera ]
+        , description = ""
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2021 May 21
+                , repo = Just "https://github.com/MartinSStewart/elm-moment-of-the-month"
+                }
+        }
+      )
+    , ( "memo-theatre"
+      , { name = "Memo theatre"
+        , website = Just "memo-theatre.lamdera.app"
+        , tags = [ Elm, Game, Lamdera ]
+        , description = ""
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2021 Mar 24
+                , repo = Just "https://github.com/MartinSStewart/memo-theatre"
+                }
+        }
+      )
+    , ( "lego-loco-remake"
+      , { name = "Lego Loco remake"
+        , website = Nothing
+        , tags = [ Elm, Game, CSharp ]
+        , description = ""
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2018 Jun 21
+                , repo = Just "https://github.com/MartinSStewart/Lego-Loco-Remake"
+                }
+        }
+      )
+    , ( "lens"
+      , { name = "Lens"
+        , website = Nothing
+        , tags = [ CSharp ]
+        , description = ""
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2017 Dec 7
+                , repo = Just "https://github.com/MartinSStewart/Lens"
+                }
+        }
+      )
+    , ( "discord-spaceship-game"
+      , { name = "Discord spaceship game"
+        , website = Nothing
+        , tags = [ CSharp, Game ]
+        , description = ""
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2018 Feb 12
+                , repo = Just "https://github.com/MartinSStewart/DiscordSpaceshipGame"
                 }
         }
       )
@@ -917,11 +1175,16 @@ qualityOrder =
     , "zig-zag"
     , "vector-rockets"
     , "code-breakers"
+    , "memo-2020-credits"
     , "surface-voyage"
+    , "moment-of-the-month"
+    , "question-and-answer"
     , "send-grid"
     , "ds-game-over"
     , "elm-box-packing"
+    , "elm-review-remove-duplicate-code"
     , "elm-audio-presentation"
+    , "the-best-color"
     , "demon-clutched-walkaround"
     , "tetherball-extreme-zombie-edition"
     , "elm-review-elm-ui-upgrade"
@@ -929,18 +1192,30 @@ qualityOrder =
     , "lamdera-backend-debugger"
     , "building-a-meetup-clone-on-lamdera"
     , "elm-pdf"
+    , "elm-online-survey"
     , "postmark-email-client"
     , "simple-survey"
     , "translation-editor"
     , "starship-corporation"
+    , "memo-lounge-3am"
+    , "time-loop-inc"
+    , "tretton37-game-jam"
     , "sanctum"
     , "culminating-game"
+    , "tile-editor"
+    , "discord-spaceship-game"
+    , "lens"
     , "stewart-everybody-net"
     , "german-game"
+    , "lego-loco-remake"
     , "elm-bayer-matrix"
     , "fake-key-gen"
+    , "birthday-list"
     , "enough-portals"
     , "hyperboggling"
+    , "memo-theatre"
+    , "summer-home-website"
+    , "how-many-words-jo"
     , "crivia"
     , "gmc-jam-7-animation"
     , "ssrpg"
@@ -961,6 +1236,7 @@ type Tag
     | CSharp
     | FSharp
     | Javascript
+    | GameJam
 
 
 type alias Thing =

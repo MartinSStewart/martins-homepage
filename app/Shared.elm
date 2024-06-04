@@ -1,4 +1,4 @@
-module Shared exposing (Breakpoints(..), Data, Model, Msg(..), SharedMsg(..), breakpoints, template, tileSpacing, tileWidth)
+module Shared exposing (Breakpoints(..), Data, Model, Msg(..), SharedMsg(..), breakpoints, pagePadding, template, tileSpacing, tileWidth)
 
 import BackendTask exposing (BackendTask)
 import Effect exposing (Effect)
