@@ -1134,6 +1134,21 @@ thingsIHaveDone =
                 }
         }
       )
+    , ( "foolproof-multiplayer-games-in-elm"
+      , { name = "Foolproof* multiplayer* games in Elm*"
+        , website = Just "https://www.youtube.com/watch?v=Fkj2Is6jxCE"
+        , tags = [ Elm, Lamdera, Game, Presentation ]
+        , description = ""
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2022 Jul 7
+                , repo = Nothing
+                }
+        }
+      )
     ]
         |> Dict.fromList
 
@@ -1189,6 +1204,7 @@ qualityOrder =
     , "tetherball-extreme-zombie-edition"
     , "elm-review-elm-ui-upgrade"
     , "elm-review-bot"
+    , "foolproof-multiplayer-games-in-elm"
     , "lamdera-backend-debugger"
     , "building-a-meetup-clone-on-lamdera"
     , "elm-pdf"
