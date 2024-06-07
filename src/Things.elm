@@ -88,7 +88,7 @@ lamderaPackage packageName description lastUpdated releasedAt =
       , description = description
       , pageLastUpdated = lastUpdated
       , pageCreatedAt = lastUpdated
-      , previewImage = "/elm-package-preview.png"
+      , previewImage = "/lamdera-preview.svg"
       , thingType =
             OtherThing
                 { releasedAt = releasedAt
@@ -475,7 +475,7 @@ thingsIHaveDone =
         , description = ""
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/elm-online-preview.svg"
         , thingType =
             OtherThing
                 { releasedAt = date 2021 Jul 23
@@ -1141,7 +1141,7 @@ thingsIHaveDone =
         , description = ""
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/elm-online-preview.svg"
         , thingType =
             OtherThing
                 { releasedAt = date 2022 Jul 7
