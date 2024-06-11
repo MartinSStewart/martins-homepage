@@ -158,7 +158,7 @@ thingsIHaveDone =
     , ( "circuit-breaker"
       , { name = "Circuit Breaker"
         , website = Just "https://martinsstewart.gitlab.io/hackman/"
-        , tags = [ Elm, Game, GameJam ]
+        , tags = [ Elm, Game ]
         , description = ""
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
@@ -173,11 +173,11 @@ thingsIHaveDone =
     , ( "hackman"
           , { name = "HackMan"
             , website = Nothing
-            , tags = [ GameMaker, Game ]
+            , tags = [ GameMaker, Game, GameJam ]
             , description = ""
             , pageLastUpdated = websiteReleasedAt
             , pageCreatedAt = websiteReleasedAt
-            , previewImage = "/discord-bot-preview.png"
+            , previewImage = "/game-maker-preview.png"
             , thingType =
                 OtherThing
                     { releasedAt = date 2016 Aug 1
@@ -1202,6 +1202,7 @@ qualityOrder =
     , "tretton37"
     , "aventyr"
     , "hobby-scale-func-prog-sweden"
+    , "hackman"
     , "zig-zag"
     , "vector-rockets"
     , "code-breakers"
