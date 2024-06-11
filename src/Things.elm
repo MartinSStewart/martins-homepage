@@ -158,7 +158,7 @@ thingsIHaveDone =
     , ( "circuit-breaker"
       , { name = "Circuit Breaker"
         , website = Just "https://martinsstewart.gitlab.io/hackman/"
-        , tags = [ Elm, Game ]
+        , tags = [ Elm, Game, GameJam ]
         , description = ""
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
@@ -170,6 +170,21 @@ thingsIHaveDone =
                 }
         }
       )
+    , ( "hackman"
+          , { name = "HackMan"
+            , website = Nothing
+            , tags = [ GameMaker, Game ]
+            , description = ""
+            , pageLastUpdated = websiteReleasedAt
+            , pageCreatedAt = websiteReleasedAt
+            , previewImage = "/discord-bot-preview.png"
+            , thingType =
+                OtherThing
+                    { releasedAt = date 2016 Aug 1
+                    , repo = Nothing
+                    }
+            }
+          )
     , elmPackage "MartinSStewart" "elm-audio" "" websiteReleasedAt (date 2020 Mar 11)
     , ( "elm-review-bot"
       , { name = "elm-review-bot"
