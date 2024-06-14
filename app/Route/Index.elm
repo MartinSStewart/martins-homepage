@@ -2,21 +2,23 @@ module Route.Index exposing (ActionData, Data, Model, Msg, route)
 
 import Array exposing (Array)
 import BackendTask exposing (BackendTask)
+import Browser.Dom
+import Browser.Events
 import Date exposing (Date)
 import Dict exposing (Dict)
 import Effect exposing (Effect)
 import FatalError exposing (FatalError)
 import Head
 import Head.Seo as Seo
-import Html
 import Html.Attributes
-import Markdown.Block exposing (Block)
+import List.Extra
 import Pages.Url
 import PagesMsg exposing (PagesMsg)
 import Route
 import RouteBuilder exposing (App, StatelessRoute)
 import Set exposing (Set)
 import Shared exposing (Breakpoints(..))
+import Task
 import Things exposing (Tag, ThingType(..))
 import Ui
 import Ui.Font
@@ -27,13 +29,15 @@ import View exposing (View)
 
 
 type alias Model =
-    { sortBy : SortBy, filter : Array Tag }
+    { sortBy : SortBy, filter : Array Tag, line : Line }
 
 
 type Msg
     = PressedAddTag Tag
     | PressedRemoveTag Tag
     | PressedSortBy SortBy
+    | GotThingPosition (Result Browser.Dom.Error (List Browser.Dom.Element))
+    | WindowResized
 
 
 type SortBy
@@ -72,26 +76,109 @@ route =
             { init = init
             , update = update
             , view = view
-            , subscriptions = \_ _ _ _ -> Sub.none
+            , subscriptions = \_ _ _ _ -> Browser.Events.onResize (\_ _ -> WindowResized)
             }
 
 
 init : App data action routeParams -> Shared.Model -> ( Model, Effect Msg )
 init _ _ =
-    ( { sortBy = Quality, filter = Array.empty }, Effect.None )
+    ( { sortBy = Quality, filter = Array.empty, line = NoLine }, getElements )
+
+
+type Line
+    = NoLine
+    | HorizontalLine { y : Float }
+    | StaggeredLine { xStart : Float, xEnd : Float, y0 : Float, y1 : Float, x : Float }
 
 
 update : App Data ActionData RouteParams -> Shared.Model -> Msg -> Model -> ( Model, Effect Msg )
 update _ _ msg model =
     case msg of
         PressedAddTag tag ->
-            ( { model | filter = Array.filter (\a -> a /= tag) model.filter |> Array.push tag }, Effect.None )
+            ( { model | filter = Array.filter (\a -> a /= tag) model.filter |> Array.push tag }, Cmd.none )
 
         PressedRemoveTag tag ->
-            ( { model | filter = Array.filter (\a -> a /= tag) model.filter }, Effect.None )
+            ( { model | filter = Array.filter (\a -> a /= tag) model.filter }, Cmd.none )
 
         PressedSortBy sortBy ->
-            ( { model | sortBy = sortBy }, Effect.None )
+            ( { model | sortBy = sortBy }, Cmd.none )
+
+        WindowResized ->
+            ( model, getElements )
+
+        GotThingPosition result ->
+            ( case result of
+                Ok elements ->
+                    case List.Extra.gatherEqualsBy (\a -> a.element.y) elements of
+                        [] ->
+                            { model | line = NoLine }
+
+                        [ ( first, _ ) ] ->
+                            { model | line = HorizontalLine { y = first.element.y - Shared.headerHeight } }
+
+                        ( first, firstRest ) :: ( second, secondRest ) :: _ ->
+                            let
+                                xStart : Float
+                                xStart =
+                                    List.map (\a -> a.element.x) elements
+                                        |> List.minimum
+                                        |> Maybe.withDefault 0
+
+                                xEnd : Float
+                                xEnd =
+                                    List.map (\a -> a.element.x) elements
+                                        |> List.maximum
+                                        |> Maybe.withDefault 0
+                                        |> (+) Shared.tileWidth
+
+                                helper top topRest bottom =
+                                    StaggeredLine
+                                        { xStart = xStart
+                                        , xEnd = xEnd
+                                        , y0 = top.element.y - Shared.headerHeight - Shared.tileSpacing / 2
+                                        , x =
+                                            List.map (\a -> a.element.x) (top :: topRest)
+                                                |> List.minimum
+                                                |> Maybe.withDefault 0
+
+                                        --|> (\a ->
+                                        --        if
+                                        --            List.length firstRest
+                                        --                + List.length secondRest
+                                        --                + 2
+                                        --                == Shared.maxColumns
+                                        --        then
+                                        --            a - xStart / 2
+                                        --
+                                        --        else
+                                        --            a
+                                        --   )
+                                        , y1 = bottom.element.y - Shared.headerHeight - Shared.tileSpacing / 2
+                                        }
+                            in
+                            { model
+                                | line =
+                                    if first.element.y < second.element.y then
+                                        helper first firstRest second
+
+                                    else
+                                        helper second secondRest first
+                            }
+
+                Err _ ->
+                    { model | line = NoLine }
+            , Cmd.none
+            )
+
+
+getElements =
+    List.map (\name -> Browser.Dom.getElement name) topOfLowTier
+        |> Task.sequence
+        |> Task.attempt GotThingPosition
+
+
+topOfLowTier =
+    List.Extra.dropWhile (\a -> a /= "sanctum") Things.qualityOrder |> List.take Shared.maxColumns
 
 
 data : BackendTask FatalError Data
@@ -149,20 +236,18 @@ validateQualityOrder =
                 |> BackendTask.fail
 
 
-head :
-    App Data ActionData RouteParams
-    -> List Head.Tag
-head app =
+head : App Data ActionData RouteParams -> List Head.Tag
+head _ =
     Seo.summary
         { canonicalUrlOverride = Nothing
-        , siteName = "elm-pages"
+        , siteName = "Martin's homepage"
         , image =
             { url = [ "images", "icon-png.png" ] |> UrlPath.join |> Pages.Url.fromPath
             , alt = "elm-pages logo"
             , dimensions = Nothing
             , mimeType = Nothing
             }
-        , description = "Welcome to elm-pages!"
+        , description = "Stuff I've done that I don't want to forget"
         , locale = Nothing
         , title = "elm-pages is running"
         }
@@ -248,18 +333,57 @@ view app _ model =
     { title = "Martin's homepage"
     , body =
         Ui.column
-            [ Ui.spacing 16
-            , Ui.Responsive.paddingXY
-                Shared.breakpoints
-                (\label ->
-                    case label of
-                        Mobile ->
-                            { x = Ui.Responsive.value 8, y = Ui.Responsive.value 16 }
+            (Ui.spacing 16
+                :: Ui.Responsive.paddingXY
+                    Shared.breakpoints
+                    (\label ->
+                        case label of
+                            Mobile ->
+                                { x = Ui.Responsive.value 8, y = Ui.Responsive.value 16 }
 
-                        NotMobile ->
-                            { x = Ui.Responsive.value Shared.pagePadding, y = Ui.Responsive.value 16 }
-                )
-            ]
+                            NotMobile ->
+                                { x = Ui.Responsive.value Shared.pagePadding, y = Ui.Responsive.value 16 }
+                    )
+                :: (case model.line of
+                        NoLine ->
+                            []
+
+                        HorizontalLine { y } ->
+                            [ Ui.el
+                                [ Ui.height (Ui.px 1)
+                                , Ui.background (Ui.rgb 0 0 0)
+                                , Ui.move { x = 0, y = round y, z = 0 }
+                                ]
+                                Ui.none
+                                |> Ui.inFront
+                            ]
+
+                        StaggeredLine { xStart, xEnd, x, y0, y1 } ->
+                            [ Ui.el
+                                [ Ui.height (Ui.px 1)
+                                , Ui.background (Ui.rgb 0 0 0)
+                                , Ui.move { x = 0, y = round y0, z = 0 }
+                                ]
+                                Ui.none
+                                |> Ui.inFront
+                            , Ui.el
+                                [ Ui.width (Ui.px 1)
+                                , Ui.height (Ui.px (round (y1 - y0)))
+                                , Ui.background (Ui.rgb 0 0 0)
+                                , Ui.move { x = round x, y = round y0, z = 0 }
+                                ]
+                                Ui.none
+                                |> Ui.inFront
+                            , Ui.el
+                                [ Ui.height (Ui.px 1)
+                                , Ui.background (Ui.rgb 0 0 0)
+                                , Ui.move { x = 0, y = round y1, z = 0 }
+                                ]
+                                Ui.none
+                                |> Ui.inFront
+                            ]
+                   )
+            )
             [ Ui.el
                 [ Ui.Font.size 32, Ui.Font.bold, Ui.Font.lineHeight 1.1 ]
                 (Ui.text "Stuff I've done that I don't want to forget")
@@ -416,6 +540,7 @@ thingsViewNotMobile ( name, thing ) =
         , Ui.alignTop
         , Ui.padding 4
         , Ui.spacing 4
+        , Ui.id name
         ]
         [ Ui.el
             [ Ui.Font.bold

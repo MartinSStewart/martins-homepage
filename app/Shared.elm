@@ -1,4 +1,4 @@
-module Shared exposing (Breakpoints(..), Data, Model, Msg(..), SharedMsg(..), breakpoints, pagePadding, template, tileSpacing, tileWidth)
+module Shared exposing (Breakpoints(..), Data, Model, Msg(..), SharedMsg(..), breakpoints, headerHeight, maxColumns, pagePadding, template, tileSpacing, tileWidth)
 
 import BackendTask exposing (BackendTask)
 import Effect exposing (Effect)
@@ -155,10 +155,19 @@ type Breakpoints
     | NotMobile
 
 
+headerHeight : number
+headerHeight =
+    30
+
+
 header : Maybe Route -> Ui.Element msg
 header maybeRoute =
     Ui.row
-        [ Ui.background (Ui.rgb 0 0 0), Ui.Font.bold, Ui.Font.color (Ui.rgb 255 255 255) ]
+        [ Ui.background (Ui.rgb 0 0 0)
+        , Ui.Font.bold
+        , Ui.Font.color (Ui.rgb 255 255 255)
+        , Ui.height (Ui.px headerHeight)
+        ]
         [ Ui.row
             [ Html.Attributes.attribute "elm-pages:prefetch" "" |> Ui.htmlAttribute
             , Ui.link (Route.toString Route.Index)
