@@ -171,20 +171,20 @@ thingsIHaveDone =
         }
       )
     , ( "hackman"
-          , { name = "HackMan"
-            , website = Nothing
-            , tags = [ GameMaker, Game, GameJam ]
-            , description = ""
-            , pageLastUpdated = websiteReleasedAt
-            , pageCreatedAt = websiteReleasedAt
-            , previewImage = "/game-maker-preview.png"
-            , thingType =
-                OtherThing
-                    { releasedAt = date 2016 Aug 1
-                    , repo = Nothing
-                    }
-            }
-          )
+      , { name = "HackMan"
+        , website = Nothing
+        , tags = [ GameMaker, Game, GameJam ]
+        , description = ""
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/game-maker-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2016 Aug 1
+                , repo = Nothing
+                }
+        }
+      )
     , elmPackage "MartinSStewart" "elm-audio" "" websiteReleasedAt (date 2020 Mar 11)
     , ( "elm-review-bot"
       , { name = "elm-review-bot"
@@ -295,6 +295,21 @@ thingsIHaveDone =
             OtherThing
                 { releasedAt = date 2023 Jul 5
                 , repo = Just "https://github.com/MartinSStewart/postmark-email-client"
+                }
+        }
+      )
+    , ( "elm-camp-2023"
+      , { name = "Elm Camp 2023"
+        , website = Just "https://elm.camp/23-denmark"
+        , tags = [ Elm, Lamdera ]
+        , description = "I helped set up the website for Elm Camp 2023. Also I created a simple website for displaying a schedule of events during the unconference. Also I borrowed a fancy camera and took photos while I was there."
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/elm-camp-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2023 Jun 28
+                , repo = Just "https://github.com/elm-camp/website"
                 }
         }
       )
@@ -1200,6 +1215,7 @@ qualityOrder =
     , "elm-nonempty-string"
     , "insurello"
     , "tretton37"
+    , "elm-camp-2023"
     , "aventyr"
     , "hobby-scale-func-prog-sweden"
     , "hackman"
