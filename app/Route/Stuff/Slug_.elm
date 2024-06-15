@@ -122,7 +122,11 @@ view app sharedModel =
     { title = thing.name
     , body =
         Ui.column
-            [ Ui.padding 16 ]
+            [ Ui.padding 16
+            , Ui.widthMax Shared.contentMaxWidth
+            , Ui.centerX
+            , Ui.height Ui.fill
+            ]
             [ Ui.el [ Ui.Font.size 36 ] (Ui.text thing.name)
             , Ui.text
                 ("Created at "

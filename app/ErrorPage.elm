@@ -1,6 +1,5 @@
 module ErrorPage exposing (ErrorPage(..), Model, Msg, head, init, internalError, notFound, statusCode, update, view)
 
-import Effect exposing (Effect)
 import Head
 import Html exposing (Html)
 import Ui
@@ -17,18 +16,18 @@ type alias Model =
     }
 
 
-init : ErrorPage -> ( Model, Effect Msg )
+init : ErrorPage -> ( Model, Cmd Msg )
 init errorPage =
     ( { count = 0 }
-    , Effect.none
+    , Cmd.none
     )
 
 
-update : ErrorPage -> Msg -> Model -> ( Model, Effect Msg )
+update : ErrorPage -> Msg -> Model -> ( Model, Cmd Msg )
 update errorPage msg model =
     case msg of
         Increment ->
-            ( { model | count = model.count + 1 }, Effect.none )
+            ( { model | count = model.count + 1 }, Cmd.none )
 
 
 head : ErrorPage -> List Head.Tag

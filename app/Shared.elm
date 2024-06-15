@@ -1,4 +1,4 @@
-module Shared exposing (Breakpoints(..), Data, Model, Msg(..), SharedMsg(..), breakpoints, pagePadding, template, tileSpacing, tileWidth)
+module Shared exposing (Breakpoints(..), Data, Model, Msg(..), SharedMsg(..), breakpoints, contentMaxWidth, headerHeight, maxColumns, pagePadding, template, tileSpacing, tileWidth)
 
 import BackendTask exposing (BackendTask)
 import Effect exposing (Effect)
@@ -112,12 +112,7 @@ view sharedData page model toMsg pageView =
             (Ui.column
                 [ Ui.height Ui.fill ]
                 [ header page.route
-                , Ui.el
-                    [ Ui.widthMax contentMaxWidth
-                    , Ui.centerX
-                    , Ui.height Ui.fill
-                    ]
-                    pageView.body
+                , pageView.body
                 ]
             )
         ]
@@ -132,12 +127,17 @@ maxColumns =
 
 contentMaxWidth : number
 contentMaxWidth =
-    tileWidth * maxColumns + tileSpacing * (maxColumns - 1) + pagePadding * 2
+    getContentWidth maxColumns
+
+
+getContentWidth : number -> number
+getContentWidth columns =
+    tileWidth * columns + tileSpacing * (maxColumns - 1) + pagePadding * 2
 
 
 pagePadding : number
 pagePadding =
-    16
+    80
 
 
 tileWidth : number
@@ -147,7 +147,7 @@ tileWidth =
 
 tileSpacing : number
 tileSpacing =
-    8
+    12
 
 
 type Breakpoints
@@ -155,10 +155,19 @@ type Breakpoints
     | NotMobile
 
 
+headerHeight : number
+headerHeight =
+    30
+
+
 header : Maybe Route -> Ui.Element msg
 header maybeRoute =
     Ui.row
-        [ Ui.background (Ui.rgb 0 0 0), Ui.Font.bold, Ui.Font.color (Ui.rgb 255 255 255) ]
+        [ Ui.background (Ui.rgb 0 0 0)
+        , Ui.Font.bold
+        , Ui.Font.color (Ui.rgb 255 255 255)
+        , Ui.height (Ui.px headerHeight)
+        ]
         [ Ui.row
             [ Html.Attributes.attribute "elm-pages:prefetch" "" |> Ui.htmlAttribute
             , Ui.link (Route.toString Route.Index)
@@ -213,4 +222,4 @@ header maybeRoute =
 
 breakpoints : Ui.Responsive.Breakpoints Breakpoints
 breakpoints =
-    Ui.Responsive.breakpoints Mobile [ ( 550, NotMobile ) ]
+    Ui.Responsive.breakpoints Mobile [ ( getContentWidth 3, NotMobile ) ]
