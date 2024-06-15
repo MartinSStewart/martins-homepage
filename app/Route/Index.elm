@@ -18,6 +18,8 @@ import Route
 import RouteBuilder exposing (App, StatelessRoute)
 import Set exposing (Set)
 import Shared exposing (Breakpoints(..))
+import Svg exposing (Svg)
+import Svg.Attributes
 import Task
 import Things exposing (Tag, ThingType(..))
 import Ui
@@ -29,14 +31,15 @@ import View exposing (View)
 
 
 type alias Model =
-    { sortBy : SortBy, filter : Array Tag, line : Line }
+    { sortBy : SortBy, filter : Array Tag, worstTier : Line, topTier : Line }
 
 
 type Msg
     = PressedAddTag Tag
     | PressedRemoveTag Tag
     | PressedSortBy SortBy
-    | GotThingPosition (Result Browser.Dom.Error (List Browser.Dom.Element))
+    | GotWorstTierPosition (Result Browser.Dom.Error (List Browser.Dom.Element))
+    | GotTopTierPosition (Result Browser.Dom.Error (List Browser.Dom.Element))
     | WindowResized
 
 
@@ -82,12 +85,12 @@ route =
 
 init : App data action routeParams -> Shared.Model -> ( Model, Effect Msg )
 init _ _ =
-    ( { sortBy = Quality, filter = Array.empty, line = NoLine }, getElements )
+    ( { sortBy = Quality, filter = Array.empty, worstTier = NoLine, topTier = NoLine }, getElements )
 
 
 type Line
     = NoLine
-    | HorizontalLine { y : Float }
+    | HorizontalLine { xStart : Float, xEnd : Float, y : Float }
     | StaggeredLine { xStart : Float, xEnd : Float, y0 : Float, y1 : Float, x : Float }
 
 
@@ -106,79 +109,102 @@ update _ _ msg model =
         WindowResized ->
             ( model, getElements )
 
-        GotThingPosition result ->
-            ( case result of
-                Ok elements ->
-                    case List.Extra.gatherEqualsBy (\a -> a.element.y) elements of
-                        [] ->
-                            { model | line = NoLine }
+        GotWorstTierPosition result ->
+            ( { model | worstTier = getLines result }, Cmd.none )
 
-                        [ ( first, _ ) ] ->
-                            { model | line = HorizontalLine { y = first.element.y - Shared.headerHeight } }
+        GotTopTierPosition result ->
+            ( { model | topTier = getLines result }, Cmd.none )
 
-                        ( first, firstRest ) :: ( second, secondRest ) :: _ ->
-                            let
-                                xStart : Float
-                                xStart =
-                                    List.map (\a -> a.element.x) elements
+
+getLines : Result error (List Browser.Dom.Element) -> Line
+getLines result =
+    case result of
+        Ok elements ->
+            let
+                elements2 : List Browser.Dom.Element
+                elements2 =
+                    List.Extra.gatherEqualsBy (\a -> round a.element.x) elements
+                        |> List.filterMap (\( first, rest ) -> List.Extra.minimumBy (\a -> a.element.y) (first :: rest))
+            in
+            case List.Extra.gatherEqualsBy (\a -> a.element.y) elements2 of
+                [] ->
+                    NoLine
+
+                [ ( first, _ ) ] ->
+                    let
+                        xStart : Float
+                        xStart =
+                            List.map (\a -> a.element.x) elements |> List.minimum |> Maybe.withDefault 0
+
+                        xEnd : Float
+                        xEnd =
+                            List.map (\a -> a.element.x) elements
+                                |> List.maximum
+                                |> Maybe.withDefault 0
+                                |> (+) Shared.tileWidth
+                    in
+                    HorizontalLine
+                        { xStart = xStart
+                        , xEnd = xEnd
+                        , y = first.element.y - Shared.tileSpacing / 2 - Shared.headerHeight
+                        }
+
+                ( first, firstRest ) :: ( second, secondRest ) :: _ ->
+                    let
+                        xStart : Float
+                        xStart =
+                            List.map (\a -> a.element.x) elements |> List.minimum |> Maybe.withDefault 0
+
+                        xEnd : Float
+                        xEnd =
+                            List.map (\a -> a.element.x) elements
+                                |> List.maximum
+                                |> Maybe.withDefault 0
+                                |> (+) Shared.tileWidth
+
+                        helper top topRest bottom =
+                            StaggeredLine
+                                { xStart = xStart
+                                , xEnd = xEnd
+                                , y0 = top.element.y - Shared.tileSpacing / 2 - Shared.headerHeight
+                                , x =
+                                    List.map (\a -> a.element.x) (top :: topRest)
                                         |> List.minimum
                                         |> Maybe.withDefault 0
+                                        |> (\a -> a - Shared.tileSpacing / 2)
+                                , y1 = bottom.element.y - Shared.tileSpacing / 2 - Shared.headerHeight
+                                }
+                    in
+                    if first.element.y < second.element.y then
+                        helper first firstRest second
 
-                                xEnd : Float
-                                xEnd =
-                                    List.map (\a -> a.element.x) elements
-                                        |> List.maximum
-                                        |> Maybe.withDefault 0
-                                        |> (+) Shared.tileWidth
+                    else
+                        helper second secondRest first
 
-                                helper top topRest bottom =
-                                    StaggeredLine
-                                        { xStart = xStart
-                                        , xEnd = xEnd
-                                        , y0 = top.element.y - Shared.headerHeight - Shared.tileSpacing / 2
-                                        , x =
-                                            List.map (\a -> a.element.x) (top :: topRest)
-                                                |> List.minimum
-                                                |> Maybe.withDefault 0
-
-                                        --|> (\a ->
-                                        --        if
-                                        --            List.length firstRest
-                                        --                + List.length secondRest
-                                        --                + 2
-                                        --                == Shared.maxColumns
-                                        --        then
-                                        --            a - xStart / 2
-                                        --
-                                        --        else
-                                        --            a
-                                        --   )
-                                        , y1 = bottom.element.y - Shared.headerHeight - Shared.tileSpacing / 2
-                                        }
-                            in
-                            { model
-                                | line =
-                                    if first.element.y < second.element.y then
-                                        helper first firstRest second
-
-                                    else
-                                        helper second secondRest first
-                            }
-
-                Err _ ->
-                    { model | line = NoLine }
-            , Cmd.none
-            )
+        Err _ ->
+            NoLine
 
 
+getElements : Cmd Msg
 getElements =
-    List.map (\name -> Browser.Dom.getElement name) topOfLowTier
-        |> Task.sequence
-        |> Task.attempt GotThingPosition
+    Cmd.batch
+        [ List.map (\name -> Browser.Dom.getElement name) topOfLowTier
+            |> Task.sequence
+            |> Task.attempt GotWorstTierPosition
+        , List.map (\name -> Browser.Dom.getElement name) topOfTopTier
+            |> Task.sequence
+            |> Task.attempt GotTopTierPosition
+        ]
 
 
+topOfLowTier : List String
 topOfLowTier =
     List.Extra.dropWhile (\a -> a /= "sanctum") Things.qualityOrder |> List.take Shared.maxColumns
+
+
+topOfTopTier : List String
+topOfTopTier =
+    List.Extra.dropWhile (\a -> a /= "secret-santa-game") Things.qualityOrder |> List.take Shared.maxColumns
 
 
 data : BackendTask FatalError Data
@@ -267,6 +293,102 @@ thingDate thing =
             record.releasedAt
 
 
+svgLine : String -> String -> String -> String -> Line -> Ui.Element msg
+svgLine aboveTier belowTier aboveColor belowColor line =
+    Svg.svg
+        [ Html.Attributes.style "position" "relative"
+        , Html.Attributes.style "top" "0"
+        , Html.Attributes.style "left" "0"
+        , Html.Attributes.style "width" "100%"
+        , Html.Attributes.style "height" "100%"
+        , Html.Attributes.style "pointer-events" "none"
+        ]
+        (case line of
+            NoLine ->
+                []
+
+            HorizontalLine { xStart, xEnd, y } ->
+                [ Svg.line
+                    [ Svg.Attributes.x1 (String.fromFloat (xStart - Shared.pagePadding))
+                    , Svg.Attributes.x2 (String.fromFloat (xEnd + Shared.pagePadding))
+                    , Svg.Attributes.y1 (String.fromFloat (y + 2))
+                    , Svg.Attributes.y2 (String.fromFloat (y + 2))
+                    , Svg.Attributes.strokeWidth "2"
+                    , Svg.Attributes.stroke belowColor
+                    ]
+                    []
+                , Svg.line
+                    [ Svg.Attributes.x1 (String.fromFloat (xStart - Shared.pagePadding))
+                    , Svg.Attributes.x2 (String.fromFloat (xEnd + Shared.pagePadding))
+                    , Svg.Attributes.y1 (String.fromFloat (y - 2))
+                    , Svg.Attributes.y2 (String.fromFloat (y - 2))
+                    , Svg.Attributes.strokeWidth "2"
+                    , Svg.Attributes.stroke aboveColor
+                    ]
+                    []
+                , svgText "start" belowColor (xStart - Shared.pagePadding) (y + 16) belowTier
+                , svgText "start" aboveColor (xStart - Shared.pagePadding) (y - 6) aboveTier
+                , svgText "end" belowColor (xEnd + Shared.pagePadding) (y + 16) belowTier
+                , svgText "end" aboveColor (xEnd + Shared.pagePadding) (y - 6) aboveTier
+                ]
+
+            StaggeredLine { xStart, xEnd, x, y0, y1 } ->
+                [ Svg.path
+                    [ "M "
+                        ++ String.fromFloat (xStart - Shared.pagePadding)
+                        ++ " "
+                        ++ String.fromFloat (y1 + 2)
+                        ++ " H "
+                        ++ String.fromFloat (x + 2)
+                        ++ " V "
+                        ++ String.fromFloat (y0 + 2)
+                        ++ " H "
+                        ++ String.fromFloat (xEnd + Shared.pagePadding)
+                        |> Svg.Attributes.d
+                    , Svg.Attributes.strokeWidth "2"
+                    , Svg.Attributes.stroke belowColor
+                    , Svg.Attributes.fill "none"
+                    ]
+                    []
+                , Svg.path
+                    [ "M "
+                        ++ String.fromFloat (xStart - Shared.pagePadding)
+                        ++ " "
+                        ++ String.fromFloat (y1 - 2)
+                        ++ " H "
+                        ++ String.fromFloat (x - 2)
+                        ++ " V "
+                        ++ String.fromFloat (y0 - 2)
+                        ++ " H "
+                        ++ String.fromFloat (xEnd + Shared.pagePadding)
+                        |> Svg.Attributes.d
+                    , Svg.Attributes.strokeWidth "2"
+                    , Svg.Attributes.stroke aboveColor
+                    , Svg.Attributes.fill "none"
+                    ]
+                    []
+                , svgText "start" belowColor (xStart - Shared.pagePadding) (y1 + 16) belowTier
+                , svgText "start" aboveColor (xStart - Shared.pagePadding) (y1 - 6) aboveTier
+                , svgText "end" belowColor (xEnd + Shared.pagePadding) (y0 + 16) belowTier
+                , svgText "end" aboveColor (xEnd + Shared.pagePadding) (y0 - 6) aboveTier
+                ]
+        )
+        |> Ui.html
+        |> Ui.el [ Ui.Responsive.visible Shared.breakpoints [ NotMobile ], Ui.height Ui.fill ]
+
+
+svgText : String -> String -> Float -> Float -> String -> Svg msg
+svgText anchor color x y text =
+    Svg.text_
+        [ Svg.Attributes.x (String.fromFloat x)
+        , Svg.Attributes.y (String.fromFloat y)
+        , Svg.Attributes.textAnchor anchor
+        , Svg.Attributes.fill color
+        , Svg.Attributes.style "font-weight: 700; font-size: 14px"
+        ]
+        [ Svg.text text ]
+
+
 view :
     App Data ActionData RouteParams
     -> Shared.Model
@@ -332,9 +454,21 @@ view app _ model =
     in
     { title = "Martin's homepage"
     , body =
-        Ui.column
-            (Ui.spacing 16
-                :: Ui.Responsive.paddingXY
+        Ui.el
+            (if model.sortBy == Quality then
+                [ svgLine "Middle tier" "Worst tier" "orange" "red" model.worstTier |> Ui.inFront
+                , svgLine "Top tier" "Middle tier" "#1293d8" "orange" model.topTier |> Ui.inFront
+                ]
+
+             else
+                []
+            )
+            (Ui.column
+                [ Ui.spacing 16
+                , Ui.widthMax Shared.contentMaxWidth
+                , Ui.centerX
+                , Ui.height Ui.fill
+                , Ui.Responsive.paddingXY
                     Shared.breakpoints
                     (\label ->
                         case label of
@@ -344,67 +478,29 @@ view app _ model =
                             NotMobile ->
                                 { x = Ui.Responsive.value Shared.pagePadding, y = Ui.Responsive.value 16 }
                     )
-                :: (case model.line of
-                        NoLine ->
-                            []
-
-                        HorizontalLine { y } ->
-                            [ Ui.el
-                                [ Ui.height (Ui.px 1)
-                                , Ui.background (Ui.rgb 0 0 0)
-                                , Ui.move { x = 0, y = round y, z = 0 }
-                                ]
-                                Ui.none
-                                |> Ui.inFront
-                            ]
-
-                        StaggeredLine { xStart, xEnd, x, y0, y1 } ->
-                            [ Ui.el
-                                [ Ui.height (Ui.px 1)
-                                , Ui.background (Ui.rgb 0 0 0)
-                                , Ui.move { x = 0, y = round y0, z = 0 }
-                                ]
-                                Ui.none
-                                |> Ui.inFront
-                            , Ui.el
-                                [ Ui.width (Ui.px 1)
-                                , Ui.height (Ui.px (round (y1 - y0)))
-                                , Ui.background (Ui.rgb 0 0 0)
-                                , Ui.move { x = round x, y = round y0, z = 0 }
-                                ]
-                                Ui.none
-                                |> Ui.inFront
-                            , Ui.el
-                                [ Ui.height (Ui.px 1)
-                                , Ui.background (Ui.rgb 0 0 0)
-                                , Ui.move { x = 0, y = round y1, z = 0 }
-                                ]
-                                Ui.none
-                                |> Ui.inFront
-                            ]
-                   )
-            )
-            [ Ui.el
-                [ Ui.Font.size 32, Ui.Font.bold, Ui.Font.lineHeight 1.1 ]
-                (Ui.text "Stuff I've done that I don't want to forget")
-            , Ui.column
-                [ Ui.spacing 8 ]
-                [ filterView model
-                , Ui.row
-                    [ Ui.wrap
-                    , Ui.spacing Shared.tileSpacing
-                    , Ui.contentCenterX
-                    , Ui.Responsive.visible Shared.breakpoints [ NotMobile ]
-                    ]
-                    (List.filterMap (filterThings thingsViewNotMobile) thingsSorted)
-                , Ui.column
-                    [ Ui.spacing Shared.tileSpacing
-                    , Ui.Responsive.visible Shared.breakpoints [ Mobile ]
-                    ]
-                    (List.filterMap (filterThings thingsViewMobile) thingsSorted)
                 ]
-            ]
-            |> Ui.map PagesMsg.fromMsg
+                [ Ui.el
+                    [ Ui.Font.size 32, Ui.Font.bold, Ui.Font.lineHeight 1.1 ]
+                    (Ui.text "Stuff I've done that I don't want to forget")
+                , Ui.column
+                    [ Ui.spacing 8 ]
+                    [ filterView model
+                    , Ui.row
+                        [ Ui.wrap
+                        , Ui.spacing Shared.tileSpacing
+                        , Ui.contentCenterX
+                        , Ui.Responsive.visible Shared.breakpoints [ NotMobile ]
+                        ]
+                        (List.filterMap (filterThings thingsViewNotMobile) thingsSorted)
+                    , Ui.column
+                        [ Ui.spacing Shared.tileSpacing
+                        , Ui.Responsive.visible Shared.breakpoints [ Mobile ]
+                        ]
+                        (List.filterMap (filterThings thingsViewMobile) thingsSorted)
+                    ]
+                ]
+                |> Ui.map PagesMsg.fromMsg
+            )
     }
 
 

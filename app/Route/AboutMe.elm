@@ -111,7 +111,11 @@ view app shared model =
     { title = "About me"
     , body =
         Ui.row
-            [ Ui.widthMax 1000, Ui.centerX, Ui.contentTop, Ui.height Ui.fill ]
+            [ Ui.widthMax 1000
+            , Ui.centerX
+            , Ui.contentTop
+            , Ui.height Ui.fill
+            ]
             [ Ui.image
                 [ Ui.widthMin 250
                 , Ui.Responsive.visible Shared.breakpoints [ NotMobile ]
