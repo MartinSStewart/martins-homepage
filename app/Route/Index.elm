@@ -22,6 +22,7 @@ import Svg exposing (Svg)
 import Svg.Attributes
 import Task
 import Things exposing (Tag, ThingType(..))
+import Time exposing (Month(..))
 import Ui
 import Ui.Font
 import Ui.Input
@@ -44,8 +45,8 @@ type Msg
 
 
 type SortBy
-    = Alphabetically
-    | Chronologically
+    = Alphabetical
+    | Chronological
     | Quality
 
 
@@ -424,7 +425,7 @@ view app _ model =
         thingsSorted : List ( String, Thing )
         thingsSorted =
             case model.sortBy of
-                Alphabetically ->
+                Alphabetical ->
                     Dict.toList thingsDone
 
                 Quality ->
@@ -441,7 +442,7 @@ view app _ model =
                         Things.qualityOrder
                         |> List.reverse
 
-                Chronologically ->
+                Chronological ->
                     Dict.toList thingsDone
                         |> List.sortWith (\( _, a ) ( _, b ) -> Date.compare (thingDate b) (thingDate a))
 
@@ -500,23 +501,154 @@ view app _ model =
                 , Ui.column
                     [ Ui.spacing 8 ]
                     [ filterView model
-                    , Ui.row
-                        [ Ui.wrap
-                        , Ui.spacing Shared.tileSpacing
-                        , Ui.contentCenterX
-                        , Ui.Responsive.visible Shared.breakpoints [ NotMobile ]
-                        ]
-                        (List.filterMap (filterThings thingsViewNotMobile) thingsSorted)
-                    , Ui.column
-                        [ Ui.spacing Shared.tileSpacing
-                        , Ui.Responsive.visible Shared.breakpoints [ Mobile ]
-                        ]
-                        (List.filterMap (filterThings thingsViewMobile) thingsSorted)
+                    , if model.sortBy == Chronological then
+                        timelineView app.data.thingsIHaveDone model
+
+                      else
+                        Ui.row
+                            [ Ui.wrap
+                            , Ui.spacing Shared.tileSpacing
+                            , Ui.contentCenterX
+                            , Ui.Responsive.visible Shared.breakpoints [ NotMobile ]
+                            ]
+                            (List.filterMap (filterThings thingsViewNotMobile) thingsSorted)
+                    , if model.sortBy == Chronological then
+                        Ui.none
+
+                      else
+                        Ui.column
+                            [ Ui.spacing Shared.tileSpacing
+                            , Ui.Responsive.visible Shared.breakpoints [ Mobile ]
+                            ]
+                            (List.filterMap (filterThings thingsViewMobile) thingsSorted)
                     ]
                 ]
                 |> Ui.map PagesMsg.fromMsg
             )
     }
+
+
+timelineView : Dict String Thing -> Model -> Ui.Element msg
+timelineView things model =
+    let
+        things2 : Dict ( Int, Int ) (List Thing)
+        things2 =
+            List.foldl
+                (\( _, thing ) dict ->
+                    case thing.thingType of
+                        OtherThing { releasedAt } ->
+                            Dict.update
+                                ( Date.year releasedAt, Date.monthNumber releasedAt )
+                                (\maybe -> Maybe.withDefault [] maybe |> (::) thing |> Just)
+                                dict
+
+                        JobThing _ ->
+                            dict
+
+                        PodcastThing { releasedAt } ->
+                            Dict.update
+                                ( Date.year releasedAt, Date.monthNumber releasedAt )
+                                (\maybe -> Maybe.withDefault [] maybe |> (::) thing |> Just)
+                                dict
+                )
+                Dict.empty
+                (Dict.toList things)
+    in
+    timelineViewHelper 9 1993 [] things2 model
+
+
+timelineViewHelper : Int -> Int -> List (Ui.Element msg) -> Dict ( Int, Int ) (List Thing) -> Model -> Ui.Element msg
+timelineViewHelper month year list thingsSorted model =
+    if month > 6 && year >= 2024 then
+        Ui.column [] list
+
+    else
+        timelineViewHelper
+            (modBy 12 (month + 1))
+            (if month >= 11 then
+                year + 1
+
+             else
+                year
+            )
+            (Ui.row
+                [ Ui.spacing 8 ]
+                [ Ui.el
+                    [ Ui.Font.family [ Ui.Font.monospace ]
+                    , Ui.Font.size 16
+                    , Ui.width Ui.shrink
+                    , if Dict.member ( year, month ) thingsSorted then
+                        Ui.Font.bold
+
+                      else
+                        Ui.noAttr
+                    ]
+                    (Ui.text (String.fromInt year ++ " " ++ monthToString month))
+                , if month < 3 && year <= 2010 then
+                    Ui.none
+
+                  else
+                    Ui.el [ Ui.width (Ui.px 20), Ui.height Ui.fill, Ui.background (Ui.rgb 100 100 100) ] Ui.none
+                , case Dict.get ( year, month ) thingsSorted of
+                    Just things ->
+                        List.map
+                            (\thing ->
+                                Ui.image
+                                    [ Ui.width (Ui.px 60)
+                                    , Ui.height (Ui.px 60)
+                                    ]
+                                    { source = thing.previewImage, description = thing.name, onLoad = Nothing }
+                            )
+                            things
+                            |> Ui.row [ Ui.spacing 4 ]
+
+                    Nothing ->
+                        Ui.none
+                ]
+                :: list
+            )
+            thingsSorted
+            model
+
+
+monthToString : Int -> String
+monthToString month =
+    case month of
+        0 ->
+            "Jan"
+
+        1 ->
+            "Feb"
+
+        2 ->
+            "Mar"
+
+        3 ->
+            "Apr"
+
+        4 ->
+            "May"
+
+        5 ->
+            "Jun"
+
+        6 ->
+            "Jul"
+
+        7 ->
+            "Aug"
+
+        8 ->
+            "Sep"
+
+        9 ->
+            "Oct"
+
+        10 ->
+            "Nov"
+
+        _ ->
+            "Dec"
 
 
 containerBackground : Ui.Attribute msg
@@ -566,14 +698,14 @@ sortByView model =
             , Ui.el
                 (Ui.borderWith { left = 0, right = 0, top = 1, bottom = 1 }
                     :: tooltip "Sort by title names"
-                    :: sorByButtonAttributes model.sortBy Alphabetically
+                    :: sorByButtonAttributes model.sortBy Alphabetical
                 )
                 (Ui.text "A to Z")
             , Ui.el
                 (Ui.roundedWith { topLeft = 0, topRight = 16, bottomLeft = 0, bottomRight = 16 }
                     :: Ui.border 1
-                    :: tooltip "Sort by when things were released. For stuff that doesn't have a clear release date, this is when it first become known to or used by several people"
-                    :: sorByButtonAttributes model.sortBy Chronologically
+                    :: tooltip "Sort by when things were released. For stuff that doesn't have a clear release date, this is when it first became known to or used by several people (or when I abandoned it)"
+                    :: sorByButtonAttributes model.sortBy Chronological
                 )
                 (Ui.text "Newest to oldest")
             ]
