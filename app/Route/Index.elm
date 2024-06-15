@@ -104,10 +104,22 @@ update _ _ msg model =
             ( { model | filter = Array.filter (\a -> a /= tag) model.filter }, Cmd.none )
 
         PressedSortBy sortBy ->
-            ( { model | sortBy = sortBy }, Cmd.none )
+            ( { model | sortBy = sortBy }
+            , if sortBy == Quality then
+                getElements
+
+              else
+                Cmd.none
+            )
 
         WindowResized ->
-            ( model, getElements )
+            ( model
+            , if model.sortBy == Quality then
+                getElements
+
+              else
+                Cmd.none
+            )
 
         GotWorstTierPosition result ->
             ( { model | worstTier = getLines result }, Cmd.none )
@@ -301,7 +313,6 @@ svgLine aboveTier belowTier aboveColor belowColor line =
         , Html.Attributes.style "left" "0"
         , Html.Attributes.style "width" "100%"
         , Html.Attributes.style "height" "100%"
-        , Html.Attributes.style "pointer-events" "none"
         ]
         (case line of
             NoLine ->
@@ -374,7 +385,11 @@ svgLine aboveTier belowTier aboveColor belowColor line =
                 ]
         )
         |> Ui.html
-        |> Ui.el [ Ui.Responsive.visible Shared.breakpoints [ NotMobile ], Ui.height Ui.fill ]
+        |> Ui.el
+            [ Ui.Responsive.visible Shared.breakpoints [ NotMobile ]
+            , Ui.height Ui.fill
+            , Ui.htmlAttribute (Html.Attributes.style "pointer-events" "none")
+            ]
 
 
 svgText : String -> String -> Float -> Float -> String -> Svg msg
