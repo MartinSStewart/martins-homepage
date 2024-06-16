@@ -1,8 +1,18 @@
-module Things exposing (Tag(..), Thing, ThingType(..), qualityOrder, tagData, thingsIHaveDone)
+module Things exposing
+    ( Tag(..)
+    , Thing
+    , ThingType(..)
+    , csharpColor
+    , elmColor
+    , gameMakerColor
+    , lamderaColor
+    , qualityOrder
+    , tagData
+    , thingsIHaveDone
+    )
 
 import Date exposing (Date)
 import Dict exposing (Dict)
-import Set exposing (Set)
 import Time exposing (Month(..))
 import Ui
 
@@ -11,7 +21,7 @@ tagData : Tag -> TagData
 tagData tag =
     case tag of
         Elm ->
-            { text = "Elm", color = Ui.rgb 18 147 216, tooltip = "Anything created with Elm or related to the Elm community" }
+            { text = "Elm", color = elmColor, tooltip = "Anything created with Elm or related to the Elm community" }
 
         ElmPackage ->
             { text = "Elm package", color = Ui.rgb 77 174 226, tooltip = "Is a published Elm package" }
@@ -20,13 +30,13 @@ tagData tag =
             { text = "Game", color = Ui.rgb 43 121 34, tooltip = "Is a game or contains games" }
 
         Lamdera ->
-            { text = "Lamdera", color = Ui.rgb 46 51 53, tooltip = "Created with Lamdera" }
+            { text = "Lamdera", color = lamderaColor, tooltip = "Created with Lamdera" }
 
         Podcast ->
             { text = "Podcast", color = Ui.rgb 150 74 8, tooltip = "A podcast I've been invited to" }
 
         GameMaker ->
-            { text = "Game Maker", color = Ui.rgb 182 6 6, tooltip = "Made with Game Maker 7/8/Studio" }
+            { text = "Game Maker", color = gameMakerColor, tooltip = "Made with Game Maker 7/8/Studio" }
 
         GameJam ->
             { text = "Game jam", color = Ui.rgb 154 20 20, tooltip = "Made with Game Maker 7/8/Studio" }
@@ -38,7 +48,7 @@ tagData tag =
             { text = "Job", color = Ui.rgb 168 116 116, tooltip = "Full time or part time job" }
 
         CSharp ->
-            { text = "C#", color = Ui.rgb 105 0 129, tooltip = "Made using C#" }
+            { text = "C#", color = csharpColor, tooltip = "Made using C#" }
 
         FSharp ->
             { text = "F#", color = Ui.rgb 55 139 186, tooltip = "Worked with F#" }
@@ -48,6 +58,26 @@ tagData tag =
 
         Javascript ->
             { text = "JavaScript", color = Ui.rgb 217 197 70, tooltip = "Made using JavaScript" }
+
+
+gameMakerColor : Ui.Color
+gameMakerColor =
+    Ui.rgb 182 6 6
+
+
+csharpColor : Ui.Color
+csharpColor =
+    Ui.rgb 105 0 129
+
+
+elmColor : Ui.Color
+elmColor =
+    Ui.rgb 18 147 216
+
+
+lamderaColor : Ui.Color
+lamderaColor =
+    Ui.rgb 46 51 53
 
 
 type alias TagData =
@@ -601,6 +631,7 @@ thingsIHaveDone =
                 { startedAt = date 2014 Apr 1
                 , endedAt = Just (date 2017 Jan 31)
                 , elmPercentage = 0
+                , columnIndex = 2
                 }
         }
       )
@@ -617,6 +648,7 @@ thingsIHaveDone =
                 { startedAt = date 2013 Jun 4
                 , endedAt = Just (date 2016 Dec 26)
                 , elmPercentage = 0
+                , columnIndex = 1
                 }
         }
       )
@@ -633,6 +665,7 @@ thingsIHaveDone =
                 { startedAt = date 2016 Oct 31
                 , endedAt = Just (date 2020 Jan 31)
                 , elmPercentage = 5
+                , columnIndex = 1
                 }
         }
       )
@@ -649,6 +682,7 @@ thingsIHaveDone =
                 { startedAt = date 2020 Feb 3
                 , endedAt = Just (date 2022 Feb 25)
                 , elmPercentage = 50
+                , columnIndex = 1
                 }
         }
       )
@@ -665,6 +699,7 @@ thingsIHaveDone =
                 { startedAt = date 2021 Aug 18
                 , endedAt = Just (date 2023 Apr 30)
                 , elmPercentage = 100
+                , columnIndex = 2
                 }
         }
       )
@@ -681,6 +716,7 @@ thingsIHaveDone =
                 { startedAt = date 2023 Aug 15
                 , endedAt = Nothing
                 , elmPercentage = 100
+                , columnIndex = 1
                 }
         }
       )
@@ -1300,7 +1336,7 @@ type alias Thing =
 
 
 type ThingType
-    = JobThing { startedAt : Date, endedAt : Maybe Date, elmPercentage : Int }
+    = JobThing { startedAt : Date, endedAt : Maybe Date, elmPercentage : Int, columnIndex : Int }
     | OtherThing
         { repo : Maybe String
         , -- Very imprecise due to it being unclear what counts as "released at". If there isn't a clear release date, pick something that counts as when the thing became usable for or known to several people.

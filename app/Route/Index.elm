@@ -4,7 +4,7 @@ import Array exposing (Array)
 import BackendTask exposing (BackendTask)
 import Browser.Dom
 import Browser.Events
-import Date exposing (Date)
+import Date exposing (Date, Month)
 import Dict exposing (Dict)
 import Effect exposing (Effect)
 import FatalError exposing (FatalError)
@@ -21,7 +21,7 @@ import Shared exposing (Breakpoints(..))
 import Svg exposing (Svg)
 import Svg.Attributes
 import Task
-import Things exposing (Tag, ThingType(..))
+import Things exposing (Tag(..), ThingType(..))
 import Time exposing (Month(..))
 import Ui
 import Ui.Font
@@ -553,27 +553,134 @@ timelineView things model =
                 )
                 Dict.empty
                 (Dict.toList things)
+
+        durations : List { startedAt : Int, endedAt : Int, name : String, color : Ui.Color }
+        durations =
+            List.filterMap
+                (\( _, thing ) ->
+                    case thing.thingType of
+                        OtherThing { releasedAt } ->
+                            Nothing
+
+                        JobThing { startedAt, endedAt } ->
+                            Just
+                                { startedAt = yearAndMonthToCount (Date.year startedAt) (Date.month startedAt)
+                                , endedAt =
+                                    case endedAt of
+                                        Just a ->
+                                            yearAndMonthToCount (Date.year a) (Date.month a)
+
+                                        Nothing ->
+                                            currentDate2
+                                , name = thing.name ++ " job"
+                                , color =
+                                    if List.member Lamdera thing.tags then
+                                        Things.lamderaColor
+
+                                    else if List.member CSharp thing.tags then
+                                        Things.csharpColor
+
+                                    else if List.member Elm thing.tags then
+                                        Things.elmColor
+
+                                    else if List.member GameMaker thing.tags then
+                                        Things.gameMakerColor
+
+                                    else
+                                        Ui.rgb 0 0 0
+                                }
+
+                        PodcastThing { releasedAt } ->
+                            Nothing
+                )
+                (Dict.toList things)
     in
-    timelineViewHelper 9 1993 [] things2 model
+    timelineViewHelper currentDate2 9 [] things2 durations model
 
 
-timelineViewHelper : Int -> Int -> List (Ui.Element msg) -> Dict ( Int, Int ) (List Thing) -> Model -> Ui.Element msg
-timelineViewHelper month year list thingsSorted model =
-    if month > 6 && year >= 2024 then
+yearAndMonthToCount : Int -> Month -> Int
+yearAndMonthToCount year month =
+    12 * (year - 1993) + (Date.monthToNumber month - 1)
+
+
+bornAt : Int
+bornAt =
+    yearAndMonthToCount 1993 Oct
+
+
+darkAgesEnd : Int
+darkAgesEnd =
+    yearAndMonthToCount 2007 Jan
+
+
+gameMakerEraEnd : Int
+gameMakerEraEnd =
+    yearAndMonthToCount 2016 Nov
+
+
+csharpEraEnd =
+    yearAndMonthToCount 2018 Nov
+
+
+currentDate2 =
+    yearAndMonthToCount 2024 Jul
+
+
+timelineBlock : Ui.Color -> String -> Int -> Int -> Int -> Ui.Element msg
+timelineBlock color text startDate endDate count =
+    if endDate <= count || startDate > count then
+        Ui.none
+
+    else
+        Ui.el
+            [ Ui.width (Ui.px 24)
+            , Ui.height Ui.fill
+            , Ui.background color
+            , if endDate == count + 1 then
+                Ui.inFront
+                    (Ui.el
+                        [ Ui.rotate (Ui.turns 0.75)
+                        , Ui.Font.exactWhitespace
+                        , Ui.Font.color (Ui.rgb 255 255 255)
+                        , Ui.move { x = -2, y = 200, z = 0 }
+                        ]
+                        (Ui.text text)
+                    )
+
+              else
+                Ui.noAttr
+            ]
+            Ui.none
+
+
+timelineViewHelper :
+    Int
+    -> Int
+    -> List (Ui.Element msg)
+    -> Dict ( Int, Int ) (List Thing)
+    -> List { startedAt : Int, endedAt : Int, name : String, color : Ui.Color }
+    -> Model
+    -> Ui.Element msg
+timelineViewHelper currentDate count list thingsSorted durations model =
+    let
+        month : Int
+        month =
+            modBy 12 count
+
+        year : Int
+        year =
+            1993 + count // 12
+    in
+    if currentDate <= count then
         Ui.column [] list
 
     else
         timelineViewHelper
-            (modBy 12 (month + 1))
-            (if month >= 11 then
-                year + 1
-
-             else
-                year
-            )
+            currentDate
+            (count + 1)
             (Ui.row
                 [ Ui.spacing 8 ]
-                [ Ui.el
+                ([ Ui.el
                     [ Ui.Font.family [ Ui.Font.monospace ]
                     , Ui.Font.size 16
                     , Ui.width Ui.shrink
@@ -584,30 +691,37 @@ timelineViewHelper month year list thingsSorted model =
                         Ui.noAttr
                     ]
                     (Ui.text (String.fromInt year ++ " " ++ monthToString month))
-                , if month < 3 && year <= 2010 then
-                    Ui.none
+                 , timelineBlock (Ui.rgb 100 100 100) "No programming dark ages" bornAt darkAgesEnd count
+                 , timelineBlock Things.gameMakerColor "Game Maker era" darkAgesEnd gameMakerEraEnd count
+                 , timelineBlock Things.csharpColor "C# era" gameMakerEraEnd csharpEraEnd count
+                 , timelineBlock Things.elmColor "Elm era" csharpEraEnd currentDate count
+                 ]
+                    ++ List.map
+                        (\{ startedAt, endedAt, name, color } ->
+                            timelineBlock color name startedAt endedAt count
+                        )
+                        durations
+                    ++ [ case Dict.get ( year, month ) thingsSorted of
+                            Just things ->
+                                List.map
+                                    (\thing ->
+                                        Ui.image
+                                            [ Ui.width (Ui.px 60)
+                                            , Ui.height (Ui.px 60)
+                                            ]
+                                            { source = thing.previewImage, description = thing.name, onLoad = Nothing }
+                                    )
+                                    things
+                                    |> Ui.row [ Ui.spacing 4 ]
 
-                  else
-                    Ui.el [ Ui.width (Ui.px 20), Ui.height Ui.fill, Ui.background (Ui.rgb 100 100 100) ] Ui.none
-                , case Dict.get ( year, month ) thingsSorted of
-                    Just things ->
-                        List.map
-                            (\thing ->
-                                Ui.image
-                                    [ Ui.width (Ui.px 60)
-                                    , Ui.height (Ui.px 60)
-                                    ]
-                                    { source = thing.previewImage, description = thing.name, onLoad = Nothing }
-                            )
-                            things
-                            |> Ui.row [ Ui.spacing 4 ]
-
-                    Nothing ->
-                        Ui.none
-                ]
+                            Nothing ->
+                                Ui.none
+                       ]
+                )
                 :: list
             )
             thingsSorted
+            durations
             model
 
 
