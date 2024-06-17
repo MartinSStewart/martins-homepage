@@ -732,8 +732,9 @@ timelineViewHelper currentDate count list thingsSorted durations model =
                                 List.map
                                     (\thing ->
                                         Ui.image
-                                            [ Ui.width (Ui.px 40)
-                                            , Ui.height (Ui.px 40)
+                                            [ Ui.width (Ui.px 39)
+                                            , Ui.height (Ui.px 39)
+                                            , Ui.alignBottom
                                             ]
                                             { source = thing.previewImage, description = thing.name, onLoad = Nothing }
                                     )
