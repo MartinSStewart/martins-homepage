@@ -538,7 +538,7 @@ timelineView things model =
                     case thing.thingType of
                         OtherThing { releasedAt } ->
                             Dict.update
-                                ( Date.year releasedAt, Date.monthNumber releasedAt )
+                                ( Date.year releasedAt, Date.monthNumber releasedAt - 1 )
                                 (\maybe -> Maybe.withDefault [] maybe |> (::) thing |> Just)
                                 dict
 
@@ -554,7 +554,7 @@ timelineView things model =
                 Dict.empty
                 (Dict.toList things)
 
-        durations : List { startedAt : Int, endedAt : Int, name : String, color : Ui.Color }
+        durations : List { startedAt : Int, endedAt : Int, name : String, color : Ui.Color, columnIndex : Int }
         durations =
             List.filterMap
                 (\( _, thing ) ->
@@ -562,7 +562,7 @@ timelineView things model =
                         OtherThing { releasedAt } ->
                             Nothing
 
-                        JobThing { startedAt, endedAt } ->
+                        JobThing { startedAt, endedAt, columnIndex } ->
                             Just
                                 { startedAt = yearAndMonthToCount (Date.year startedAt) (Date.month startedAt)
                                 , endedAt =
@@ -588,6 +588,7 @@ timelineView things model =
 
                                     else
                                         Ui.rgb 0 0 0
+                                , columnIndex = columnIndex
                                 }
 
                         PodcastThing { releasedAt } ->
@@ -626,23 +627,23 @@ currentDate2 =
     yearAndMonthToCount 2024 Jul
 
 
-timelineBlock : Ui.Color -> String -> Int -> Int -> Int -> Ui.Element msg
+timelineBlock : Ui.Color -> String -> Int -> Int -> Int -> Maybe (Ui.Element msg)
 timelineBlock color text startDate endDate count =
     if endDate <= count || startDate > count then
-        Ui.none
+        Nothing
 
     else
         Ui.el
             [ Ui.width (Ui.px 24)
             , Ui.height Ui.fill
             , Ui.background color
-            , if endDate == count + 1 then
+            , if endDate == count + 6 then
                 Ui.inFront
                     (Ui.el
                         [ Ui.rotate (Ui.turns 0.75)
                         , Ui.Font.exactWhitespace
                         , Ui.Font.color (Ui.rgb 255 255 255)
-                        , Ui.move { x = -2, y = 200, z = 0 }
+                        , Ui.move { x = -2, y = 0, z = 0 }
                         ]
                         (Ui.text text)
                     )
@@ -651,6 +652,7 @@ timelineBlock color text startDate endDate count =
                 Ui.noAttr
             ]
             Ui.none
+            |> Just
 
 
 timelineViewHelper :
@@ -658,7 +660,7 @@ timelineViewHelper :
     -> Int
     -> List (Ui.Element msg)
     -> Dict ( Int, Int ) (List Thing)
-    -> List { startedAt : Int, endedAt : Int, name : String, color : Ui.Color }
+    -> List { startedAt : Int, endedAt : Int, name : String, color : Ui.Color, columnIndex : Int }
     -> Model
     -> Ui.Element msg
 timelineViewHelper currentDate count list thingsSorted durations model =
@@ -670,6 +672,20 @@ timelineViewHelper currentDate count list thingsSorted durations model =
         year : Int
         year =
             1993 + count // 12
+
+        columns : List (Ui.Element msg)
+        columns =
+            List.foldl
+                (\{ startedAt, endedAt, name, color, columnIndex } list2 ->
+                    case timelineBlock color name startedAt endedAt count of
+                        Just a ->
+                            List.Extra.setAt (columnIndex - 1) a list2
+
+                        Nothing ->
+                            list2
+                )
+                (List.repeat 2 (Ui.el [ Ui.width (Ui.px 24), Ui.height Ui.fill ] Ui.none))
+                durations
     in
     if currentDate <= count then
         Ui.column [] list
@@ -679,7 +695,16 @@ timelineViewHelper currentDate count list thingsSorted durations model =
             currentDate
             (count + 1)
             (Ui.row
-                [ Ui.spacing 8 ]
+                [ Ui.spacing 8
+                , Ui.behindContent
+                    (Ui.el
+                        [ Ui.height (Ui.px 1)
+                        , Ui.background (Ui.rgb 200 200 200)
+                        ]
+                        Ui.none
+                    )
+                , Ui.height (Ui.px 40)
+                ]
                 ([ Ui.el
                     [ Ui.Font.family [ Ui.Font.monospace ]
                     , Ui.Font.size 16
@@ -692,22 +717,21 @@ timelineViewHelper currentDate count list thingsSorted durations model =
                     ]
                     (Ui.text (String.fromInt year ++ " " ++ monthToString month))
                  , timelineBlock (Ui.rgb 100 100 100) "No programming dark ages" bornAt darkAgesEnd count
-                 , timelineBlock Things.gameMakerColor "Game Maker era" darkAgesEnd gameMakerEraEnd count
+                    |> Maybe.withDefault Ui.none
+                 , timelineBlock Things.gameMakerColor "GameMaker era" darkAgesEnd gameMakerEraEnd count
+                    |> Maybe.withDefault Ui.none
                  , timelineBlock Things.csharpColor "C# era" gameMakerEraEnd csharpEraEnd count
-                 , timelineBlock Things.elmColor "Elm era" csharpEraEnd currentDate count
+                    |> Maybe.withDefault Ui.none
+                 , timelineBlock Things.elmColor "Elm era" csharpEraEnd currentDate count |> Maybe.withDefault Ui.none
                  ]
-                    ++ List.map
-                        (\{ startedAt, endedAt, name, color } ->
-                            timelineBlock color name startedAt endedAt count
-                        )
-                        durations
+                    ++ columns
                     ++ [ case Dict.get ( year, month ) thingsSorted of
                             Just things ->
                                 List.map
                                     (\thing ->
                                         Ui.image
-                                            [ Ui.width (Ui.px 60)
-                                            , Ui.height (Ui.px 60)
+                                            [ Ui.width (Ui.px 40)
+                                            , Ui.height (Ui.px 40)
                                             ]
                                             { source = thing.previewImage, description = thing.name, onLoad = Nothing }
                                     )

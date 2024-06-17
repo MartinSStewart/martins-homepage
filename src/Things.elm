@@ -36,7 +36,7 @@ tagData tag =
             { text = "Podcast", color = Ui.rgb 150 74 8, tooltip = "A podcast I've been invited to" }
 
         GameMaker ->
-            { text = "Game Maker", color = gameMakerColor, tooltip = "Made with Game Maker 7/8/Studio" }
+            { text = "GameMaker", color = gameMakerColor, tooltip = "Made with Game Maker 7/8/Studio" }
 
         GameJam ->
             { text = "Game jam", color = Ui.rgb 154 20 20, tooltip = "Made with Game Maker 7/8/Studio" }
@@ -639,14 +639,14 @@ thingsIHaveDone =
       , { name = "Crivia"
         , website = Just "https://www.cliftonbazaar.games/games.php?game=crivia"
         , tags = [ Game, GameMaker, Job ]
-        , description = "A game I was hired to make for a guy named James Clifton. Crivia or Cricket Trivia is a game about answering trivia questions about the sport Cricket. I was only paid like 60 USD for on and off work spanning 3 years so this kind of stretches the definition of a job but I think at the time I was more concerned with experience and resume building. The game was made in Game Maker with a tiny amount of PHP used for saving highscores to James' website."
+        , description = "A game I was hired to make for a guy named James Clifton. Crivia or Cricket Trivia is a game about answering trivia questions about the sport Cricket. I was only paid like 60 USD for on and off work spanning 8 months so this kind of stretches the definition of a job but I think at the time I was more concerned with experience and resume building. The game was made in Game Maker with a tiny amount of PHP used for saving highscores to James' website."
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/game-maker-preview.png"
         , thingType =
             JobThing
                 { startedAt = date 2013 Jun 4
-                , endedAt = Just (date 2016 Dec 26)
+                , endedAt = Just (date 2014 Feb 14)
                 , elmPercentage = 0
                 , columnIndex = 1
                 }
@@ -1057,7 +1057,7 @@ thingsIHaveDone =
         , description = ""
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/lamdera-preview.svg"
         , thingType =
             OtherThing
                 { releasedAt = date 2020 Jan 27
