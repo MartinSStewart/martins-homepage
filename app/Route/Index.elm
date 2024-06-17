@@ -679,13 +679,15 @@ timelineViewHelper currentDate count list thingsSorted durations model =
                 (\{ startedAt, endedAt, name, color, columnIndex } list2 ->
                     case timelineBlock color name startedAt endedAt count of
                         Just a ->
-                            List.Extra.setAt (columnIndex - 1) a list2
+                            List.Extra.setAt (columnIndex - 1) (Just a) list2
 
                         Nothing ->
                             list2
                 )
-                (List.repeat 2 (Ui.el [ Ui.width (Ui.px 24), Ui.height Ui.fill ] Ui.none))
+                (List.repeat 2 Nothing)
                 durations
+                |> List.Extra.dropWhileRight (\a -> a == Nothing)
+                |> List.map (Maybe.withDefault (Ui.el [ Ui.width (Ui.px 24), Ui.height Ui.fill ] Ui.none))
     in
     if currentDate <= count then
         Ui.column [] list
