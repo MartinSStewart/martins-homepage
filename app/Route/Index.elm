@@ -4,6 +4,7 @@ import Array exposing (Array)
 import BackendTask exposing (BackendTask)
 import Browser.Dom
 import Browser.Events
+import Color.Manipulate
 import Date exposing (Date, Month)
 import Dict exposing (Dict)
 import Effect exposing (Effect)
@@ -27,6 +28,7 @@ import Ui
 import Ui.Font
 import Ui.Input
 import Ui.Responsive
+import Ui.Shadow
 import UrlPath
 import View exposing (View)
 
@@ -93,6 +95,12 @@ type Line
     = NoLine
     | HorizontalLine { xStart : Float, xEnd : Float, y : Float }
     | StaggeredLine { xStart : Float, xEnd : Float, y0 : Float, y1 : Float, x : Float }
+
+
+type Tier
+    = TopTier
+    | MiddleTier
+    | WorstTier
 
 
 update : App Data ActionData RouteParams -> Shared.Model -> Msg -> Model -> ( Model, Effect Msg )
@@ -210,14 +218,24 @@ getElements =
         ]
 
 
+worstTier : List String
+worstTier =
+    List.Extra.dropWhile (\a -> a /= "sanctum") Things.qualityOrder
+
+
 topOfLowTier : List String
 topOfLowTier =
-    List.Extra.dropWhile (\a -> a /= "sanctum") Things.qualityOrder |> List.take Shared.maxColumns
+    List.take Shared.maxColumns worstTier
+
+
+middleTier : List String
+middleTier =
+    List.Extra.dropWhile (\a -> a /= "secret-santa-game") Things.qualityOrder
 
 
 topOfTopTier : List String
 topOfTopTier =
-    List.Extra.dropWhile (\a -> a /= "secret-santa-game") Things.qualityOrder |> List.take Shared.maxColumns
+    List.take Shared.maxColumns middleTier
 
 
 data : BackendTask FatalError Data
@@ -412,8 +430,27 @@ view :
     -> View (PagesMsg Msg)
 view app _ model =
     let
-        thingsDone =
-            app.data.thingsIHaveDone
+        thingsDone0 : Dict String ( Tier, Thing )
+        thingsDone0 =
+            Dict.map (\_ thing -> ( TopTier, thing )) app.data.thingsIHaveDone
+
+        thingsDone1 : Dict String ( Tier, Thing )
+        thingsDone1 =
+            List.foldl
+                (\name dict ->
+                    Dict.update name (Maybe.map (Tuple.mapFirst (\_ -> MiddleTier))) dict
+                )
+                thingsDone0
+                middleTier
+
+        thingsDone2 : Dict String ( Tier, Thing )
+        thingsDone2 =
+            List.foldl
+                (\name dict ->
+                    Dict.update name (Maybe.map (Tuple.mapFirst (\_ -> WorstTier))) dict
+                )
+                thingsDone1
+                worstTier
 
         filterSet : Set String
         filterSet =
@@ -422,16 +459,16 @@ view app _ model =
                 (Array.toList model.filter)
                 |> Set.fromList
 
-        thingsSorted : List ( String, Thing )
+        thingsSorted : List ( String, ( Tier, Thing ) )
         thingsSorted =
             case model.sortBy of
                 Alphabetical ->
-                    Dict.toList thingsDone
+                    Dict.toList thingsDone2
 
                 Quality ->
                     List.foldl
                         (\name list ->
-                            case Dict.get name thingsDone of
+                            case Dict.get name thingsDone2 of
                                 Just thing ->
                                     ( name, thing ) :: list
 
@@ -443,12 +480,12 @@ view app _ model =
                         |> List.reverse
 
                 Chronological ->
-                    Dict.toList thingsDone
-                        |> List.sortWith (\( _, a ) ( _, b ) -> Date.compare (thingDate b) (thingDate a))
+                    Dict.toList thingsDone2
+                        |> List.sortWith (\( _, ( _, a ) ) ( _, ( _, b ) ) -> Date.compare (thingDate b) (thingDate a))
 
-        filterThings viewFunc ( name, thing ) =
+        filterThings viewFunc ( name, ( tier, thing ) ) =
             if Set.isEmpty filterSet then
-                viewFunc ( name, thing ) |> Just
+                viewFunc name tier thing |> Just
 
             else if
                 Array.toList model.filter
@@ -463,7 +500,7 @@ view app _ model =
                                 thing.tags
                         )
             then
-                viewFunc ( name, thing ) |> Just
+                viewFunc name tier thing |> Just
 
             else
                 Nothing
@@ -792,9 +829,14 @@ monthToString month =
             "Dec"
 
 
+containerBackgroundColor : Ui.Color
+containerBackgroundColor =
+    Ui.rgb 245 245 245
+
+
 containerBackground : Ui.Attribute msg
 containerBackground =
-    Ui.background (Ui.rgb 245 245 245)
+    Ui.background containerBackgroundColor
 
 
 containerBorder : Ui.Color
@@ -802,6 +844,7 @@ containerBorder =
     Ui.rgb 210 210 210
 
 
+sorByButtonAttributes : SortBy -> SortBy -> List (Ui.Attribute Msg)
 sorByButtonAttributes selected sortBy =
     [ Ui.Input.button (PressedSortBy sortBy)
     , Ui.border 1
@@ -872,8 +915,8 @@ filterView model =
         ]
 
 
-thingsViewMobile : ( String, Thing ) -> Ui.Element Msg
-thingsViewMobile ( name, thing ) =
+thingsViewMobile : String -> Tier -> Thing -> Ui.Element Msg
+thingsViewMobile name tier thing =
     Ui.row
         [ containerBackground
         , Ui.borderColor containerBorder
@@ -913,12 +956,80 @@ thingsViewMobile ( name, thing ) =
         ]
 
 
-thingsViewNotMobile : ( String, Thing ) -> Ui.Element Msg
-thingsViewNotMobile ( name, thing ) =
+worstTierColor =
+    Ui.rgb 250 130 130
+
+
+topTierBackground =
+    Color.Manipulate.weightedMix containerBackgroundColor Things.elmColor 0.9
+
+
+worstTierBackground =
+    Color.Manipulate.weightedMix containerBackgroundColor worstTierColor 0.9
+
+
+thingsViewNotMobile : String -> Tier -> Thing -> Ui.Element Msg
+thingsViewNotMobile name tier thing =
     Ui.column
         [ Ui.width (Ui.px Shared.tileWidth)
-        , containerBackground
-        , Ui.borderColor containerBorder
+        , Ui.background
+            (case tier of
+                MiddleTier ->
+                    containerBackgroundColor
+
+                TopTier ->
+                    topTierBackground
+
+                WorstTier ->
+                    worstTierBackground
+            )
+        , Ui.borderColor
+            (case tier of
+                MiddleTier ->
+                    containerBorder
+
+                TopTier ->
+                    Things.elmColor
+
+                WorstTier ->
+                    worstTierColor
+            )
+        , Ui.Shadow.shadows
+            [ { x = 0
+              , y = 0
+              , size = 0
+              , blur = 4
+              , color =
+                    (case tier of
+                        MiddleTier ->
+                            containerBorder
+
+                        TopTier ->
+                            Things.elmColor
+
+                        WorstTier ->
+                            worstTierColor
+                    )
+                        |> Color.Manipulate.fadeOut 0.8
+              }
+            , { x = 0
+              , y = 0
+              , size = 0
+              , blur = 2
+              , color =
+                    (case tier of
+                        MiddleTier ->
+                            containerBorder
+
+                        TopTier ->
+                            Things.elmColor
+
+                        WorstTier ->
+                            worstTierColor
+                    )
+                        |> Color.Manipulate.fadeOut 0.8
+              }
+            ]
         , Ui.border 1
         , Ui.rounded 4
         , Ui.alignTop
