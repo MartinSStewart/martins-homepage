@@ -159,7 +159,7 @@ thingsIHaveDone =
       , { name = "ascii-collab"
         , website = Just "https://ascii-collab.app/"
         , tags = [ Elm, Game, Lamdera ]
-        , description = "An infinite canvas that people can draw ascii art on together"
+        , description = "An infinite canvas that people can draw ascii art on together. I wrote an [announcement post](https://discourse.elm-lang.org/t/ascii-collab-draw-ascii-art-together-on-an-infinite-canvas/6273) and a [follow up post](https://discourse.elm-lang.org/t/ascii-collab-progress-update/7019) about it."
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
@@ -174,7 +174,7 @@ thingsIHaveDone =
       , { name = "Meetdown"
         , website = Just "https://meetdown.app/"
         , tags = [ Elm, Lamdera ]
-        , description = ""
+        , description = "[Announcement post](https://discourse.elm-lang.org/t/i-made-a-meetup-com-clone/7480)"
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
@@ -189,7 +189,7 @@ thingsIHaveDone =
       , { name = "Circuit Breaker"
         , website = Just "https://martinsstewart.gitlab.io/hackman/"
         , tags = [ Elm, Game ]
-        , description = ""
+        , description = "I made a [blog post](https://dev.to/martinsstewart/what-is-elm-and-a-game-i-m-making-with-it-3di1) describing how Elm made it easier to create along with an [announcement post](https://discourse.elm-lang.org/t/ive-created-a-game-in-elm/4844)."
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
@@ -220,7 +220,7 @@ thingsIHaveDone =
       , { name = "elm-review-bot"
         , website = Nothing
         , tags = [ Elm, Lamdera ]
-        , description = ""
+        , description = "[Discourse post](https://discourse.elm-lang.org/t/i-created-218-pull-requests-in-3-days/7276)"
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
@@ -231,11 +231,11 @@ thingsIHaveDone =
                 }
         }
       )
-    , ( "state-of-elm"
-      , { name = "state-of-elm"
+    , ( "state-of-elm-2022"
+      , { name = "state-of-elm 2022"
         , website = Just "https://state-of-elm.com/2022"
         , tags = [ Elm, Lamdera ]
-        , description = ""
+        , description = "[Announcement post](https://discourse.elm-lang.org/t/state-of-elm-2022/8284) and [results announcement](https://discourse.elm-lang.org/t/state-of-elm-survey-results/8362)."
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
@@ -246,7 +246,27 @@ thingsIHaveDone =
                 }
         }
       )
-    , elmPackage "MartinSStewart" "elm-serialize" "" websiteReleasedAt (date 2020 Jul 30)
+    , ( "state-of-elm-2023"
+      , { name = "state-of-elm 2023"
+        , website = Just "https://state-of-elm.com/2023"
+        , tags = [ Elm, Lamdera ]
+        , description = "[Announcement post](https://discourse.elm-lang.org/t/state-of-elm-2023/9307) and a [closing post](https://discourse.elm-lang.org/t/state-of-elm-2023-closed/9369). Embarrassingly I've never finished the results page for this so the results of this survey aren't published."
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/discord-bot-preview.png"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2023 Sep 3
+                , repo = Just "https://github.com/MartinSStewart/state-of-elm"
+                }
+        }
+      )
+    , elmPackage
+        "MartinSStewart"
+        "elm-serialize"
+        "[Discourse post](https://discourse.elm-lang.org/t/elm-serialize-quickly-and-reliably-encode-and-decode-elm-values/6112/3)"
+        websiteReleasedAt
+        (date 2020 Jul 30)
     , ( "elm-review-elm-ui-upgrade"
       , { name = "elm-review-elm-ui-upgrade"
         , website = Nothing
@@ -310,7 +330,12 @@ thingsIHaveDone =
     , elmPackage "MartinSStewart" "send-grid" "" websiteReleasedAt (date 2020 Feb 15)
     , elmPackage "MartinSStewart" "elm-bayer-matrix" "A package for generating [bayer matrices](https://en.wikipedia.org/wiki/Ordered_dithering). These are useful for producing a dithering effect for partially transparent images. I used it for [surface-voyage](/stuff/surface-voyage) to fade out objects too close to the camera. That said, in hindsight it was silly to make a package for 50 lines of code though." websiteReleasedAt (date 2020 Feb 15)
     , elmPackage "MartinSStewart" "elm-box-packing" "" websiteReleasedAt (date 2020 Apr 25)
-    , elmPackage "MartinSStewart" "elm-codec-bytes" "" websiteReleasedAt (date 2020 Feb 15)
+    , elmPackage
+        "MartinSStewart"
+        "elm-codec-bytes"
+        "[Discourse post](https://discourse.elm-lang.org/t/elm-codec-bytes-1-0-0-released/3989)"
+        websiteReleasedAt
+        (date 2020 Feb 15)
     , elmPackage "MartinSStewart" "elm-geometry-serialize" "" websiteReleasedAt (date 2020 Jul 31)
     , elmPackage "MartinSStewart" "elm-nonempty-string" "" websiteReleasedAt (date 2020 Feb 15)
     , ( "postmark-email-client"
@@ -690,7 +715,7 @@ thingsIHaveDone =
       , { name = "Realia"
         , website = Just "https://realia.se/"
         , tags = [ Elm, Lamdera, Job ]
-        , description = ""
+        , description = "[Discourse post](https://discourse.elm-lang.org/t/using-lamdera-professionally/9142)"
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
