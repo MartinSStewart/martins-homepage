@@ -1240,6 +1240,21 @@ thingsIHaveDone =
                 }
         }
       )
+    , ( "emils-turn"
+      , { name = "Emils turn"
+        , website = Nothing
+        , tags = [ Elm, Lamdera ]
+        , description = "A simple app that helps me and my friend Emil remember whose turn it is to buy brownies to snack on after we take a break from bouldering. Took 20-30 minutes to make. ![Martin's turn](/emils-tur/image0.png) ![Emil's turn](/emils-tur/image1.png)"
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/lamdera-preview.svg"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2024 Jun 30
+                , repo = Just "https://github.com/MartinSStewart/emils-turn"
+                }
+        }
+      )
     ]
         |> Dict.fromList
 
@@ -1262,7 +1277,7 @@ qualityOrder =
     , "elm-map"
     , "elm-codec-bytes"
     , "break-the-facade"
-    , "state-of-elm"
+    , "state-of-elm-2022"
     , "sheep-game"
     , "secret-santa-game"
     , "air-hockey-racing"
@@ -1289,6 +1304,7 @@ qualityOrder =
     , "question-and-answer"
     , "send-grid"
     , "ds-game-over"
+    , "emils-turn"
     , "elm-box-packing"
     , "elm-review-remove-duplicate-code"
     , "elm-audio-presentation"
@@ -1314,6 +1330,7 @@ qualityOrder =
     , "tile-editor"
     , "discord-spaceship-game"
     , "lens"
+    , "state-of-elm-2023"
     , "stewart-everybody-net"
     , "german-game"
     , "lego-loco-remake"
