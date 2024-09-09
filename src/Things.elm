@@ -1255,6 +1255,125 @@ thingsIHaveDone =
                 }
         }
       )
+    , lamderaPackage "containers" """This package lets Elm users finally have a Dict and Set type that is both fast (not linear access time like [pzp-1997/assoc-list](https://package.elm-lang.org/packages/pzp1997/assoc-list/latest/)) while not requiring keys to be `comparable`.
+
+In this article I want to discuss an interesting set of trade offs I discovered when designing a Dict/Set data structure that, as far as I can tell, are unavoidable regardless of which programming language you use.
+
+But first some thanks are in order.
+* Thank you [Robin](https://github.com/robinheghan) for the original implementation of this package https://github.com/elm-explorations/hashmap. You handled most of the work for me!
+* Thank you [Ambue](https://ambue.com/) for letting me work on this package during work hours.
+* Thank you [miniBill](https://github.com/miniBill) for the Dict test suite. Without it I would have missed a critical bug.
+
+## So here's what I discovered
+
+First, for the purposes of explaining this discovery, lets say a Dict is a type with the following API:
+```elm
+get : key -> Dict key value -> Maybe value
+insert : key -> value -> Dict key value -> Dict key value
+fromList : List (key, value) -> Dict key value
+toList : Dict key value -> List (key, value)
+```
+
+Now let me list some properties that are really nice to have in a Dict type:
+1. The `key` typevar can be any equatable type (so functions can't be used as keys but non-comparable types are allowed)
+2. Two dicts with exactly the same key-value pairs are equal regardless of insertion order. For example, `elm fromList [ ("X", 0), ("Y", 1) ] == fromList [ ("Y", 1), ("X", 0) ]`
+3. If `elm dictA == dictB` then `elm f dictA == f dictB` where `f` is an arbitrary function
+4. Renaming/reordering record fields or custom type variants should never change the output of `toList`
+
+My discovery is that, as far as I can tell, regardless of what programming language you use or performance characteristics you allow for, *it's impossible to have more than 3 of these properties in a Dict type*.
+
+Now I don't have a mathematical proof to back this claim but I can explain why I believe it is true.
+
+First, lets consider the built in Dict type (I'm going to refer to it as elm/dict even though there isn't any package named that). What properties does it have?
+
+* Well it fails on 1. You can only have comparable keys.
+* It passes on 2. You'll find that `elm fromList [ ("X", 0), ("Y", 1) ] == fromList [ ("Y", 1), ("X", 0) ]` is indeed true
+* Passes on 3. And actually more broadly, outside of one language bug that exploits the fact that `NaN /= NaN`, any code written in Elm will pass on 3.
+* Passes on 4. Again this is a global property of the Elm language. Renaming/reordering a record fields or custom type variants will never change the runtime behavior of your code (with the exception of reordering record fields affecting record constructors).
+
+It's nice that elm/dict passes on 2, 3, and 4. But comparable keys are really restrictive! So lets try allowing for non-comparable keys while trying to keep those other nice properties.
+
+Well, the question we immediately encounter is, how should `toList` sort the list of key-value pairs? With elm/dict the list is lexicographically sorted by the key. This is possible because all of the keys are comparable values. But what do we do if we have non-comparable keys? For example, suppose we have the following custom type being used as our key
+```elm
+type Color
+    = Red
+    | Green
+    | Blue
+
+myDict =
+    fromList [ (Blue, 2), (Green, 1), (Red, 0) ]
+```
+We really only have 3 options for sorting:
+A. Sort based on variant names. For example alphabetically sort the names in ascending order. Which gives us `elm toList myDict == [ (Blue, 2), (Green, 1), (Red, 0) ]`
+B. Sort by the order the variants are defined. That gives us `elm toList myDict == [ (Red, 0), (Green, 1), (Blue, 2) ]`
+C. Sort the list based on the order the key-value pairs were added. Then we get `elm toList [ (Blue, 2), (Green, 1), (Red, 0) ]` aka the original list.
+
+Do any of these approaches to sorting let us keep all 4 of the nice to have properties?
+A. Violates 4. If we rename a variant, it could potentially change it's alphabetical ordering and thereby change the output of `toList`.
+B. Also violates 4. If we reorder our variants, that will change the output of `toList`
+C. This does not violate 4! But what about 2 and 3?
+    * Well it depends on how `==` is implemented for our Dict type. Supposed `dictA == dictB` is the same as writing `toList dictA == toList dictB`. Well in that case 2 fails. We can see that if we take the example we used on elm/dict earlier.
+    ```elm
+    fromList [ ("X", 0), ("Y", 1) ] == fromList [ ("Y", 1), ("X", 0) ]
+
+    -- is converted into this because of how we defined == to work for dict equality
+    toList (fromList [ ("X", 0), ("Y", 1) ]) == toList (fromList [ ("Y", 1), ("X", 0) ])
+
+    -- which simplifies to this since ordering by insertion means toList and fromList cancel eachother out
+    [ ("X", 0), ("Y", 1) ]) == [ ("Y", 1), ("X", 0) ]
+
+    -- which is
+    False
+    ```
+    On the bright side, property 3 is valid at least!
+    * Okay well how about we make it so `dictA == dictB` instead checks that both dicts have the same key-values pairs while ignoring order? In that case 2 is valid! But lets look at 3. More specifically, consider this code
+    ```elm
+    dictA = fromList [ ("X", 0), ("Y", 1) ]
+    dictB = fromList [ ("Y", 1), ("X", 0) ]
+
+    -- This is now true since order doesn't matter when checking for equality
+    dictA == dictB
+
+    -- But if we were to do this
+    toList dictA == toList dictB
+
+    -- Then we get
+    False
+    ```
+    This violates 3 which says `elm dictA == dictB` implies `elm f dictA == f dictB` for any function f.
+
+You might argue I've skipped an obvious approach to sorting `toList`'s output, just don't sort at all! We'll leave it as an implementation detail of our Dict type. Maybe a hashmap, binary tree, or red-black tree?
+
+Unfortunately that still sorts it, just in a way that probably ends up depending on variant names, variant order, and insertion order, all at the same time.
+
+For example, if you're hashing the keys, what property of that key will you use? The variant names? The variant order? Its insertion order? If you don't use any of those, what is left? If you use a binary tree or red-black tree then instead of a hash function you need some kind of comparable function internally but you have the same problem. You need to compare based on *something* in the key. Even if you don't care about performance and your dict is just a list internally with `==` used on every existing key to check for duplicate keys (this is [pzp-1997/assoc-list](https://package.elm-lang.org/packages/pzp1997/assoc-list/latest/)'s approach) you still have to pick at least one of these 3 sorting approaches.
+
+It's starting to feel like a game of whack-a-mole isn't it? Every time we try to force all 4 properties to be valid, one pops back up. Maybe we can solve this by thinking outside of the box?
+
+For example, in our custom type example, what if we could define a unique function for each non-comparable type that tells the dict how to sort it? Maybe we could introduce some new syntax and make it look like this:
+```elm
+type Color
+    = Red
+    | Green
+    | Blue
+    compareWith(compareColor)
+
+compareColor : Color -> Color -> Order
+compareColor a b =
+    compare (colorToInt a) (colorToInt b)
+
+colorToInt : Color -> Order
+colorToInt a =
+    case a of
+        Red -> 0
+        Green -> 1
+        Blue -> 2
+```
+I'd argue you this doesn't so much give you all 4 properties as it just forces us to give up 1 (non-comparable keys) but lets use make any type comparable. You can do this of course, and languages like Haskell let you do it, with various other trade-offs as a result.
+
+
+Another idea: we attach an integer to our record fields and custom type variants
+    """ websiteReleasedAt (date 2021 Sep 7)
     ]
         |> Dict.fromList
 
@@ -1271,6 +1390,7 @@ qualityOrder =
     , "elm-audio"
     , "elm-serialize"
     , "lamdera-program-test"
+    , "lamdera-containers"
     , "discord-bot"
     , "circuit-breaker"
     , "realia"

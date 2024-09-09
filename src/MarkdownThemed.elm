@@ -5,6 +5,7 @@ import Html.Attributes
 import Markdown.Block exposing (Block, HeadingLevel(..), ListItem(..))
 import Markdown.Html
 import Markdown.Renderer
+import SyntaxHighlight
 import Ui exposing (Element)
 import Ui.Accessibility
 import Ui.Font
@@ -15,7 +16,13 @@ render : List Block -> Ui.Element msg
 render blocks =
     case Markdown.Renderer.render renderer blocks of
         Ok elements ->
-            Ui.column [ Ui.spacing 20 ] elements
+            Ui.column
+                [ Ui.spacing 20
+                , SyntaxHighlight.useTheme SyntaxHighlight.gitHub
+                    |> Ui.html
+                    |> Ui.behindContent
+                ]
+                elements
 
         Err _ ->
             Ui.none
@@ -40,7 +47,27 @@ renderer =
     , html = Markdown.Html.oneOf []
     , text = \s -> Ui.el [ Ui.width Ui.shrink, Ui.Font.size 18 ] (Ui.text s)
     , codeSpan =
-        \content -> Ui.html (Html.code [] [ Html.text content ])
+        \content ->
+            if String.startsWith "elm " content then
+                case SyntaxHighlight.elm (String.dropLeft 4 content) of
+                    Ok ok ->
+                        SyntaxHighlight.toInlineHtml ok
+                            |> Ui.html
+                            |> Ui.el [ Ui.Font.size 18 ]
+
+                    Err _ ->
+                        Ui.el
+                            [ Ui.Font.family [ Ui.Font.monospace ]
+                            , Ui.Font.size 18
+                            ]
+                            (Ui.text content)
+
+            else
+                Ui.el
+                    [ Ui.Font.family [ Ui.Font.monospace ]
+                    , Ui.Font.size 18
+                    ]
+                    (Ui.text content)
     , strong = \list -> Ui.Prose.paragraph [ Ui.width Ui.shrink, Ui.Font.bold ] list
     , emphasis = \list -> Ui.Prose.paragraph [ Ui.width Ui.shrink, Ui.Font.italic ] list
     , hardLineBreak = Ui.html (Html.br [] [])
@@ -108,16 +135,24 @@ renderer =
                     items
                 )
     , codeBlock =
-        \{ body } ->
-            Ui.column
-                [ Ui.Font.family [ Ui.Font.monospace ]
-                , Ui.background theme.lightGrey
-                , Ui.rounded 5
-                , Ui.padding 10
-                , Ui.htmlAttribute (Html.Attributes.class "preserve-white-space")
-                , Ui.scrollableX
-                ]
-                [ Ui.html (Html.text body) ]
+        \{ body, language } ->
+            case SyntaxHighlight.elm body of
+                Ok ok ->
+                    SyntaxHighlight.toBlockHtml Nothing ok
+                        |> Ui.html
+                        |> Ui.el [ Ui.Font.size 18 ]
+
+                --Ui.column
+                --    [ Ui.Font.family [ Ui.Font.monospace ]
+                --    , Ui.background theme.lightGrey
+                --    , Ui.rounded 5
+                --    , Ui.padding 10
+                --    , Ui.htmlAttribute (Html.Attributes.style "white-space" "pre-wrap")
+                --    , Ui.scrollableX
+                --    ]
+                --    [ Ui.html (Html.text body) ]
+                Err _ ->
+                    Ui.text body
     , thematicBreak = Ui.none
     , table = \children -> Ui.column [] children
     , tableHeader = \children -> Ui.column [ Ui.width Ui.shrink ] children
