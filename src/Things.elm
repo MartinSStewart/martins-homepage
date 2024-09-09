@@ -1360,7 +1360,7 @@ type Color
 
 compareColor : Color -> Color -> Order
 compareColor a b =
-    compare (colorToInt a) (colorToInt b)
+    Basics.compare (colorToInt a) (colorToInt b)
 
 colorToInt : Color -> Order
 colorToInt a =
@@ -1371,8 +1371,6 @@ colorToInt a =
 ```
 I'd argue you this doesn't so much give you all 4 properties as it just forces us to give up 1 (non-comparable keys) but lets use make any type comparable. You can do this of course, and languages like Haskell let you do it, with various other trade-offs as a result.
 
-
-Another idea: we attach an integer to our record fields and custom type variants
     """ websiteReleasedAt (date 2021 Sep 7)
     ]
         |> Dict.fromList
