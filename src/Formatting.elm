@@ -13,6 +13,7 @@ type Formatting
     | NumberList (List Formatting)
     | LetterList (List Formatting)
     | Image { source : String, description : String }
+    | SimpleParagraph String
 
 
 type Inline
@@ -20,6 +21,7 @@ type Inline
     | Italic String
     | Link String String
     | InlineCode String
+    | Text String
 
 
 view : List Formatting -> Ui.Element msg
@@ -84,6 +86,9 @@ viewHelper item =
         Image a ->
             Ui.image [] { source = a.source, description = a.description, onLoad = Nothing }
 
+        SimpleParagraph text ->
+            Ui.text text
+
 
 inlineView : Inline -> Ui.Element msg
 inlineView inline =
@@ -110,3 +115,6 @@ inlineView inline =
                         , Ui.Font.size 18
                         ]
                         (Ui.text text)
+
+        Text text ->
+            Ui.text text

@@ -4,6 +4,7 @@ import BackendTask exposing (BackendTask)
 import Date exposing (Date)
 import Dict
 import FatalError exposing (FatalError)
+import Formatting exposing (Formatting)
 import Head
 import Head.Seo as Seo
 import Markdown.Block exposing (Block)
@@ -55,7 +56,7 @@ type alias Thing =
     { name : String
     , website : Maybe String
     , tags : List Tag
-    , description : List Block
+    , description : List Formatting
     , pageLastUpdated : Date
     , pageCreatedAt : Date
     , thingType : ThingType
@@ -70,22 +71,17 @@ data : RouteParams -> BackendTask FatalError Data
 data routeParams =
     case Dict.get routeParams.slug Things.thingsIHaveDone of
         Just thing ->
-            case Markdown.Parser.parse thing.description of
-                Ok description ->
-                    BackendTask.succeed
-                        { thing =
-                            { name = thing.name
-                            , website = thing.website
-                            , tags = thing.tags
-                            , description = description
-                            , pageLastUpdated = thing.pageLastUpdated
-                            , pageCreatedAt = thing.pageCreatedAt
-                            , thingType = thing.thingType
-                            }
-                        }
-
-                Err error ->
-                    FatalError.fromString (ParserUtils.errorsToString "Things.elm" error) |> BackendTask.fail
+            BackendTask.succeed
+                { thing =
+                    { name = thing.name
+                    , website = thing.website
+                    , tags = thing.tags
+                    , description = thing.description
+                    , pageLastUpdated = thing.pageLastUpdated
+                    , pageCreatedAt = thing.pageCreatedAt
+                    , thingType = thing.thingType
+                    }
+                }
 
         Nothing ->
             BackendTask.fail (FatalError.fromString "Page not found")
@@ -142,6 +138,6 @@ view app sharedModel =
                 Ui.text "TODO"
 
               else
-                MarkdownThemed.render thing.description
+                Formatting.view thing.description
             ]
     }
