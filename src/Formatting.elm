@@ -9,9 +9,9 @@ import Ui.Prose
 type Formatting
     = Paragraph (List Inline)
     | CodeBlock String
-    | BulletList (List Formatting)
-    | NumberList (List Formatting)
-    | LetterList (List Formatting)
+    | BulletList (List Inline) (List (List Formatting))
+    | NumberList (List Inline) (List (List Formatting))
+    | LetterList (List Inline) (List (List Formatting))
     | Image { source : String, description : String }
     | SimpleParagraph String
 
@@ -47,47 +47,45 @@ viewHelper item =
                 Err _ ->
                     Ui.text text
 
-        BulletList formattings ->
-            Ui.column
-                [ Ui.spacing 16, Ui.paddingLeft 32 ]
-                (List.map
-                    (\item2 -> Ui.row [] [ Ui.text "* ", viewHelper item2 ])
-                    formattings
-                )
+        BulletList leading formattings ->
+            listHelper (\_ -> "•") leading formattings
 
-        NumberList formattings ->
-            Ui.column
-                [ Ui.spacing 16, Ui.paddingLeft 32 ]
-                (List.indexedMap
-                    (\index item2 ->
-                        Ui.row
-                            []
-                            [ Ui.text (String.fromInt index ++ ". ")
-                            , viewHelper item2
-                            ]
-                    )
-                    formattings
-                )
+        NumberList leading formattings ->
+            listHelper (\index -> String.fromInt index ++ ".") leading formattings
 
-        LetterList formattings ->
-            Ui.column
-                [ Ui.spacing 16, Ui.paddingLeft 32 ]
-                (List.indexedMap
-                    (\index item2 ->
-                        Ui.row
-                            []
-                            [ Ui.text (String.fromChar (Char.fromCode (Char.toCode 'A' + index)) ++ ". ")
-                            , viewHelper item2
-                            ]
-                    )
-                    formattings
-                )
+        LetterList leading formattings ->
+            listHelper
+                (\index -> String.fromChar (Char.fromCode (Char.toCode 'A' + index)) ++ ".")
+                leading
+                formattings
 
         Image a ->
             Ui.image [] { source = a.source, description = a.description, onLoad = Nothing }
 
         SimpleParagraph text ->
             Ui.text text
+
+
+listHelper : (Int -> String) -> List Inline -> List (List Formatting) -> Ui.Element msg
+listHelper iconFunc leading formattings =
+    Ui.column
+        [ Ui.spacing 12 ]
+        [ Ui.Prose.paragraph [] (List.map inlineView leading)
+        , Ui.column
+            [ Ui.spacing 12, Ui.paddingLeft 4 ]
+            (List.indexedMap
+                (\index item2 ->
+                    Ui.row
+                        [ Ui.spacing 6 ]
+                        [ Ui.el
+                            [ Ui.alignTop, Ui.width Ui.shrink ]
+                            (Ui.text (iconFunc index))
+                        , view item2
+                        ]
+                )
+                formattings
+            )
+        ]
 
 
 inlineView : Inline -> Ui.Element msg
