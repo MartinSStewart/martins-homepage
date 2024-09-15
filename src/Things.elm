@@ -1369,7 +1369,43 @@ colorToInt a =
         Green -> 1
         Blue -> 2
 ```
-I'd argue you this doesn't so much give you all 4 properties as it just forces us to give up 1 (non-comparable keys) but lets use make any type comparable. You can do this of course, and languages like Haskell let you do it, with various other trade-offs as a result.
+I'd argue you this doesn't so much give you all 4 properties as it just forces us to give up 1 (non-comparable keys) but lets us make any type comparable. You can do this of course, and languages like Haskell let you do it, with various other trade-offs (how does this work with anonymous/structural records for example).
+
+How about a framing challenge? From the start I said we'd say a Dict type has the following functions
+```elm
+get : key -> Dict key value -> Maybe value
+insert : key -> value -> Dict key value -> Dict key value
+fromList : List (key, value) -> Dict key value
+toList : Dict key value -> List (key, value)
+```
+but `toList` is causing us lots of trouble. What if we just remove it?
+
+Well we can. But we'd also need to remove any other functions iterate over the dict's key-value pairs (foldl and foldr for example). That's quite limiting.
+
+Okay what if we keep toList but change it to this?
+```elm
+toList : (key -> key -> Order) -> Dict key value -> List (key, value)
+```
+Now the user has to choose how to sort the key-value pairs, problem solved!
+
+That indeed solves it but it's not ideal. The first is that it's inconvenient. The second is that there are some types that can't easily be sorted by the user. For example
+```elm
+import Package exposing (OpaqueType)
+
+dict : Dict OpaqueType Int
+dict = ...
+
+list =
+    toList sortOpaqueType dict
+
+sortOpaqueType =
+    Debug.todo "How am I supposed to sort an opaque type that doesn't expose anything useful?? "
+```
+Maybe this situation is rare. Or rare enough that this approach is practical? Hard to say.
+
+## Summary
+
+To me it wasn't at all obvious from the start that I'd encounter so many trade-offs when all I wanted was a Dict type that didn't demand comparable keys. While I independently discovered this, I'm sure either many others have also figured this out, or alternatively, I've made a mistake somewhere and my conclusions aren't sound. I sure hope it's the latter. I really want all 4 of those properties in a dict package...
 
     """ websiteReleasedAt (date 2021 Sep 7)
     ]

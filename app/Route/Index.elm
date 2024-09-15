@@ -957,7 +957,7 @@ thingsViewMobile name tier thing =
 
 
 worstTierColor =
-    Ui.rgb 250 130 130
+    Ui.rgb 200 100 100
 
 
 topTierBackground =
@@ -1008,7 +1008,7 @@ thingsViewNotMobile name tier thing =
                             Things.elmColor
 
                         WorstTier ->
-                            worstTierColor
+                            containerBorder
                     )
                         |> Color.Manipulate.fadeOut 0.8
               }
