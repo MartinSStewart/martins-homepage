@@ -90,7 +90,7 @@ elmPackage user packageName description lastUpdated releasedAt =
     ( packageName
     , { name = packageName
       , website =
-            "https://package.elm-lang.org/packages/"
+            "package.elm-lang.org/packages/"
                 ++ user
                 ++ "/"
                 ++ packageName
@@ -104,7 +104,7 @@ elmPackage user packageName description lastUpdated releasedAt =
       , thingType =
             OtherThing
                 { releasedAt = releasedAt
-                , repo = "https://github.com/" ++ user ++ "/" ++ packageName |> Just
+                , repo = "github.com/" ++ user ++ "/" ++ packageName |> Just
                 }
       }
     )
@@ -123,7 +123,7 @@ lamderaPackage packageName description lastUpdated releasedAt =
       , thingType =
             OtherThing
                 { releasedAt = releasedAt
-                , repo = "https://github.com/lamdera/" ++ packageName |> Just
+                , repo = "github.com/lamdera/" ++ packageName |> Just
                 }
       }
     )
@@ -143,7 +143,7 @@ thingsIHaveDone : Dict String Thing
 thingsIHaveDone =
     [ ( "town-collab"
       , { name = "town-collab"
-        , website = Just "https://town-collab.app/"
+        , website = Just "town-collab.app/"
         , tags = [ Elm, Game, Lamdera ]
         , description = [ SimpleParagraph "A game I've been working on, inspired by an old childrens game called Lego Loco" ]
         , pageLastUpdated = websiteReleasedAt
@@ -152,52 +152,52 @@ thingsIHaveDone =
         , thingType =
             OtherThing
                 { releasedAt = date 2023 Feb 11
-                , repo = Just "https://github.com/MartinSStewart/town-collab"
+                , repo = Just "github.com/MartinSStewart/town-collab"
                 }
         }
       )
     , ( "ascii-collab"
       , { name = "ascii-collab"
-        , website = Just "https://ascii-collab.app/"
+        , website = Just "ascii-collab.app/"
         , tags = [ Elm, Game, Lamdera ]
-        , description = [ SimpleParagraph "An infinite canvas that people can draw ascii art on together. I wrote an [announcement post](https://discourse.elm-lang.org/t/ascii-collab-draw-ascii-art-together-on-an-infinite-canvas/6273) and a [follow up post](https://discourse.elm-lang.org/t/ascii-collab-progress-update/7019) about it." ]
+        , description = [ SimpleParagraph "An infinite canvas that people can draw ascii art on together. I wrote an [announcement post](discourse.elm-lang.org/t/ascii-collab-draw-ascii-art-together-on-an-infinite-canvas/6273) and a [follow up post](discourse.elm-lang.org/t/ascii-collab-progress-update/7019) about it." ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             OtherThing
                 { releasedAt = date 2020 Sep 12
-                , repo = Just "https://github.com/MartinSStewart/ascii-collab"
+                , repo = Just "github.com/MartinSStewart/ascii-collab"
                 }
         }
       )
     , ( "meetdown"
       , { name = "Meetdown"
-        , website = Just "https://meetdown.app/"
+        , website = Just "meetdown.app/"
         , tags = [ Elm, Lamdera ]
-        , description = [ SimpleParagraph "[Announcement post](https://discourse.elm-lang.org/t/i-made-a-meetup-com-clone/7480)" ]
+        , description = [ SimpleParagraph "[Announcement post](discourse.elm-lang.org/t/i-made-a-meetup-com-clone/7480)" ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             OtherThing
                 { releasedAt = date 2021 Jun 27
-                , repo = Just "https://github.com/MartinSStewart/meetdown"
+                , repo = Just "github.com/MartinSStewart/meetdown"
                 }
         }
       )
     , ( "circuit-breaker"
       , { name = "Circuit Breaker"
-        , website = Just "https://martinsstewart.gitlab.io/hackman/"
+        , website = Just "martinsstewart.gitlab.io/hackman/"
         , tags = [ Elm, Game ]
-        , description = [ SimpleParagraph "I made a [blog post](https://dev.to/martinsstewart/what-is-elm-and-a-game-i-m-making-with-it-3di1) describing how Elm made it easier to create along with an [announcement post](https://discourse.elm-lang.org/t/ive-created-a-game-in-elm/4844)." ]
+        , description = [ SimpleParagraph "I made a [blog post](dev.to/martinsstewart/what-is-elm-and-a-game-i-m-making-with-it-3di1) describing how Elm made it easier to create along with an [announcement post](discourse.elm-lang.org/t/ive-created-a-game-in-elm/4844)." ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             OtherThing
                 { releasedAt = date 2019 Dec 17
-                , repo = Just "https://gitlab.com/MartinSStewart/hackman"
+                , repo = Just "gitlab.com/MartinSStewart/hackman"
                 }
         }
       )
@@ -221,51 +221,51 @@ thingsIHaveDone =
       , { name = "elm-review-bot"
         , website = Nothing
         , tags = [ Elm, Lamdera ]
-        , description = [ SimpleParagraph "[Discourse post](https://discourse.elm-lang.org/t/i-created-218-pull-requests-in-3-days/7276)" ]
+        , description = [ SimpleParagraph "[Discourse post](discourse.elm-lang.org/t/i-created-218-pull-requests-in-3-days/7276)" ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             OtherThing
                 { releasedAt = date 2021 Aug 24
-                , repo = Just "https://github.com/MartinSStewart/elm-review-bot"
+                , repo = Just "github.com/MartinSStewart/elm-review-bot"
                 }
         }
       )
     , ( "state-of-elm-2022"
       , { name = "state-of-elm 2022"
-        , website = Just "https://state-of-elm.com/2022"
+        , website = Just "state-of-elm.com/2022"
         , tags = [ Elm, Lamdera ]
-        , description = [ SimpleParagraph "[Announcement post](https://discourse.elm-lang.org/t/state-of-elm-2022/8284) and [results announcement](https://discourse.elm-lang.org/t/state-of-elm-survey-results/8362)." ]
+        , description = [ SimpleParagraph "[Announcement post](discourse.elm-lang.org/t/state-of-elm-2022/8284) and [results announcement](discourse.elm-lang.org/t/state-of-elm-survey-results/8362)." ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             OtherThing
                 { releasedAt = date 2022 May 1
-                , repo = Just "https://github.com/MartinSStewart/state-of-elm"
+                , repo = Just "github.com/MartinSStewart/state-of-elm"
                 }
         }
       )
     , ( "state-of-elm-2023"
       , { name = "state-of-elm 2023"
-        , website = Just "https://state-of-elm.com/2023"
+        , website = Just "state-of-elm.com/2023"
         , tags = [ Elm, Lamdera ]
-        , description = [ SimpleParagraph "[Announcement post](https://discourse.elm-lang.org/t/state-of-elm-2023/9307) and a [closing post](https://discourse.elm-lang.org/t/state-of-elm-2023-closed/9369). Embarrassingly I've never finished the results page for this so the results of this survey aren't published." ]
+        , description = [ SimpleParagraph "[Announcement post](discourse.elm-lang.org/t/state-of-elm-2023/9307) and a [closing post](discourse.elm-lang.org/t/state-of-elm-2023-closed/9369). Embarrassingly I've never finished the results page for this so the results of this survey aren't published." ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             OtherThing
                 { releasedAt = date 2023 Sep 3
-                , repo = Just "https://github.com/MartinSStewart/state-of-elm"
+                , repo = Just "github.com/MartinSStewart/state-of-elm"
                 }
         }
       )
     , elmPackage
         "MartinSStewart"
         "elm-serialize"
-        [ SimpleParagraph "[Discourse post](https://discourse.elm-lang.org/t/elm-serialize-quickly-and-reliably-encode-and-decode-elm-values/6112/3)" ]
+        [ SimpleParagraph "[Discourse post](discourse.elm-lang.org/t/elm-serialize-quickly-and-reliably-encode-and-decode-elm-values/6112/3)" ]
         websiteReleasedAt
         (date 2020 Jul 30)
     , ( "elm-review-elm-ui-upgrade"
@@ -279,13 +279,13 @@ thingsIHaveDone =
         , thingType =
             OtherThing
                 { releasedAt = date 2023 Aug 27
-                , repo = Just "https://github.com/MartinSStewart/elm-review-elm-ui-upgrade"
+                , repo = Just "github.com/MartinSStewart/elm-review-elm-ui-upgrade"
                 }
         }
       )
     , ( "lamdera-backend-debugger"
       , { name = "Lamdera backend debugger"
-        , website = Just "https://backend-debugger.lamdera.app/"
+        , website = Just "backend-debugger.lamdera.app/"
         , tags = [ Elm, Lamdera ]
         , description = []
         , pageLastUpdated = websiteReleasedAt
@@ -294,7 +294,7 @@ thingsIHaveDone =
         , thingType =
             OtherThing
                 { releasedAt = date 2023 Jul 20
-                , repo = Just "https://github.com/MartinSStewart/lamdera-backend-debugger"
+                , repo = Just "github.com/MartinSStewart/lamdera-backend-debugger"
                 }
         }
       )
@@ -324,24 +324,24 @@ thingsIHaveDone =
         , thingType =
             OtherThing
                 { releasedAt = date 2020 Oct 29
-                , repo = Just "https://github.com/MartinSStewart/elm-pdf"
+                , repo = Just "github.com/MartinSStewart/elm-pdf"
                 }
         }
       )
     , elmPackage "MartinSStewart" "send-grid" [] websiteReleasedAt (date 2020 Feb 15)
-    , elmPackage "MartinSStewart" "elm-bayer-matrix" [ SimpleParagraph "A package for generating [bayer matrices](https://en.wikipedia.org/wiki/Ordered_dithering). These are useful for producing a dithering effect for partially transparent images. I used it for [surface-voyage](/stuff/surface-voyage) to fade out objects too close to the camera. That said, in hindsight it was silly to make a package for 50 lines of code though." ] websiteReleasedAt (date 2020 Feb 15)
+    , elmPackage "MartinSStewart" "elm-bayer-matrix" [ SimpleParagraph "A package for generating [bayer matrices](en.wikipedia.org/wiki/Ordered_dithering). These are useful for producing a dithering effect for partially transparent images. I used it for [surface-voyage](/stuff/surface-voyage) to fade out objects too close to the camera. That said, in hindsight it was silly to make a package for 50 lines of code though." ] websiteReleasedAt (date 2020 Feb 15)
     , elmPackage "MartinSStewart" "elm-box-packing" [] websiteReleasedAt (date 2020 Apr 25)
     , elmPackage
         "MartinSStewart"
         "elm-codec-bytes"
-        [ SimpleParagraph "[Discourse post](https://discourse.elm-lang.org/t/elm-codec-bytes-1-0-0-released/3989)" ]
+        [ SimpleParagraph "[Discourse post](discourse.elm-lang.org/t/elm-codec-bytes-1-0-0-released/3989)" ]
         websiteReleasedAt
         (date 2020 Feb 15)
     , elmPackage "MartinSStewart" "elm-geometry-serialize" [] websiteReleasedAt (date 2020 Jul 31)
     , elmPackage "MartinSStewart" "elm-nonempty-string" [] websiteReleasedAt (date 2020 Feb 15)
     , ( "postmark-email-client"
       , { name = "Postmark email client"
-        , website = Just "https://postmark-email-client.lamdera.app/"
+        , website = Just "postmark-email-client.lamdera.app/"
         , tags = [ Elm, Lamdera ]
         , description = []
         , pageLastUpdated = websiteReleasedAt
@@ -350,13 +350,13 @@ thingsIHaveDone =
         , thingType =
             OtherThing
                 { releasedAt = date 2023 Jul 5
-                , repo = Just "https://github.com/MartinSStewart/postmark-email-client"
+                , repo = Just "github.com/MartinSStewart/postmark-email-client"
                 }
         }
       )
     , ( "elm-camp-2023"
       , { name = "Elm Camp 2023"
-        , website = Just "https://elm.camp/23-denmark"
+        , website = Just "elm.camp/23-denmark"
         , tags = [ Elm, Lamdera ]
         , description = [ SimpleParagraph "I helped set up the website for Elm Camp 2023. Also I created a simple website for displaying a schedule of events during the unconference. Also I borrowed a fancy camera and took photos while I was there." ]
         , pageLastUpdated = websiteReleasedAt
@@ -365,13 +365,13 @@ thingsIHaveDone =
         , thingType =
             OtherThing
                 { releasedAt = date 2023 Jun 28
-                , repo = Just "https://github.com/elm-camp/website"
+                , repo = Just "github.com/elm-camp/website"
                 }
         }
       )
     , ( "translation-editor"
       , { name = "Translation editor"
-        , website = Just "https://translations-editor.lamdera.app/"
+        , website = Just "translations-editor.lamdera.app/"
         , tags = [ Elm, Lamdera ]
         , description = []
         , pageLastUpdated = websiteReleasedAt
@@ -380,7 +380,7 @@ thingsIHaveDone =
         , thingType =
             OtherThing
                 { releasedAt = date 2023 Feb 27
-                , repo = Just "https://github.com/MartinSStewart/translation-editor"
+                , repo = Just "github.com/MartinSStewart/translation-editor"
                 }
         }
       )
@@ -388,20 +388,20 @@ thingsIHaveDone =
       , { name = "elm-map"
         , website = Nothing
         , tags = [ Elm ]
-        , description = [ SimpleParagraph "While working at [Realia](/stuff/realia) the app I was creating needed a map viewer so you could see which realtors had sold properties in your area (so you could judge if they would do a good job selling your home). Initially I used Google Maps for this. From a user perspective, Google Maps is pretty good. From a programmer perspective it was really awful to work with. So I switched to Mapbox. It's better. And it has an [Elm package](https://package.elm-lang.org/packages/gampleman/elm-mapbox/latest/) too. Still not great though. So I decided to make my own map viewer written in Elm. I made a proof of concept for the vector tile decoding over the 2022 winter break (the map viewer would still be relying on the Mapbox server for data) and then in 2023 summer I convinced my boss (Sam) to let finish the rest during work time.\n\nLater when I started working for [Ambue](/stuff/ambue) my new boss (Stephen) expressed interest in using the map viewer I had created in Elm for viewing homes that belonged to our client's portfolios. I got permission from Sam to open source the map viewer so it could live on at Ambue." ]
+        , description = [ SimpleParagraph "While working at [Realia](/stuff/realia) the app I was creating needed a map viewer so you could see which realtors had sold properties in your area (so you could judge if they would do a good job selling your home). Initially I used Google Maps for this. From a user perspective, Google Maps is pretty good. From a programmer perspective it was really awful to work with. So I switched to Mapbox. It's better. And it has an [Elm package](package.elm-lang.org/packages/gampleman/elm-mapbox/latest/) too. Still not great though. So I decided to make my own map viewer written in Elm. I made a proof of concept for the vector tile decoding over the 2022 winter break (the map viewer would still be relying on the Mapbox server for data) and then in 2023 summer I convinced my boss (Sam) to let finish the rest during work time.\n\nLater when I started working for [Ambue](/stuff/ambue) my new boss (Stephen) expressed interest in using the map viewer I had created in Elm for viewing homes that belonged to our client's portfolios. I got permission from Sam to open source the map viewer so it could live on at Ambue." ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
         , thingType =
             OtherThing
                 { releasedAt = date 2023 May 17
-                , repo = Just "https://github.com/MartinSStewart/elm-map"
+                , repo = Just "github.com/MartinSStewart/elm-map"
                 }
         }
       )
     , ( "simple-survey"
       , { name = "simple-survey"
-        , website = Just "https://simple-survey.lamdera.app/"
+        , website = Just "simple-survey.lamdera.app/"
         , tags = [ Elm, Lamdera ]
         , description = [ SimpleParagraph "A simple survey app! As of time of writing it only lets you create surveys with free text questions. Other survey creation tools can do a lot more than that. But simple-survey has the advantage of not spamming you with ads, not showing cookie/GDPR popups (while still respecting user privacy), or ask you to sign up. Initially it was created so that we could gather some attendee info before the first [elm-camp](/stuff/elm-camp-2023). Since then it's been used for the 2024 Elm camp and nothing else that I'm aware of." ]
         , pageLastUpdated = websiteReleasedAt
@@ -410,28 +410,28 @@ thingsIHaveDone =
         , thingType =
             OtherThing
                 { releasedAt = date 2023 May 21
-                , repo = Just "https://github.com/MartinSStewart/simple-survey"
+                , repo = Just "github.com/MartinSStewart/simple-survey"
                 }
         }
       )
     , ( "sheep-game"
       , { name = "Sheep game"
-        , website = Just "https://sheep-game.lamdera.app/"
+        , website = Just "sheep-game.lamdera.app/"
         , tags = [ Elm, Lamdera ]
-        , description = [ SimpleParagraph "A game you play with a group of friends where everyone is given the same list of questions and in secret everyone tries to pick the same answers as everyone else. Once everyone is done, for each question you count the number of answers that match your own. Whoever has the most matches in total wins.\n\nI didn't come up with this idea, it's probably a pretty old concept. But I did make this app to speed up the process of collecting answers and displaying the results. My friends and I play it twice a year. I organize the \"summer sheep game\" and a friend organizes the \"winter sheep game\" (that way be both get once chance to participate each year).\n\n[Here's an example](https://sheep-game.lamdera.app/join/a217210861) of what it looks like when I played it with some Elm community members" ]
+        , description = [ SimpleParagraph "A game you play with a group of friends where everyone is given the same list of questions and in secret everyone tries to pick the same answers as everyone else. Once everyone is done, for each question you count the number of answers that match your own. Whoever has the most matches in total wins.\n\nI didn't come up with this idea, it's probably a pretty old concept. But I did make this app to speed up the process of collecting answers and displaying the results. My friends and I play it twice a year. I organize the \"summer sheep game\" and a friend organizes the \"winter sheep game\" (that way be both get once chance to participate each year).\n\n[Here's an example](sheep-game.lamdera.app/join/a217210861) of what it looks like when I played it with some Elm community members" ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/sheep-game-preview.png"
         , thingType =
             OtherThing
                 { releasedAt = date 2022 Jun 13
-                , repo = Just "https://github.com/MartinSStewart/sheep-game"
+                , repo = Just "github.com/MartinSStewart/sheep-game"
                 }
         }
       )
     , ( "air-hockey-racing"
       , { name = "Air Hockey Racing"
-        , website = Just "https://air-hockey-racing.lamdera.app/"
+        , website = Just "air-hockey-racing.lamdera.app/"
         , tags = [ Elm, Lamdera ]
         , description = []
         , pageLastUpdated = websiteReleasedAt
@@ -440,13 +440,13 @@ thingsIHaveDone =
         , thingType =
             OtherThing
                 { releasedAt = date 2022 Jun 14
-                , repo = Just "https://github.com/MartinSStewart/air-hockey-racing"
+                , repo = Just "github.com/MartinSStewart/air-hockey-racing"
                 }
         }
       )
     , ( "elm-town-48"
       , { name = "Elm Town episode\u{00A0}48"
-        , website = Just "https://elm.town/episodes/making-little-games-like-presents"
+        , website = Just "elm.town/episodes/making-little-games-like-presents"
         , tags = [ Elm, Podcast ]
         , description = []
         , pageLastUpdated = websiteReleasedAt
@@ -457,7 +457,7 @@ thingsIHaveDone =
       )
     , ( "elm-town-64"
       , { name = "Elm Town episode\u{00A0}64"
-        , website = Just "https://elm.town/episodes/elm-town-64-the-network-effect"
+        , website = Just "elm.town/episodes/elm-town-64-the-network-effect"
         , tags = [ Elm, Podcast ]
         , description = []
         , pageLastUpdated = websiteReleasedAt
@@ -468,7 +468,7 @@ thingsIHaveDone =
       )
     , ( "elm-radio-57"
       , { name = "Elm Radio episode\u{00A0}57"
-        , website = Just "https://elm-radio.com/episode/state-of-elm-2022"
+        , website = Just "elm-radio.com/episode/state-of-elm-2022"
         , tags = [ Elm, Podcast ]
         , description = []
         , pageLastUpdated = websiteReleasedAt
@@ -541,7 +541,7 @@ thingsIHaveDone =
     , lamderaPackage "program-test" [] websiteReleasedAt (date 2021 Jul 7)
     , ( "making-a-game-with-elm-and-lamdera"
       , { name = "Making a game with Elm and Lamdera"
-        , website = Just "https://www.youtube.com/watch?v=pZ_WqwRwwao"
+        , website = Just "www.youtube.com/watch?v=pZ_WqwRwwao"
         , tags = [ Game, Elm, Lamdera, Presentation ]
         , description = []
         , pageLastUpdated = websiteReleasedAt
@@ -556,7 +556,7 @@ thingsIHaveDone =
       )
     , ( "building-a-meetup-clone-on-lamdera"
       , { name = "Building a Meetup clone on Lamdera"
-        , website = Just "https://www.youtube.com/watch?v=3Nn5meBieh4"
+        , website = Just "www.youtube.com/watch?v=3Nn5meBieh4"
         , tags = [ Elm, Lamdera, Presentation ]
         , description = []
         , pageLastUpdated = websiteReleasedAt
@@ -571,7 +571,7 @@ thingsIHaveDone =
       )
     , ( "hobby-scale-func-prog-sweden"
       , { name = "Hobby scale (Func\u{00A0}Prog\u{00A0}Sweden)"
-        , website = Just "https://www.youtube.com/watch?v=o7M0JxgDfhE"
+        , website = Just "www.youtube.com/watch?v=o7M0JxgDfhE"
         , tags = [ Elm, Lamdera, Presentation ]
         , description = []
         , pageLastUpdated = websiteReleasedAt
@@ -580,13 +580,13 @@ thingsIHaveDone =
         , thingType =
             OtherThing
                 { releasedAt = date 2022 Mar 16
-                , repo = Just "https://github.com/MartinSStewart/lamdera-presentation"
+                , repo = Just "github.com/MartinSStewart/lamdera-presentation"
                 }
         }
       )
     , ( "hobby-scale-goto-aarhus"
       , { name = "Hobby scale (GOTO\u{00A0}Aarhus)"
-        , website = Just "https://www.youtube.com/watch?v=o7M0JxgDfhE"
+        , website = Just "www.youtube.com/watch?v=o7M0JxgDfhE"
         , tags = [ Elm, Lamdera, Presentation ]
         , description = []
         , pageLastUpdated = websiteReleasedAt
@@ -595,7 +595,7 @@ thingsIHaveDone =
         , thingType =
             OtherThing
                 { releasedAt = date 2022 Mar 16
-                , repo = Just "https://github.com/MartinSStewart/lamdera-presentation"
+                , repo = Just "github.com/MartinSStewart/lamdera-presentation"
                 }
         }
       )
@@ -610,7 +610,7 @@ thingsIHaveDone =
         , thingType =
             OtherThing
                 { releasedAt = date 2021 Nov 11
-                , repo = Just "https://github.com/MartinSStewart/audio-presentation"
+                , repo = Just "github.com/MartinSStewart/audio-presentation"
                 }
         }
       )
@@ -631,22 +631,22 @@ thingsIHaveDone =
       )
     , ( "aventyr"
       , { name = "aventyr"
-        , website = Just "https://www.youtube.com/watch?v=Y_ExX2LT_bw"
+        , website = Just "www.youtube.com/watch?v=Y_ExX2LT_bw"
         , tags = [ Game, CSharp ]
-        , description = [ SimpleParagraph "A 2d portal game I worked on and off on for a couple years. Really it was attempt four at a 2d portal game. The first three attempts were in Game Maker (which includes [enough-portals](/stuff/enough-portals)). It wasn't suited to the complexity or performance requirements so eventually I switched to using C#. I never got close to finishing this game but it's largely responsible for teaching me C# and helping me independently realize that inheritence is bad and pure functions and immutable data are good.\n\nThis is where my profile image originated. I picked [an icon](https://thenounproject.com/icon/work-in-progress-42732/) for Aventyr's exe file to indicate that it's a work in progress. Then for some reason I started using that icon for profile images (assuming I can be bothered with setting a profile image)" ]
+        , description = [ SimpleParagraph "A 2d portal game I worked on and off on for a couple years. Really it was attempt four at a 2d portal game. The first three attempts were in Game Maker (which includes [enough-portals](/stuff/enough-portals)). It wasn't suited to the complexity or performance requirements so eventually I switched to using C#. I never got close to finishing this game but it's largely responsible for teaching me C# and helping me independently realize that inheritence is bad and pure functions and immutable data are good.\n\nThis is where my profile image originated. I picked [an icon](thenounproject.com/icon/work-in-progress-42732/) for Aventyr's exe file to indicate that it's a work in progress. Then for some reason I started using that icon for profile images (assuming I can be bothered with setting a profile image)" ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/profile.png"
         , thingType =
             OtherThing
                 { releasedAt = date 2016 Sep 22
-                , repo = Just "https://github.com/MartinSStewart/Aventyr-Project"
+                , repo = Just "github.com/MartinSStewart/Aventyr-Project"
                 }
         }
       )
     , ( "starship-corporation"
       , { name = "Starship Corporation"
-        , website = Just "https://store.steampowered.com/app/292330/Starship_Corporation/"
+        , website = Just "store.steampowered.com/app/292330/Starship_Corporation/"
         , tags = [ Game, GameMaker, Job ]
         , description = []
         , pageLastUpdated = websiteReleasedAt
@@ -663,7 +663,7 @@ thingsIHaveDone =
       )
     , ( "crivia"
       , { name = "Crivia"
-        , website = Just "https://www.cliftonbazaar.games/games.php?game=crivia"
+        , website = Just "www.cliftonbazaar.games/games.php?game=crivia"
         , tags = [ Game, GameMaker, Job ]
         , description = [ SimpleParagraph "A game I was hired to make for a guy named James Clifton. Crivia or Cricket Trivia is a game about answering trivia questions about the sport Cricket. I was only paid like 60 USD for on and off work spanning 8 months so this kind of stretches the definition of a job but I think at the time I was more concerned with experience and resume building. The game was made in Game Maker with a tiny amount of PHP used for saving highscores to James' website." ]
         , pageLastUpdated = websiteReleasedAt
@@ -680,7 +680,7 @@ thingsIHaveDone =
       )
     , ( "tretton37"
       , { name = "tretton37"
-        , website = Just "https://www.tretton37.com/"
+        , website = Just "www.tretton37.com/"
         , tags = [ CSharp, Elm, Job ]
         , description = []
         , pageLastUpdated = websiteReleasedAt
@@ -697,7 +697,7 @@ thingsIHaveDone =
       )
     , ( "insurello"
       , { name = "Insurello"
-        , website = Just "https://insurello.se/"
+        , website = Just "insurello.se/"
         , tags = [ FSharp, Elm, Job ]
         , description = []
         , pageLastUpdated = websiteReleasedAt
@@ -714,9 +714,9 @@ thingsIHaveDone =
       )
     , ( "realia"
       , { name = "Realia"
-        , website = Just "https://realia.se/"
+        , website = Just "realia.se/"
         , tags = [ Elm, Lamdera, Job ]
-        , description = [ SimpleParagraph "[Discourse post](https://discourse.elm-lang.org/t/using-lamdera-professionally/9142)" ]
+        , description = [ SimpleParagraph "[Discourse post](discourse.elm-lang.org/t/using-lamdera-professionally/9142)" ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
@@ -731,7 +731,7 @@ thingsIHaveDone =
       )
     , ( "ambue"
       , { name = "Ambue"
-        , website = Just "https://ambue.com/"
+        , website = Just "ambue.com/"
         , tags = [ Elm, Lamdera, Job ]
         , description = []
         , pageLastUpdated = websiteReleasedAt
@@ -748,7 +748,7 @@ thingsIHaveDone =
       )
     , ( "demon-clutched-walkaround"
       , { name = "Demon Clutched walkaround"
-        , website = Just "https://ambue.com/"
+        , website = Just "ambue.com/"
         , tags = [ Game, GameMaker ]
         , description = []
         , pageLastUpdated = websiteReleasedAt
@@ -763,7 +763,7 @@ thingsIHaveDone =
       )
     , ( "this-website"
       , { name = "This website!"
-        , website = Just "https://martinstewart.dev/"
+        , website = Just "martinstewart.dev/"
         , tags = [ Elm, ElmPages ]
         , description = []
         , pageLastUpdated = websiteReleasedAt
@@ -772,7 +772,7 @@ thingsIHaveDone =
         , thingType =
             OtherThing
                 { releasedAt = websiteReleasedAt
-                , repo = Just "https://github.com/MartinSStewart/martins-homepage"
+                , repo = Just "github.com/MartinSStewart/martins-homepage"
                 }
         }
       )
@@ -847,7 +847,7 @@ thingsIHaveDone =
         , thingType =
             OtherThing
                 { releasedAt = date 2020 Jan 14
-                , repo = Just "https://gitlab.com/MartinSStewart/surface-voyage"
+                , repo = Just "gitlab.com/MartinSStewart/surface-voyage"
                 }
         }
       )
@@ -973,7 +973,7 @@ thingsIHaveDone =
       )
     , ( "memo-2020-credits"
       , { name = "Memo 2020 credits"
-        , website = Just "https://memo-2020-credits.lamdera.app/"
+        , website = Just "memo-2020-credits.lamdera.app/"
         , tags = [ Elm, Lamdera ]
         , description = []
         , pageLastUpdated = websiteReleasedAt
@@ -982,13 +982,13 @@ thingsIHaveDone =
         , thingType =
             OtherThing
                 { releasedAt = date 2020 Dec 31
-                , repo = Just "https://github.com/MartinSStewart/memo-credits-2020"
+                , repo = Just "github.com/MartinSStewart/memo-credits-2020"
                 }
         }
       )
     , ( "memo-lounge-3am"
       , { name = "Memo lounge 3am"
-        , website = Just "https://martinsstewart.gitlab.io/memo-lounge-3am/"
+        , website = Just "martinsstewart.gitlab.io/memo-lounge-3am/"
         , tags = [ Elm ]
         , description = []
         , pageLastUpdated = websiteReleasedAt
@@ -997,7 +997,7 @@ thingsIHaveDone =
         , thingType =
             OtherThing
                 { releasedAt = date 2019 Dec 31
-                , repo = Just "https://gitlab.com/MartinSStewart/memo-lounge-3am"
+                , repo = Just "gitlab.com/MartinSStewart/memo-lounge-3am"
                 }
         }
       )
@@ -1018,7 +1018,7 @@ thingsIHaveDone =
       )
     , ( "tile-editor"
       , { name = "Tile editor"
-        , website = Just "https://martinsstewart.gitlab.io/tile-editor/"
+        , website = Just "martinsstewart.gitlab.io/tile-editor/"
         , tags = [ Elm ]
         , description = [ SimpleParagraph "For one Christmas I asked for a level tileset as a present and my sister made me one! Then I made this tile editor so that I could make some kind of map with that tileset (just for admiring, you can't interact with it in any way).\n\nHere's a level my sister drew using it ![a level drawn with her tileset and my editor](/tile-editor/level.png)" ]
         , pageLastUpdated = websiteReleasedAt
@@ -1027,13 +1027,13 @@ thingsIHaveDone =
         , thingType =
             OtherThing
                 { releasedAt = date 2018 Dec 30
-                , repo = Just "https://gitlab.com/MartinSStewart/tile-editor"
+                , repo = Just "gitlab.com/MartinSStewart/tile-editor"
                 }
         }
       )
     , ( "how-many-words-jo"
       , { name = "How many words Jo"
-        , website = Just "https://martinsstewart.gitlab.io/how-many-words-jo/"
+        , website = Just "martinsstewart.gitlab.io/how-many-words-jo/"
         , tags = [ Elm ]
         , description = [ SimpleParagraph "A friend (named Jo) participates in NaNoWriMo (National Novel Writing Month) each year. I made a website that would track how many words she would need to have written during the month to be on pace to meet her desired word count of 220k (aka a lot of words)." ]
         , pageLastUpdated = websiteReleasedAt
@@ -1042,7 +1042,7 @@ thingsIHaveDone =
         , thingType =
             OtherThing
                 { releasedAt = date 2019 Nov 1
-                , repo = Just "https://gitlab.com/MartinSStewart/tile-editor"
+                , repo = Just "gitlab.com/MartinSStewart/tile-editor"
                 }
         }
       )
@@ -1072,13 +1072,13 @@ thingsIHaveDone =
         , thingType =
             OtherThing
                 { releasedAt = date 2012 Jul 30
-                , repo = Just "https://github.com/MartinSStewart/tretton37-game-jam"
+                , repo = Just "github.com/MartinSStewart/tretton37-game-jam"
                 }
         }
       )
     , ( "the-best-color"
       , { name = "The best color"
-        , website = Just "https://the-best-color.lamdera.app/"
+        , website = Just "the-best-color.lamdera.app/"
         , tags = [ Elm, Game, Lamdera ]
         , description = []
         , pageLastUpdated = websiteReleasedAt
@@ -1087,13 +1087,13 @@ thingsIHaveDone =
         , thingType =
             OtherThing
                 { releasedAt = date 2020 Jan 27
-                , repo = Just "https://github.com/MartinSStewart/best-color"
+                , repo = Just "github.com/MartinSStewart/best-color"
                 }
         }
       )
     , ( "elm-online-survey"
       , { name = "Elm Online survey"
-        , website = Just "https://audience-questions.lamdera.app/"
+        , website = Just "audience-questions.lamdera.app/"
         , tags = [ Elm, Lamdera ]
         , description = []
         , pageLastUpdated = websiteReleasedAt
@@ -1102,13 +1102,13 @@ thingsIHaveDone =
         , thingType =
             OtherThing
                 { releasedAt = date 2021 Oct 6
-                , repo = Just "https://github.com/MartinSStewart/elm-online-survey"
+                , repo = Just "github.com/MartinSStewart/elm-online-survey"
                 }
         }
       )
     , ( "time-loop-inc"
       , { name = "Time loop inc."
-        , website = Just "https://time-travel-game.lamdera.app/"
+        , website = Just "time-travel-game.lamdera.app/"
         , tags = [ Elm, Game, Lamdera ]
         , description = []
         , pageLastUpdated = websiteReleasedAt
@@ -1117,13 +1117,13 @@ thingsIHaveDone =
         , thingType =
             OtherThing
                 { releasedAt = date 2022 Jul 27
-                , repo = Just "https://github.com/MartinSStewart/time-loop-inc"
+                , repo = Just "github.com/MartinSStewart/time-loop-inc"
                 }
         }
       )
     , ( "question-and-answer"
       , { name = "Question and Answer"
-        , website = Just "https://question-and-answer.lamdera.app/"
+        , website = Just "question-and-answer.lamdera.app/"
         , tags = [ Elm, Lamdera ]
         , description = []
         , pageLastUpdated = websiteReleasedAt
@@ -1132,7 +1132,7 @@ thingsIHaveDone =
         , thingType =
             OtherThing
                 { releasedAt = date 2021 Oct 26
-                , repo = Just "https://github.com/MartinSStewart/elm-qna"
+                , repo = Just "github.com/MartinSStewart/elm-qna"
                 }
         }
       )
@@ -1147,7 +1147,7 @@ thingsIHaveDone =
         , thingType =
             OtherThing
                 { releasedAt = date 2021 Jul 14
-                , repo = Just "https://github.com/MartinSStewart/elm-review-remove-duplicate-code"
+                , repo = Just "github.com/MartinSStewart/elm-review-remove-duplicate-code"
                 }
         }
       )
@@ -1162,7 +1162,7 @@ thingsIHaveDone =
         , thingType =
             OtherThing
                 { releasedAt = date 2021 May 21
-                , repo = Just "https://github.com/MartinSStewart/elm-moment-of-the-month"
+                , repo = Just "github.com/MartinSStewart/elm-moment-of-the-month"
                 }
         }
       )
@@ -1177,7 +1177,7 @@ thingsIHaveDone =
         , thingType =
             OtherThing
                 { releasedAt = date 2021 Mar 24
-                , repo = Just "https://github.com/MartinSStewart/memo-theatre"
+                , repo = Just "github.com/MartinSStewart/memo-theatre"
                 }
         }
       )
@@ -1192,7 +1192,7 @@ thingsIHaveDone =
         , thingType =
             OtherThing
                 { releasedAt = date 2018 Jun 21
-                , repo = Just "https://github.com/MartinSStewart/Lego-Loco-Remake"
+                , repo = Just "github.com/MartinSStewart/Lego-Loco-Remake"
                 }
         }
       )
@@ -1207,7 +1207,7 @@ thingsIHaveDone =
         , thingType =
             OtherThing
                 { releasedAt = date 2017 Dec 7
-                , repo = Just "https://github.com/MartinSStewart/Lens"
+                , repo = Just "github.com/MartinSStewart/Lens"
                 }
         }
       )
@@ -1222,13 +1222,13 @@ thingsIHaveDone =
         , thingType =
             OtherThing
                 { releasedAt = date 2018 Feb 12
-                , repo = Just "https://github.com/MartinSStewart/DiscordSpaceshipGame"
+                , repo = Just "github.com/MartinSStewart/DiscordSpaceshipGame"
                 }
         }
       )
     , ( "foolproof-multiplayer-games-in-elm"
       , { name = "Foolproof* multiplayer* games in Elm*"
-        , website = Just "https://www.youtube.com/watch?v=Fkj2Is6jxCE"
+        , website = Just "www.youtube.com/watch?v=Fkj2Is6jxCE"
         , tags = [ Elm, Lamdera, Game, Presentation ]
         , description = []
         , pageLastUpdated = websiteReleasedAt
@@ -1252,19 +1252,39 @@ thingsIHaveDone =
         , thingType =
             OtherThing
                 { releasedAt = date 2024 Jun 30
-                , repo = Just "https://github.com/MartinSStewart/emils-turn"
+                , repo = Just "github.com/MartinSStewart/emils-turn"
                 }
         }
       )
     , lamderaPackage "containers"
         [ Paragraph
-            [ Text "This package lets Elm users finally have a Dict and Set type that is both fast (not linear access time like [pzp-1997/assoc-list](https://package.elm-lang.org/packages/pzp1997/assoc-list/latest/)) while not requiring keys to be `comparable`."
+            [ Text "This package lets Elm users finally have a Dict and Set type that does not require "
+            , InlineCode "comparable"
+            , Text " keys or comparison function while also being similar in performance to the built-in Dict and Set types."
             ]
-        , Paragraph [ Text "In this article I want to discuss an interesting set of trade offs I discovered when designing a Dict/Set data structure that, as far as I can tell, are unavoidable regardless of which programming language you use." ]
-        , BulletList [ Text "But first some thanks are in order." ]
-            [ [ Paragraph [ Text "Thank you [Robin](https://github.com/robinheghan) for the original implementation of this package https://github.com/elm-explorations/hashmap. You handled most of the work for me!" ] ]
-            , [ Paragraph [ Text "Thank you [Ambue](https://ambue.com/) for letting me work on this package during work hours." ] ]
-            , [ Paragraph [ Text "Thank you [miniBill](https://github.com/miniBill) for the Dict test suite. Without it I would have missed a critical bug." ] ]
+        , Paragraph [ Text "In this article I want to discuss an interesting set of trade-offs I discovered when designing a Dict/Set data structure that, as far as I can tell, are unavoidable regardless of which programming language you use." ]
+        , BulletList
+            [ Text "But first some thanks are in order." ]
+            [ [ Paragraph
+                    [ Text "Thank you "
+                    , ExternalLink "Robin" "github.com/robinheghan"
+                    , Text " for the "
+                    , ExternalLink "original implementation" "github.com/elm-explorations/hashmap"
+                    , Text " of this package. You handled most of the work for me!"
+                    ]
+              ]
+            , [ Paragraph
+                    [ Text "Thank you "
+                    , ExternalLink "Ambue" "ambue.com/"
+                    , Text " for letting me work on this package during work hours."
+                    ]
+              ]
+            , [ Paragraph
+                    [ Text "Thank you "
+                    , ExternalLink "miniBill" "github.com/miniBill"
+                    , Text " for the Dict test suite. Without it I would have missed a critical bug."
+                    ]
+              ]
             ]
         , Paragraph [ Text "So here's what I discovered" ]
         , Paragraph [ Text "First, for the purposes of explaining this discovery, lets say a Dict is a type with the following API:" ]
@@ -1274,14 +1294,31 @@ fromList : List (key, value) -> Dict key value
 toList : Dict key value -> List (key, value)
 """
         , NumberList [ Text "Now let me list some properties that are really nice to have in a Dict type:" ]
-            [ [ Paragraph [ Text "The `key` typevar can be any equatable type (so functions can't be used as keys but non-comparable types are allowed)" ] ]
-            , [ Paragraph [ Text """Two dicts with exactly the same key-value pairs are equal regardless of insertion order. For example, `elm fromList [ ("X", 0), ("Y", 1) ] == fromList [ ("Y", 1), ("X", 0) ]`""" ] ]
-            , [ Paragraph [ Text "If `elm dictA == dictB` then `elm f dictA == f dictB` where `f` is an arbitrary function" ] ]
-            , [ Paragraph [ Text "Renaming/reordering record fields or custom type variants should never change the output of `toList`" ] ]
+            [ [ Paragraph [ Text "The ", InlineCode "key", Text " typevar can be any equatable type (so functions can't be used as keys but non-comparable types are allowed)" ] ]
+            , [ Paragraph
+                    [ Text "Two dicts with exactly the same key-value pairs are equal regardless of insertion order. For example, "
+                    , InlineCode """fromList [ ("X", 0), ("Y", 1) ] == fromList [ ("Y", 1), ("X", 0) ]"""
+                    ]
+              ]
+            , [ Paragraph
+                    [ Text "If "
+                    , InlineCode "dictA == dictB"
+                    , Text " then "
+                    , InlineCode "f dictA == f dictB"
+                    , Text " where "
+                    , InlineCode "f"
+                    , Text " is an arbitrary function"
+                    ]
+              ]
+            , [ Paragraph [ Text "Renaming/reordering record fields or custom type variants should never change the output of ", InlineCode "toList" ] ]
             ]
-        , Paragraph [ Text "My discovery is that, as far as I can tell, regardless of what programming language you use or performance characteristics you allow for, *it's impossible to have more than 3 of these properties in a Dict type*." ]
-        , Paragraph [ Text "Now I don't have a mathematical proof to back this claim but I can explain why I believe it is true." ]
-        , BulletList [ Text "First, lets consider the built in Dict type (I'm going to refer to it as elm/dict even though there isn't any package named that). What properties does it have?" ]
+        , Paragraph
+            [ Text "My discovery is that, as far as I can tell, regardless of what programming language you use or performance characteristics you allow for, "
+            , Bold "it's impossible to have more than 3 of these properties in a Dict type"
+            , Text "."
+            ]
+        , Paragraph [ Text "Now I don't have a mathematical proof to back this claim but let me explain why I believe it is true." ]
+        , BulletList [ Text "First, lets consider the built-in Dict type (I'm going to refer to it as elm/dict even though there isn't any package named that). What properties does it have?" ]
             [ [ Paragraph [ Text "Well it fails on 1. You can only have comparable keys." ] ]
             , [ Paragraph [ Text """It passes on 2. You'll find that `elm fromList [ ("X", 0), ("Y", 1) ] == fromList [ ("Y", 1), ("X", 0) ]` is indeed true""" ] ]
             , [ Paragraph [ Text "Passes on 3. And actually more broadly, outside of one language bug that exploits the fact that `NaN /= NaN`, any code written in Elm will pass on 3." ] ]
@@ -1311,39 +1348,41 @@ myDict =
                             ]
                       , CodeBlock """fromList [ ("X", 0), ("Y", 1) ] == fromList [ ("Y", 1), ("X", 0) ]
 
-    -- is converted into this because of how we defined == to work for dict equality
-    toList (fromList [ ("X", 0), ("Y", 1) ]) == toList (fromList [ ("Y", 1), ("X", 0) ])
+-- is converted into this because of how we defined == to work for dict equality
+toList (fromList [ ("X", 0), ("Y", 1) ]) == toList (fromList [ ("Y", 1), ("X", 0) ])
 
-    -- which simplifies to this since ordering by insertion means toList and fromList cancel eachother out
-    [ ("X", 0), ("Y", 1) ]) == [ ("Y", 1), ("X", 0) ]
+-- which simplifies to this since ordering by insertion means toList and fromList cancel eachother out
+[ ("X", 0), ("Y", 1) ]) == [ ("Y", 1), ("X", 0) ]
 
-    -- which is
-    False
-    """
+-- which is
+False
+"""
                       ]
+                    , [ BulletList
+                            [ Text "On the bright side, property 3 is valid at least!" ]
+                            [ [ Paragraph [ Text "Okay well how about we make it so `dictA == dictB` instead checks that both dicts have the same key-values pairs while ignoring order? In that case 2 is valid! But lets look at 3. More specifically, consider this code" ]
+                              , CodeBlock """dictA = fromList [ ("X", 0), ("Y", 1) ]
+dictB = fromList [ ("Y", 1), ("X", 0) ]
 
-                    --                , BulletList [ Text "On the bright side, property 3 is valid at least!" ]
-                    --                    [ Paragraph [ Text "Okay well how about we make it so `dictA == dictB` instead checks that both dicts have the same key-values pairs while ignoring order? In that case 2 is valid! But lets look at 3. More specifically, consider this code" ]
-                    --                    , CodeBlock """dictA = fromList [ ("X", 0), ("Y", 1) ]
-                    --dictB = fromList [ ("Y", 1), ("X", 0) ]
-                    --
-                    ---- This is now true since order doesn't matter when checking for equality
-                    --dictA == dictB
-                    --
-                    ---- But if we were to do this
-                    --toList dictA == toList dictB
-                    --
-                    ---- Then we get
-                    --False
-                    --"""
-                    --                    , Paragraph [ Text "This violates 3 which says `elm dictA == dictB` implies `elm f dictA == f dictB` for any function f." ]
-                    --                    ]
+-- This is now true since order doesn't matter when checking for equality
+dictA == dictB
+
+-- But if we were to do this
+toList dictA == toList dictB
+
+-- Then we get
+False
+"""
+                              ]
+                            , [ Paragraph [ Text "This violates 3 which says `elm dictA == dictB` implies `elm f dictA == f dictB` for any function f." ] ]
+                            ]
+                      ]
                     ]
               ]
             ]
         , Paragraph [ Text "You might argue I've skipped an obvious approach to sorting `toList`'s output, just don't sort at all! We'll leave it as an implementation detail of our Dict type. Maybe a hashmap, binary tree, or red-black tree?" ]
         , Paragraph [ Text "Unfortunately that still sorts it, just in a way that probably ends up depending on some combination of variant names, variant order, and insertion order." ]
-        , Paragraph [ Text "For example, if you're hashing a custom type, what property will you use? The name of each variant? The variant order? If you don't use any of those, what is left? If you use a binary tree or red-black tree then instead of a hash function you need some kind of comparable function internally but you have the same problem. You need to compare based on *something* in the key. Even if you don't care about performance and your dict is just a list internally with `==` used on every existing key to check for duplicate keys (this is [pzp-1997/assoc-list](https://package.elm-lang.org/packages/pzp1997/assoc-list/latest/)'s approach) you still have to pick at least one of these 3 sorting approaches." ]
+        , Paragraph [ Text "For example, if you're hashing a custom type, what property will you use? The name of each variant? The variant order? If you don't use any of those, what is left? If you use a binary tree or red-black tree then instead of a hash function you need some kind of comparable function internally but you have the same problem. You need to compare based on *something* in the key. Even if you don't care about performance and your dict is just a list internally with `==` used on every existing key to check for duplicate keys (this is [pzp-1997/assoc-list](package.elm-lang.org/packages/pzp1997/assoc-list/latest/)'s approach) you still have to pick at least one of these 3 sorting approaches." ]
         , Paragraph [ Text "It's starting to feel like a game of whack-a-mole isn't it? Every time we try to force all 4 properties to be valid, one pops back up. Maybe we can solve this by thinking outside of the box?" ]
         , Paragraph [ Text "For example, in our custom type example, what if we could define a unique function for each non-comparable type that tells the dict how to sort it? Maybe we could introduce some new syntax and make it look like this:" ]
         , CodeBlock """type Color

@@ -7,15 +7,12 @@ import FatalError exposing (FatalError)
 import Formatting exposing (Formatting)
 import Head
 import Head.Seo as Seo
-import Markdown.Block exposing (Block)
-import Markdown.Parser
-import MarkdownThemed
+import Icons
 import Pages.Url
 import PagesMsg exposing (PagesMsg)
-import ParserUtils
 import RouteBuilder exposing (App, StatelessRoute)
 import Shared
-import Things exposing (Tag, ThingType)
+import Things exposing (Tag, ThingType(..))
 import Ui
 import Ui.Font
 import View exposing (View)
@@ -122,18 +119,44 @@ view app sharedModel =
             , Ui.widthMax Shared.contentMaxWidth
             , Ui.centerX
             , Ui.height Ui.fill
+            , Ui.spacing 24
             ]
-            [ Ui.el [ Ui.Font.size 36 ] (Ui.text thing.name)
-            , Ui.text
-                ("Created at "
-                    ++ Date.toIsoString thing.pageCreatedAt
-                    ++ (if thing.pageLastUpdated == thing.pageCreatedAt then
-                            ""
+            [ Ui.column
+                []
+                [ case thing.website of
+                    Just url ->
+                        Formatting.externalLink 36 thing.name url
 
-                        else
-                            " " ++ "(updated at " ++ Date.toIsoString thing.pageLastUpdated ++ ")"
-                       )
-                )
+                    Nothing ->
+                        Ui.el [ Ui.Font.size 36 ] (Ui.text thing.name)
+                , Ui.row
+                    [ Ui.spacing 16 ]
+                    [ Ui.text
+                        ("Created at "
+                            ++ Date.toIsoString thing.pageCreatedAt
+                            ++ (if thing.pageLastUpdated == thing.pageCreatedAt then
+                                    ""
+
+                                else
+                                    " " ++ "(updated at " ++ Date.toIsoString thing.pageLastUpdated ++ ")"
+                               )
+                        )
+                    , case thing.thingType of
+                        OtherThing other ->
+                            case other.repo of
+                                Just repo ->
+                                    Formatting.externalLink 16 "View source code" repo
+
+                                Nothing ->
+                                    Ui.none
+
+                        JobThing _ ->
+                            Ui.none
+
+                        PodcastThing _ ->
+                            Ui.none
+                    ]
+                ]
             , if List.isEmpty thing.description then
                 Ui.text "TODO"
 

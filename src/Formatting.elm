@@ -1,5 +1,7 @@
 module Formatting exposing (..)
 
+import Icons
+import Route exposing (Route)
 import SyntaxHighlight
 import Ui
 import Ui.Font
@@ -19,9 +21,10 @@ type Formatting
 type Inline
     = Bold String
     | Italic String
-    | Link String String
+    | Link String Route
     | InlineCode String
     | Text String
+    | ExternalLink String String
 
 
 view : List Formatting -> Ui.Element msg
@@ -42,7 +45,13 @@ viewHelper item =
                 Ok ok ->
                     SyntaxHighlight.toBlockHtml Nothing ok
                         |> Ui.html
-                        |> Ui.el [ Ui.Font.size 18 ]
+                        |> Ui.el
+                            [ codeBackground
+                            , codeBorder
+                            , Ui.border 1
+                            , Ui.rounded 4
+                            , Ui.paddingXY 8 0
+                            ]
 
                 Err _ ->
                     Ui.text text
@@ -51,7 +60,7 @@ viewHelper item =
             listHelper (\_ -> "•") leading formattings
 
         NumberList leading formattings ->
-            listHelper (\index -> String.fromInt index ++ ".") leading formattings
+            listHelper (\index -> String.fromInt (index + 1) ++ ".") leading formattings
 
         LetterList leading formattings ->
             listHelper
@@ -78,7 +87,7 @@ listHelper iconFunc leading formattings =
                     Ui.row
                         [ Ui.spacing 6 ]
                         [ Ui.el
-                            [ Ui.alignTop, Ui.width Ui.shrink ]
+                            [ Ui.alignTop, Ui.width Ui.shrink, Ui.Font.bold ]
                             (Ui.text (iconFunc index))
                         , view item2
                         ]
@@ -97,22 +106,50 @@ inlineView inline =
         Italic text ->
             Ui.el [ Ui.Font.italic ] (Ui.text text)
 
-        Link url text ->
-            Ui.el [ Ui.link url, Ui.Font.color (Ui.rgb 20 100 255) ] (Ui.text text)
+        Link text url ->
+            Ui.el [ Ui.link (Route.toString url), Ui.Font.color (Ui.rgb 20 100 255) ] (Ui.text text)
 
         InlineCode text ->
-            case SyntaxHighlight.elm (String.dropLeft 4 text) of
+            case SyntaxHighlight.elm text of
                 Ok ok ->
                     SyntaxHighlight.toInlineHtml ok
                         |> Ui.html
-                        |> Ui.el [ Ui.Font.size 18 ]
+                        |> Ui.el
+                            [ codeBackground
+                            , codeBorder
+                            , Ui.border 1
+                            , Ui.rounded 4
+                            , Ui.paddingXY 4 0
+                            ]
 
                 Err _ ->
                     Ui.el
                         [ Ui.Font.family [ Ui.Font.monospace ]
-                        , Ui.Font.size 18
                         ]
                         (Ui.text text)
 
         Text text ->
             Ui.text text
+
+        ExternalLink text url ->
+            externalLink 16 text url
+
+
+externalLink : Int -> String -> String -> Ui.Element msg
+externalLink fontSize text url =
+    Ui.row
+        [ Ui.linkNewTab ("https://" ++ url)
+        , Ui.Font.color (Ui.rgb 20 100 255)
+        , Ui.Font.size fontSize
+        ]
+        [ Ui.text text
+        , Ui.el [ Ui.Font.size (round (toFloat fontSize * 12 / 16)), Ui.paddingLeft 2 ] Icons.externaLink
+        ]
+
+
+codeBackground =
+    Ui.background (Ui.rgb 240 240 240)
+
+
+codeBorder =
+    Ui.borderColor (Ui.rgb 210 210 210)
