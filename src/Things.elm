@@ -1260,7 +1260,7 @@ thingsIHaveDone =
         [ Paragraph
             [ Text "This package lets Elm users finally have a Dict and Set type that does not require "
             , InlineCode "comparable"
-            , Text " keys or comparison function while also being similar in performance to the built-in Dict and Set types."
+            , Text " keys or a comparison function while also being similar in performance to the built-in Dict and Set types."
             ]
         , Paragraph [ Text "In this article I want to discuss an interesting set of trade-offs I discovered when designing a Dict/Set data structure that, as far as I can tell, are unavoidable regardless of which programming language you use." ]
         , BulletList
@@ -1320,12 +1320,26 @@ toList : Dict key value -> List (key, value)
         , Paragraph [ Text "Now I don't have a mathematical proof to back this claim but let me explain why I believe it is true." ]
         , BulletList [ Text "First, lets consider the built-in Dict type (I'm going to refer to it as elm/dict even though there isn't any package named that). What properties does it have?" ]
             [ [ Paragraph [ Text "Well it fails on 1. You can only have comparable keys." ] ]
-            , [ Paragraph [ Text """It passes on 2. You'll find that `elm fromList [ ("X", 0), ("Y", 1) ] == fromList [ ("Y", 1), ("X", 0) ]` is indeed true""" ] ]
-            , [ Paragraph [ Text "Passes on 3. And actually more broadly, outside of one language bug that exploits the fact that `NaN /= NaN`, any code written in Elm will pass on 3." ] ]
+            , [ Paragraph
+                    [ Text "It passes on 2. You'll find that "
+                    , InlineCode """fromList [ ("X", 0), ("Y", 1) ] == fromList [ ("Y", 1), ("X", 0) ]"""
+                    , Text " is indeed true"
+                    ]
+              ]
+            , [ Paragraph
+                    [ Text "Passes on 3. And actually more broadly, outside of one language bug that exploits the fact that "
+                    , InlineCode "NaN /= NaN"
+                    , Text ", any code written in Elm will pass on 3."
+                    ]
+              ]
             , [ Paragraph [ Text "Passes on 4. Again this is a global property of the Elm language. Renaming/reordering a record fields or custom type variants will never change the runtime behavior of your code (with the exception of reordering record fields affecting record constructors)." ] ]
             ]
         , Paragraph [ Text "It's nice that elm/dict passes on 2, 3, and 4. But comparable keys are really restrictive! So lets try allowing for non-comparable keys while trying to keep those other nice properties." ]
-        , Paragraph [ Text "Well, the question we immediately encounter is, how should `toList` sort the list of key-value pairs? With elm/dict the list is lexicographically sorted by the key. This is possible because all of the keys are comparable values. But what do we do if we have non-comparable keys? For example, suppose we have the following custom type being used as our key" ]
+        , Paragraph
+            [ Text "Well, the question we immediately encounter is, how should "
+            , InlineCode "toList"
+            , Text " sort the list of key-value pairs? With elm/dict the list is lexicographically sorted by the key. This is possible because all of the keys are comparable values. But what do we do if we have non-comparable keys? For example, suppose we have the following custom type being used as our key"
+            ]
         , CodeBlock """type Color
     = Red
     | Green
@@ -1335,12 +1349,30 @@ myDict =
     fromList [ (Blue, 2), (Green, 1), (Red, 0) ]
 """
         , LetterList [ Text "We really only have 3 options for sorting:" ]
-            [ [ Paragraph [ Text "Sort based on variant names. For example alphabetically sort the names in ascending order. Which gives us `elm toList myDict == [ (Blue, 2), (Green, 1), (Red, 0) ]`" ] ]
-            , [ Paragraph [ Text "Sort by the order the variants are defined. That gives us `elm toList myDict == [ (Red, 0), (Green, 1), (Blue, 2) ]`" ] ]
-            , [ Paragraph [ Text "Sort the list based on the order the key-value pairs were added. Then we get `elm toList [ (Blue, 2), (Green, 1), (Red, 0) ]` aka the original list." ] ]
+            [ [ Paragraph
+                    [ Text "Sort based on variant names. For example alphabetically sort the names in ascending order. Which gives us "
+                    , InlineCode "toList myDict == [ (Blue, 2), (Green, 1), (Red, 0) ]"
+                    ]
+              ]
+            , [ Paragraph
+                    [ Text "Sort by the order the variants are defined. That gives us "
+                    , InlineCode "toList myDict == [ (Red, 0), (Green, 1), (Blue, 2) ]"
+                    ]
+              ]
+            , [ Paragraph
+                    [ Text "Sort the list based on the order the key-value pairs were added. Then we get "
+                    , InlineCode "toList [ (Blue, 2), (Green, 1), (Red, 0) ]"
+                    , Text " which is just the original list."
+                    ]
+              ]
             ]
         , LetterList [ Text "Do any of these approaches to sorting let us keep all 4 of the nice to have properties?" ]
-            [ [ Paragraph [ Text "Violates 4. If we rename a variant, it could potentially change it's alphabetical ordering and thereby change the output of `toList`." ] ]
+            [ [ Paragraph
+                    [ Text "Violates 4. If we rename a variant, it could potentially change it's alphabetical ordering and thereby change the output of "
+                    , InlineCode "toList"
+                    , Text "."
+                    ]
+              ]
             , [ Paragraph [ Text "Also violates 4. If we reorder our variants, that will change the output of `toList`" ] ]
             , [ BulletList [ Text "This does not violate 4! But what about 2 and 3?" ]
                     [ [ Paragraph
@@ -1374,7 +1406,12 @@ toList dictA == toList dictB
 False
 """
                               ]
-                            , [ Paragraph [ Text "This violates 3 which says `elm dictA == dictB` implies `elm f dictA == f dictB` for any function f." ] ]
+                            , [ Paragraph
+                                    [ Text "This violates 3 which says `elm dictA == dictB` implies "
+                                    , InlineCode "f dictA == f dictB"
+                                    , Text " for any function f."
+                                    ]
+                              ]
                             ]
                       ]
                     ]
@@ -1382,7 +1419,7 @@ False
             ]
         , Paragraph [ Text "You might argue I've skipped an obvious approach to sorting `toList`'s output, just don't sort at all! We'll leave it as an implementation detail of our Dict type. Maybe a hashmap, binary tree, or red-black tree?" ]
         , Paragraph [ Text "Unfortunately that still sorts it, just in a way that probably ends up depending on some combination of variant names, variant order, and insertion order." ]
-        , Paragraph [ Text "For example, if you're hashing a custom type, what property will you use? The name of each variant? The variant order? If you don't use any of those, what is left? If you use a binary tree or red-black tree then instead of a hash function you need some kind of comparable function internally but you have the same problem. You need to compare based on *something* in the key. Even if you don't care about performance and your dict is just a list internally with `==` used on every existing key to check for duplicate keys (this is [pzp-1997/assoc-list](package.elm-lang.org/packages/pzp1997/assoc-list/latest/)'s approach) you still have to pick at least one of these 3 sorting approaches." ]
+        , Paragraph [ Text "For example, if you're hashing a custom type, what property will you use? The name of each variant? The variant order? If you don't use any of those, what is left? If you use a binary tree or red-black tree then instead of a hash function you need some kind of comparable function internally but you have the same problem. You need to compare based on *something* in the key. Even if you don't care about performance and your dict is just a list internally with ", InlineCode "==", Text " used on every existing key to check for duplicate keys (this is [pzp-1997/assoc-list](package.elm-lang.org/packages/pzp1997/assoc-list/latest/)'s approach) you still have to pick at least one of these 3 sorting approaches." ]
         , Paragraph [ Text "It's starting to feel like a game of whack-a-mole isn't it? Every time we try to force all 4 properties to be valid, one pops back up. Maybe we can solve this by thinking outside of the box?" ]
         , Paragraph [ Text "For example, in our custom type example, what if we could define a unique function for each non-comparable type that tells the dict how to sort it? Maybe we could introduce some new syntax and make it look like this:" ]
         , CodeBlock """type Color
@@ -1409,7 +1446,7 @@ insert : key -> value -> Dict key value -> Dict key value
 fromList : List (key, value) -> Dict key value
 toList : Dict key value -> List (key, value)
 """
-        , Paragraph [ Text "but `toList` is causing us lots of trouble. What if we just remove it?" ]
+        , Paragraph [ Text "but ", InlineCode "toList", Text " is causing us lots of trouble. What if we just remove it?" ]
         , Paragraph [ Text "Well we can. But we'd also need to remove any other functions iterate over the dict's key-value pairs (foldl and foldr for example). That's quite limiting." ]
         , Paragraph [ Text "Okay what if we keep toList but change it to this?" ]
         , CodeBlock """toList : (key -> key -> Order) -> Dict key value -> List (key, value)"""

@@ -116,7 +116,7 @@ view app sharedModel =
     , body =
         Ui.column
             [ Ui.padding 16
-            , Ui.widthMax Shared.contentMaxWidth
+            , Ui.widthMax 800
             , Ui.centerX
             , Ui.height Ui.fill
             , Ui.spacing 24
