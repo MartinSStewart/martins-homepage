@@ -1,14 +1,11 @@
 module Internal.Model2 exposing (..)
 
-import Animator
-import Browser.Dom
 import Color
 import Html
 import Html.Attributes as Attr
 import Html.Events as Events
 import Html.Keyed
 import Html.Lazy
-import Internal.BitEncodings as Bits
 import Internal.BitField as BitField exposing (BitField)
 import Internal.Bits.Analyze as AnalyzeBits
 import Internal.Bits.Inheritance as Inheritance
@@ -19,7 +16,6 @@ import Internal.Teleport as Teleport
 import Json.Decode as Json
 import Json.Encode as Encode
 import Set exposing (Set)
-import Task
 import Time
 import VirtualDom
 
@@ -722,7 +718,12 @@ link details =
                 , additionalInheritance = BitField.none
                 , attrs =
                     [ Attr.href details.url
-                    , Attr.rel "noopener noreferrer"
+                    , case details.download of
+                        Nothing ->
+                            Attr.rel "noopener noreferrer"
+
+                        Just _ ->
+                            Attr.class ""
                     , case details.download of
                         Nothing ->
                             if details.newTab then
@@ -1401,6 +1402,15 @@ fontSizeAdjusted size height =
     toFloat size * (1 / height)
 
 
+isSkippable : Flag -> Bool
+isSkippable bits =
+    -- We skip padding here as well because
+    --  1. it's supposed to accumulate, e.g. you set padding-left/padding-right and they should stack
+    --  2. But we can't use `skip` because we want to identify stuff by flag
+    --      to pull it out to use in multiline inputs.  See Ui.Input.multiline
+    BitField.fieldEqual bits Flag.skip || BitField.fieldEqual bits Flag.padding
+
+
 {-|
 
     1. What nodes are we rendering?
@@ -1435,7 +1445,7 @@ analyze has encoded inheritance attrs =
                     --  1. it's supposed to accumulate, e.g. you set padding-left/padding-right and they should stack
                     --  2. But we can't use `skip` because we want to identify stuff by flag
                     --      to pull it out to use in multiline inputs.  See Ui.Input.multiline
-                    if BitField.fieldEqual flag Flag.skip || BitField.fieldEqual flag Flag.padding then
+                    if isSkippable flag then
                         False
 
                     else
@@ -1478,7 +1488,7 @@ toAttrs parentBits myBits has htmlAttrs attrs =
         (Attribute { flag, attr }) :: remain ->
             let
                 previouslyRendered =
-                    if BitField.fieldEqual flag Flag.skip then
+                    if isSkippable flag then
                         False
 
                     else
@@ -1585,7 +1595,7 @@ toStyle parentBits myBits analyzedBits has htmlAttrs classes attrs =
         (Attribute { flag, attr }) :: remain ->
             let
                 previouslyRendered =
-                    if BitField.fieldEqual flag Flag.skip then
+                    if isSkippable flag then
                         False
 
                     else
@@ -1657,7 +1667,7 @@ toStyleAsEncodedProperty parentBits myBits analyzed has classesString htmlAttrs 
         (Attribute { flag, attr }) :: remain ->
             let
                 previouslyRendered =
-                    if BitField.fieldEqual flag Flag.skip then
+                    if isSkippable flag then
                         False
 
                     else

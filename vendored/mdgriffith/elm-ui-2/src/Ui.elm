@@ -726,6 +726,9 @@ linkNewTab uri =
 
 
 {-| A link to download a file.
+
+**Note** This will not work for cross-origin requests unless the server sends the appropriate headers.
+
 -}
 download : String -> Attribute msg
 download uri =
