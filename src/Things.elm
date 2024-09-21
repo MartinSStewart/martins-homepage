@@ -1308,16 +1308,16 @@ toList : Dict key value -> List (key, value)
                     , Code "f"
                     , Text " can be any function"
                     ]
-                , Paragraph [ Text "Renaming/reordering record fields or custom type variants should never change the output of ", Code "toList" ]
+                , Paragraph [ Text "Renaming/reordering record fields or custom type variants should never change the order of key-value pairs returned from ", Code "toList" ]
                 ]
             , Paragraph
                 [ Text "My discovery is that, as far as I can tell, regardless of what programming language you use or performance characteristics you allow for, "
-                , Bold "it's impossible to have more than 3 of these properties in a Dict type"
+                , Bold "it's impossible to have more than three of these properties in a Dict type"
                 , Text "."
                 ]
-            , Paragraph [ Italic "Note that while I'm going to focus on Dict in this article, all of these properties apply to Set as well." ]
+            , Paragraph [ Italic "For the sake of brevity, I'll refer to these properties by number through-out the rest of the article. " ]
             ]
-        , Section "So why care?"
+        , Section "Why should I care?"
             [ NumberList [ Text "I expect some readers will wonder why these properties matter. Maybe they feel arbitrary. Let me make a case for why they are important:" ]
                 [ Paragraph [ Text "We want keys to be non-comparable for the sake of convenience and type-safety. It's annoying when I have ", Code "type Id = Id String", Text " or ", Code "{ x : Int, y : Int }", Text " and I have to convert them into a comparable type before I can use it as a key. This leads to boilerplate code and increased risk mixing up types which can lead to bugs." ]
                 , Paragraph [ Text "Having two Dicts be equal based on contents, regardless of insertion order is nice but often not that big a deal. But for Sets it's kind of their whole purpose. And Sets are essentially just an alias for ", Code "Dict\u{00A0}key\u{00A0}()" ]
@@ -1335,12 +1335,12 @@ toList : Dict key value -> List (key, value)
                         [ Text "Any code written in Elm will have this property. It would be a shame for lamdera/containers to introduce some kernel code that violates this property!"
                         ]
                     ]
-                , Paragraph [ Text "People often mention that when refactoring code in Elm, they feel invincible, being able to make sweeping changes to a large codebase with little fear that they have introduced bugs. Part of why this is true is because renaming or reordering functions/types/fields/variants will never affect the runtime behavior of Elm code (with the sole exception being record field order affecting record constructors). It would be a shame here as well to lose this just because, ", Code "Dict.toList", Text " would change when renaming/reordering record fields or custom type variants." ]
+                , Paragraph [ Text "People sometimes mention that when refactoring in Elm, they feel safe making large changes to their code. Part of why this is true is because renaming or reordering functions/types/fields/variants will never affect the runtime behavior of Elm code (with the sole exception being field order affecting record constructors). It would be a shame to lose this just because, ", Code "Dict.toList", Text " would change when renaming/reordering record fields or custom type variants." ]
                 ]
             ]
         , Section "Rock solid mathematical proof"
             [ Paragraph [ Text "I don't have a mathematical proof to back this claim but let me explain why I believe it is true." ]
-            , NumberList [ Text "First, lets consider the built-in Dict type. What properties does it have?" ]
+            , NumberList [ Text "First, lets consider the built-in Dict type. Which of the 4 properties does it support?" ]
                 [ Paragraph [ Text "Well it fails on 1. You can only have comparable keys." ]
                 , Paragraph
                     [ Text "It passes on 2. You'll find that "
@@ -1348,15 +1348,14 @@ toList : Dict key value -> List (key, value)
                     , Text " is indeed true."
                     ]
                 , Paragraph
-                    [ Text "Passes"
-                    ]
-                , Paragraph [ Text "Passes" ]
+                    [ Text "Passes on 3. ", Code "dictA == dictB", Text " implies ", Code "f dictA == f dictB" ]
+                , Paragraph [ Text "And passes on 4. Since the built-in Dict only allows comparable keys, there's no way for renames or reorderings to affect ", Code "toList" ]
                 ]
             , Paragraph [ Text "It's nice that elm/dict passes on 2, 3, and 4. But comparable keys are really restrictive! So lets try allowing for non-comparable keys while trying to keep those other nice properties." ]
             , Paragraph
                 [ Text "Well, the question we immediately encounter is, how should "
                 , Code "toList"
-                , Text " sort the list of key-value pairs? With elm/dict the list is lexicographically sorted by the key. This is possible because all of the keys are comparable values. But what do we do if we have non-comparable keys? For example, suppose we have the following custom type being used as our key"
+                , Text " sort the list of key-value pairs? With elm/dict this is easy because all of the keys are comparable values. But what do we do if we have non-comparable keys? For example, suppose we have the following custom type being used as our key."
                 ]
             , CodeBlock """type Color
     = Red
@@ -1366,7 +1365,7 @@ toList : Dict key value -> List (key, value)
 myDict =
     fromList [ (Blue, 2), (Green, 1), (Red, 0) ]
 """
-            , LetterList [ Text "We have 3 options for what to base our sorting on:" ]
+            , LetterList [ Text "We have three options:" ]
                 [ Paragraph
                     [ Text "Sort based on variant names. For example alphabetically sort the names in ascending order. Which gives us "
                     , Code "toList myDict == [\u{00A0}(Blue,\u{00A0}2),\u{00A0}(Green,\u{00A0}1),\u{00A0}(Red,\u{00A0}0) ]"
@@ -1381,7 +1380,7 @@ myDict =
                     , Text " which is just the original list."
                     ]
                 ]
-            , LetterList [ Text "Do any of these approaches to sorting let us keep all 4 of the nice to have properties?" ]
+            , LetterList [ Text "Do any of these approaches to sorting let us keep all 4 of the nice-to-have properties?" ]
                 [ Paragraph
                     [ Text "Violates 4. If we rename a variant, it could potentially change it's alphabetical ordering and thereby change the output of "
                     , Code "toList"
@@ -1397,7 +1396,7 @@ myDict =
                             , Code "dictA == dictB"
                             , Text " is the same as writing "
                             , Code "toList dictA == toList dictB"
-                            , Text ". Well in that case 2 fails. We can see that if we take the example we used on elm/dict earlier."
+                            , Text ". In that case 2 fails. We can see that if we revisit the example we used on the built-in Dict."
                             ]
                         , CodeBlock """fromList [ ("X", 0), ("Y", 1) ] == fromList [ ("Y", 1), ("X", 0) ]
 
@@ -1410,32 +1409,25 @@ toList (fromList [ ("X", 0), ("Y", 1) ]) == toList (fromList [ ("Y", 1), ("X", 0
 -- which is
 False
 """
+                        , Paragraph [ Text "On the bright side, property 3 is valid at least!" ]
                         ]
-                    , BulletList
-                        [ Text "On the bright side, property 3 is valid at least!" ]
-                        [ Group
-                            [ Paragraph [ Text "Okay well how about we make it so ", Code "dictA == dictB", Text " instead checks that both dicts have the same key-values pairs while ignoring order? In that case 2 is valid! But lets look at 3. More specifically, consider this code" ]
-                            , CodeBlock """dictA = fromList [ ("X", 0), ("Y", 1) ]
+                    , Group
+                        [ Paragraph [ Text "Okay well how about we make it so ", Code "dictA == dictB", Text " checks that both dicts have the same key-values pairs while ignoring order? In that case 2 is valid! But lets look at 3. More specifically, consider this code" ]
+                        , CodeBlock """dictA = fromList [ ("X", 0), ("Y", 1) ]
 dictB = fromList [ ("Y", 1), ("X", 0) ]
 
--- This is now true since order doesn't matter when checking for equality
-dictA == dictB
+a = dictA == dictB --> True
 
--- But if we were to do this
-toList dictA == toList dictB
-
--- Then we get
-False
+b = toList dictA == toList dictB --> False
 """
-                            ]
                         , Paragraph
-                            [ Text "This violates 3 which says ", Code "dictA == dictB", Text " implies ", Code "f dictA == f dictB", Text " for any function f." ]
+                            [ Text "This violates 3 which says that if ", Code "dictA == dictB", Text " is true, then that implies ", Code "f dictA == f dictB", Text " is also true for any function f." ]
                         ]
                     ]
                 ]
-            , Paragraph [ Text "You might argue I've skipped an obvious approach to sorting ", Code "toList", Text "'s output, just don't sort at all! We'll leave it as an implementation detail of our Dict type. Maybe a hashmap or binary tree?" ]
+            , Paragraph [ Text "You might argue I've skipped an obvious approach to sorting ", Code "toList", Text "'s output. Just don't sort at all! We'll leave it as an implementation detail of our Dict type. Maybe a hashmap or binary tree?" ]
             , Paragraph [ Text "Unfortunately that still sorts it, just in a way that probably ends up depending on some combination of variant names, variant order, and insertion order." ]
-            , Paragraph [ Text "For example, if you use a hashmap, how will you hash custom types? ", Code "hash (variantName + data)", Text "? ", Code "hash (variantIndex + data)", Text "? If you don't use any of those, what is left? If you use a binary tree then instead of a hash function you need some kind of comparable function internally but you have the same problem. You need to compare keys based on ", Italic "something", Text ". Even if you don't care about performance and your dict is just a list internally with ", Code "==", Text " used on every existing key to check for duplicates you end up with it depending on insertion order." ]
+            , Paragraph [ Text "For example, if you use a hashmap, how will you hash custom types? Maybe ", Code "hash (variantName + data)", Text "? Or perhaps ", Code "hash (variantIndex + data)", Text "? If you don't use any of those, what is left? If you use a binary tree then instead of a hash function you need some kind of comparable function internally but you have the same problem. You need to compare keys based on ", Italic "something", Text ". Even if you don't care about performance and your dict is just a list with ", Code "==", Text " used on every existing key to check for duplicates you end up with it depending on insertion order." ]
             , Paragraph [ Text "It's starting to feel like a game of whack-a-mole isn't it? Every time we try to force one property to be valid, another one breaks. Maybe we can solve this by thinking outside of the box?" ]
             ]
         , Section "Time for some lateral thinking"
@@ -1457,7 +1449,7 @@ colorToInt a =
         Green -> 1
         Blue -> 2
 """
-            , Paragraph [ Text "I'd argue you this doesn't so much give you all 4 properties. We're instead giving up 1 (non-comparable keys) but added a way to make any type comparable. And yes, you can do this. Languages like Haskell support it and it comes with various other trade-offs (for example, how does this work with anonymous/structural records)." ]
+            , Paragraph [ Text "I'd argue you this doesn't so much give you all 4 properties. We're instead giving up 1 (non-comparable keys) but with a way to make any type comparable. And yes, you can do this. Languages like Haskell support it and it comes with its own set of trade-offs (for example, how does this work with anonymous/structural records)." ]
             , Paragraph [ Text "How about a framing challenge? From the start I said our Dict type has the following functions" ]
             , CodeBlock """get : key -> Dict key value -> Maybe value
 
@@ -1468,7 +1460,7 @@ fromList : List (key, value) -> Dict key value
 toList : Dict key value -> List (key, value)
 """
             , Paragraph [ Text "but ", Code "toList", Text " is causing us lots of trouble. What if we just remove it?" ]
-            , Paragraph [ Text "Well we can. But we'd also need to remove any other functions that iterate over the dict's key-value pairs (", Code "foldl", Text " and ", Code "foldr", Text " for example). That's quite limiting." ]
+            , Paragraph [ Text "Well we can. But we'd also need to remove any other functions that iterate over the dict's key-value pairs such as ", Code "foldl", Text " and ", Code "foldr", Text ". That's quite limiting." ]
             , Paragraph [ Text "Okay what if we keep toList but change it to this?" ]
             , CodeBlock """toList : (key -> key -> Order) -> Dict key value -> List (key, value)"""
             , Paragraph [ Text "Now the user has to choose how to sort the key-value pairs, problem solved!" ]
@@ -1476,15 +1468,13 @@ toList : Dict key value -> List (key, value)
             , CodeBlock """import SomePackage exposing (OpaqueType)
 
 dict : Dict OpaqueType Int
-dict = ...
+dict = fromList [ ... ]
 
-list =
-    toList sortOpaqueType dict
+list = toList sortBy dict
 
-sortOpaqueType =
-    Debug.todo "How am I supposed to sort an opaque type that doesn't expose anything useful?"
+sortBy = Debug.todo "How do I sort an opaque type that doesn't expose anything useful?"
 """
-            , Paragraph [ Text "Maybe this situation is rare. Or at least rare enough that this approach is practical? Hard to say." ]
+            , Paragraph [ Text "Maybe this situation is rare enough that this approach is practical? Hard to say." ]
             ]
         , Section "Conclusion"
             [ Paragraph [ Text "It wasn't at all obvious to me from the start that I'd encounter so many trade-offs when all I wanted was a Dict type that didn't demand comparable keys. While I independently discovered this, I'm sure either other people have also figured this out, or alternatively, I've made a mistake somewhere and my conclusions are incorrect. I sure hope it's the latter. I ", Italic "really", Text " want all 4 of those properties in a dict package..." ]
