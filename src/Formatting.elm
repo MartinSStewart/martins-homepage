@@ -51,7 +51,7 @@ codeHighlight string =
             List.map parsedCodeToString ok |> Html.span []
 
         Err error ->
-            Debug.toString error |> Html.text
+            Html.text string
 
 
 type ParsedCode
