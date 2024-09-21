@@ -1260,9 +1260,9 @@ thingsIHaveDone =
         [ Paragraph
             [ Text "This package lets Elm users finally have a Dict and Set type that does not require "
             , Code "comparable"
-            , Text " keys while also being similar in performance to the built-in Dict and Set types."
+            , Text " keys (or require any workarounds) while also being similar in performance to the built-in Dict and Set types."
             ]
-        , Paragraph [ Text "In this article I want to show a discovery I made. It's a set of trade-offs I faced that, as far as I can tell, are unavoidable regardless of how you go about designing a Dict/Set data structure." ]
+        , Paragraph [ Text "In this article I want to show a discovery I made while working on this. It's a set of significant trade-offs I faced that, as far as I can tell, are unavoidable regardless of how you go about designing a Dict/Set data structure." ]
         , BulletList
             [ Text "But first some thanks are in order!" ]
             [ Paragraph

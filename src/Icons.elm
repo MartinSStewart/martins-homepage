@@ -9,4 +9,4 @@ externaLink =
 
 
 externaLinkHtml =
-    Phosphor.arrowSquareOut Phosphor.Regular |> Phosphor.toHtml []
+    Phosphor.arrowSquareOut Phosphor.Regular |> Phosphor.withSize (12 / 16) |> Phosphor.toHtml []
