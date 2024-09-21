@@ -37,7 +37,10 @@ view : List Formatting -> Ui.Element msg
 view list =
     Html.div
         []
-        (SyntaxHighlight.useTheme SyntaxHighlight.gitHub :: List.map viewHelper list)
+        (Html.node "style" [] [ Html.text "pre { white-space: pre-wrap; }" ]
+            :: SyntaxHighlight.useTheme SyntaxHighlight.gitHub
+            :: List.map viewHelper list
+        )
         |> Ui.html
 
 

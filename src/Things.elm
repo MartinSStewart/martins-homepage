@@ -1398,16 +1398,16 @@ myDict =
                             , Code "toList dictA == toList dictB"
                             , Text ". In that case 2 fails. We can see that if we revisit the example we used on the built-in Dict."
                             ]
-                        , CodeBlock """fromList [ ("X", 0), ("Y", 1) ] == fromList [ ("Y", 1), ("X", 0) ]
+                        , CodeBlock """a = fromList [ ("X", 0), ("Y", 1) ] == fromList [ ("Y", 1), ("X", 0) ]
 
 -- is converted into this because of how we defined == to work for dict equality
-toList (fromList [ ("X", 0), ("Y", 1) ]) == toList (fromList [ ("Y", 1), ("X", 0) ])
+a = toList (fromList [ ("X", 0), ("Y", 1) ]) == toList (fromList [ ("Y", 1), ("X", 0) ])
 
 -- simplifies to this since ordering by insertion means toList and fromList cancel eachother out
-[ ("X", 0), ("Y", 1) ]) == [ ("Y", 1), ("X", 0) ]
+a = [ ("X", 0), ("Y", 1) ]) == [ ("Y", 1), ("X", 0) ]
 
 -- which is
-False
+a = False
 """
                         , Paragraph [ Text "On the bright side, property 3 is valid at least!" ]
                         ]

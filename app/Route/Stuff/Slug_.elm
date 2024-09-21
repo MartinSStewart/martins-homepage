@@ -11,10 +11,11 @@ import Icons
 import Pages.Url
 import PagesMsg exposing (PagesMsg)
 import RouteBuilder exposing (App, StatelessRoute)
-import Shared
+import Shared exposing (Breakpoints(..))
 import Things exposing (Tag, ThingType(..))
 import Ui
 import Ui.Font
+import Ui.Responsive
 import View exposing (View)
 
 
@@ -115,7 +116,16 @@ view app sharedModel =
     { title = thing.name
     , body =
         Ui.column
-            [ Ui.padding 16
+            [ Ui.Responsive.paddingXY
+                Shared.breakpoints
+                (\label ->
+                    case label of
+                        Mobile ->
+                            { x = Ui.Responsive.value 8, y = Ui.Responsive.value 16 }
+
+                        NotMobile ->
+                            { x = Ui.Responsive.value 16, y = Ui.Responsive.value 16 }
+                )
             , Ui.widthMax 800
             , Ui.centerX
             , Ui.height Ui.fill
