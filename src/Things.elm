@@ -1259,88 +1259,106 @@ thingsIHaveDone =
     , lamderaPackage "containers"
         [ Paragraph
             [ Text "This package lets Elm users finally have a Dict and Set type that does not require "
-            , InlineCode "comparable"
+            , Code "comparable"
             , Text " keys or a comparison function while also being similar in performance to the built-in Dict and Set types."
             ]
         , Paragraph [ Text "In this article I want to discuss an interesting set of trade-offs I discovered when designing a Dict/Set data structure that, as far as I can tell, are unavoidable regardless of which programming language you use." ]
         , BulletList
             [ Text "But first some thanks are in order." ]
-            [ [ Paragraph
-                    [ Text "Thank you "
-                    , ExternalLink "Robin" "github.com/robinheghan"
-                    , Text " for the "
-                    , ExternalLink "original implementation" "github.com/elm-explorations/hashmap"
-                    , Text " of this package. You handled most of the work for me!"
-                    ]
-              ]
-            , [ Paragraph
-                    [ Text "Thank you "
-                    , ExternalLink "Ambue" "ambue.com/"
-                    , Text " for letting me work on this package during work hours."
-                    ]
-              ]
-            , [ Paragraph
-                    [ Text "Thank you "
-                    , ExternalLink "miniBill" "github.com/miniBill"
-                    , Text " for the Dict test suite. Without it I would have missed a critical bug."
-                    ]
-              ]
+            [ Paragraph
+                [ Text "Thank you "
+                , ExternalLink "Robin" "github.com/robinheghan"
+                , Text " for the "
+                , ExternalLink "original implementation" "github.com/elm-explorations/hashmap"
+                , Text " of this package. You handled most of the work for me!"
+                ]
+            , Paragraph
+                [ Text "Thank you "
+                , ExternalLink "Ambue" "ambue.com/"
+                , Text " for letting me work on this package during work hours."
+                ]
+            , Paragraph
+                [ Text "Thank you "
+                , ExternalLink "miniBill" "github.com/miniBill"
+                , Text " for the Dict test suite. Without it I would have missed a critical bug."
+                ]
             ]
-        , Paragraph [ Text "So here's what I discovered" ]
-        , Paragraph [ Text "First, for the purposes of explaining this discovery, lets say a Dict is a type with the following API:" ]
-        , CodeBlock """get : key -> Dict key value -> Maybe value
+        , Section "So here's what I discovered"
+            [ Paragraph [ Text "First, for the purposes of explaining this discovery, lets say a Dict is a type with the following API:" ]
+            , CodeBlock """get : key -> Dict key value -> Maybe value
+
 insert : key -> value -> Dict key value -> Dict key value
+
 fromList : List (key, value) -> Dict key value
+
 toList : Dict key value -> List (key, value)
 """
-        , NumberList [ Text "Now let me list some properties that are really nice to have in a Dict type:" ]
-            [ [ Paragraph [ Text "The ", InlineCode "key", Text " typevar can be any equatable type (so functions can't be used as keys but non-comparable types are allowed)" ] ]
-            , [ Paragraph
+            , NumberList [ Text "Now let me list some properties that are really nice to have in a Dict type:" ]
+                [ Paragraph [ Text "The ", Code "key", Text " type variable doesn't have to be comparable" ]
+                , Paragraph
                     [ Text "Two dicts with exactly the same key-value pairs are equal regardless of insertion order. For example, "
-                    , InlineCode """fromList [ ("X", 0), ("Y", 1) ] == fromList [ ("Y", 1), ("X", 0) ]"""
+                    , Code """fromList [ ("X", 0), ("Y", 1) ] == fromList [ ("Y", 1), ("X", 0) ]"""
                     ]
-              ]
-            , [ Paragraph
+                , Paragraph
                     [ Text "If "
-                    , InlineCode "dictA == dictB"
+                    , Code "dictA == dictB"
                     , Text " then "
-                    , InlineCode "f dictA == f dictB"
+                    , Code "f dictA == f dictB"
                     , Text " where "
-                    , InlineCode "f"
+                    , Code "f"
                     , Text " is an arbitrary function"
                     ]
-              ]
-            , [ Paragraph [ Text "Renaming/reordering record fields or custom type variants should never change the output of ", InlineCode "toList" ] ]
+                , Paragraph [ Text "Renaming/reordering record fields or custom type variants should never change the output of ", Code "toList" ]
+                ]
+            , Paragraph
+                [ Text "My discovery is that, as far as I can tell, regardless of what programming language you use or performance characteristics you allow for, "
+                , Bold "it's impossible to have more than 3 of these properties in a Dict type"
+                , Text "."
+                ]
+            , Paragraph [ Italic "Note that while I'm just going to talk about Dict in this article, all of these properties apply to Set as well." ]
             ]
-        , Paragraph
-            [ Text "My discovery is that, as far as I can tell, regardless of what programming language you use or performance characteristics you allow for, "
-            , Bold "it's impossible to have more than 3 of these properties in a Dict type"
-            , Text "."
+        , Section "So why care?"
+            [ NumberList [ Text "I expect some readers will wonder why these properties matter. Maybe they feel arbitrary. Let me make a case for why they are important:" ]
+                [ Paragraph [ Text "We want keys to be non-comparable for the sake of convenience and type-safety. It's annoying when I have ", Code "type Id = Id String", Text " or ", Code "{ x : Int, y : Int }", Text " and I have to convert them into a comparable type before I can use it as a key. This leads to boilerplate code and increased risk mixing up types which can lead to bugs." ]
+                , Paragraph [ Text "Having two Dicts be equal based on contents, regardless of insertion order is nice but often not that big a deal. But for Sets it's kind of their whole purpose. And Sets are essentially just an alias for ", Code "Dict\u{00A0}key\u{00A0}()" ]
+                , BulletList
+                    [ Code "dictA == dictB"
+                    , Text " implies "
+                    , Code "f dictA == f dictB"
+                    , Text " is quite handy:"
+
+                    --, Footnote [ Text "In mathematics something with this property is refered to as being ", ExternalLink "well-defined" "en.wikipedia.org/wiki/Well-defined_expression" ]
+                    ]
+                    [ Paragraph [ Text "If two values are equal and the same function is applied to both, you can save yourself CPU time by only computing one and reusing the result" ]
+                    , Paragraph [ Text "It's easier to reason about what some code does if you are certain that ", Code "==", Text " means two values are indistinguishable no matter what you do to them." ]
+                    , Paragraph
+                        [ Text "Any code written in Elm will have this property. It would be a shame for lamdera/containers to introduce some kernel code that violates this property!"
+                        ]
+                    ]
+                , Paragraph [ Text "People often mention that when refactoring code in Elm, they feel invincible, being able to make sweeping changes to a large codebase with little fear that they have introduced bugs. Part of why this is true is because renaming or reordering functions/types/fields/variants will never affect the runtime behavior of Elm code (with the sole exception being record field order affecting record constructors). It would be a shame here as well to lose this just because, ", Code "Dict.toList", Text " would change when renaming/reordering record fields or custom type variants." ]
+                ]
             ]
-        , Paragraph [ Text "Now I don't have a mathematical proof to back this claim but let me explain why I believe it is true." ]
-        , BulletList [ Text "First, lets consider the built-in Dict type (I'm going to refer to it as elm/dict even though there isn't any package named that). What properties does it have?" ]
-            [ [ Paragraph [ Text "Well it fails on 1. You can only have comparable keys." ] ]
-            , [ Paragraph
+        , Section "Rock solid mathematical proof"
+            [ Paragraph [ Text "I don't have a mathematical proof to back this claim but let me explain why I believe it is true." ]
+            , NumberList [ Text "First, lets consider the built-in Dict type. What properties does it have?" ]
+                [ Paragraph [ Text "Well it fails on 1. You can only have comparable keys." ]
+                , Paragraph
                     [ Text "It passes on 2. You'll find that "
-                    , InlineCode """fromList [ ("X", 0), ("Y", 1) ] == fromList [ ("Y", 1), ("X", 0) ]"""
-                    , Text " is indeed true"
+                    , Code """fromList [ ("X", 0), ("Y", 1) ] == fromList [ ("Y", 1), ("X", 0) ]"""
+                    , Text " is indeed true."
                     ]
-              ]
-            , [ Paragraph
-                    [ Text "Passes on 3. And actually more broadly, outside of one language bug that exploits the fact that "
-                    , InlineCode "NaN /= NaN"
-                    , Text ", any code written in Elm will pass on 3."
+                , Paragraph
+                    [ Text "Passes"
                     ]
-              ]
-            , [ Paragraph [ Text "Passes on 4. Again this is a global property of the Elm language. Renaming/reordering a record fields or custom type variants will never change the runtime behavior of your code (with the exception of reordering record fields affecting record constructors)." ] ]
-            ]
-        , Paragraph [ Text "It's nice that elm/dict passes on 2, 3, and 4. But comparable keys are really restrictive! So lets try allowing for non-comparable keys while trying to keep those other nice properties." ]
-        , Paragraph
-            [ Text "Well, the question we immediately encounter is, how should "
-            , InlineCode "toList"
-            , Text " sort the list of key-value pairs? With elm/dict the list is lexicographically sorted by the key. This is possible because all of the keys are comparable values. But what do we do if we have non-comparable keys? For example, suppose we have the following custom type being used as our key"
-            ]
-        , CodeBlock """type Color
+                , Paragraph [ Text "Passes" ]
+                ]
+            , Paragraph [ Text "It's nice that elm/dict passes on 2, 3, and 4. But comparable keys are really restrictive! So lets try allowing for non-comparable keys while trying to keep those other nice properties." ]
+            , Paragraph
+                [ Text "Well, the question we immediately encounter is, how should "
+                , Code "toList"
+                , Text " sort the list of key-value pairs? With elm/dict the list is lexicographically sorted by the key. This is possible because all of the keys are comparable values. But what do we do if we have non-comparable keys? For example, suppose we have the following custom type being used as our key"
+                ]
+            , CodeBlock """type Color
     = Red
     | Green
     | Blue
@@ -1348,52 +1366,56 @@ toList : Dict key value -> List (key, value)
 myDict =
     fromList [ (Blue, 2), (Green, 1), (Red, 0) ]
 """
-        , LetterList [ Text "We really only have 3 options for sorting:" ]
-            [ [ Paragraph
+            , LetterList [ Text "We have 3 options for what to base our sorting on:" ]
+                [ Paragraph
                     [ Text "Sort based on variant names. For example alphabetically sort the names in ascending order. Which gives us "
-                    , InlineCode "toList myDict == [ (Blue, 2), (Green, 1), (Red, 0) ]"
+                    , Code "toList myDict == [\u{00A0}(Blue,\u{00A0}2),\u{00A0}(Green,\u{00A0}1),\u{00A0}(Red,\u{00A0}0) ]"
                     ]
-              ]
-            , [ Paragraph
-                    [ Text "Sort by the order the variants are defined. That gives us "
-                    , InlineCode "toList myDict == [ (Red, 0), (Green, 1), (Blue, 2) ]"
+                , Paragraph
+                    [ Text "Sort by the order the variants are defined in code. That gives us "
+                    , Code "toList myDict == [\u{00A0}(Red,\u{00A0}0),\u{00A0}(Green,\u{00A0}1),\u{00A0}(Blue,\u{00A0}2) ]"
                     ]
-              ]
-            , [ Paragraph
+                , Paragraph
                     [ Text "Sort the list based on the order the key-value pairs were added. Then we get "
-                    , InlineCode "toList [ (Blue, 2), (Green, 1), (Red, 0) ]"
+                    , Code "toList myDict == [\u{00A0}(Blue,\u{00A0}2),\u{00A0}(Green,\u{00A0}1),\u{00A0}(Red,\u{00A0}0) ]"
                     , Text " which is just the original list."
                     ]
-              ]
-            ]
-        , LetterList [ Text "Do any of these approaches to sorting let us keep all 4 of the nice to have properties?" ]
-            [ [ Paragraph
+                ]
+            , LetterList [ Text "Do any of these approaches to sorting let us keep all 4 of the nice to have properties?" ]
+                [ Paragraph
                     [ Text "Violates 4. If we rename a variant, it could potentially change it's alphabetical ordering and thereby change the output of "
-                    , InlineCode "toList"
+                    , Code "toList"
                     , Text "."
                     ]
-              ]
-            , [ Paragraph [ Text "Also violates 4. If we reorder our variants, that will change the output of `toList`" ] ]
-            , [ BulletList [ Text "This does not violate 4! But what about 2 and 3?" ]
-                    [ [ Paragraph
-                            [ Text "Well it depends on how `==` is implemented for our Dict type. Supposed `dictA == dictB` is the same as writing `toList dictA == toList dictB`. Well in that case 2 fails. We can see that if we take the example we used on elm/dict earlier."
+                , Paragraph [ Text "Also violates 4. If we reorder our variants, that will change the output of ", Code "toList" ]
+                , BulletList [ Text "This does not violate 4! But what about 2 and 3?" ]
+                    [ Group
+                        [ Paragraph
+                            [ Text "Well it depends on how "
+                            , Code "=="
+                            , Text " is implemented for our Dict type. Supposed "
+                            , Code "dictA == dictB"
+                            , Text " is the same as writing "
+                            , Code "toList dictA == toList dictB"
+                            , Text ". Well in that case 2 fails. We can see that if we take the example we used on elm/dict earlier."
                             ]
-                      , CodeBlock """fromList [ ("X", 0), ("Y", 1) ] == fromList [ ("Y", 1), ("X", 0) ]
+                        , CodeBlock """fromList [ ("X", 0), ("Y", 1) ] == fromList [ ("Y", 1), ("X", 0) ]
 
 -- is converted into this because of how we defined == to work for dict equality
 toList (fromList [ ("X", 0), ("Y", 1) ]) == toList (fromList [ ("Y", 1), ("X", 0) ])
 
--- which simplifies to this since ordering by insertion means toList and fromList cancel eachother out
+-- simplifies to this since ordering by insertion means toList and fromList cancel eachother out
 [ ("X", 0), ("Y", 1) ]) == [ ("Y", 1), ("X", 0) ]
 
 -- which is
 False
 """
-                      ]
-                    , [ BulletList
-                            [ Text "On the bright side, property 3 is valid at least!" ]
-                            [ [ Paragraph [ Text "Okay well how about we make it so `dictA == dictB` instead checks that both dicts have the same key-values pairs while ignoring order? In that case 2 is valid! But lets look at 3. More specifically, consider this code" ]
-                              , CodeBlock """dictA = fromList [ ("X", 0), ("Y", 1) ]
+                        ]
+                    , BulletList
+                        [ Text "On the bright side, property 3 is valid at least!" ]
+                        [ Group
+                            [ Paragraph [ Text "Okay well how about we make it so ", Code "dictA == dictB", Text " instead checks that both dicts have the same key-values pairs while ignoring order? In that case 2 is valid! But lets look at 3. More specifically, consider this code" ]
+                            , CodeBlock """dictA = fromList [ ("X", 0), ("Y", 1) ]
 dictB = fromList [ ("Y", 1), ("X", 0) ]
 
 -- This is now true since order doesn't matter when checking for equality
@@ -1405,24 +1427,20 @@ toList dictA == toList dictB
 -- Then we get
 False
 """
-                              ]
-                            , [ Paragraph
-                                    [ Text "This violates 3 which says `elm dictA == dictB` implies "
-                                    , InlineCode "f dictA == f dictB"
-                                    , Text " for any function f."
-                                    ]
-                              ]
                             ]
-                      ]
+                        , Paragraph
+                            [ Text "This violates 3 which says ", Code "dictA == dictB", Text " implies ", Code "f dictA == f dictB", Text " for any function f." ]
+                        ]
                     ]
-              ]
+                ]
+            , Paragraph [ Text "You might argue I've skipped an obvious approach to sorting ", Code "toList", Text "'s output, just don't sort at all! We'll leave it as an implementation detail of our Dict type. Maybe a hashmap or binary tree?" ]
+            , Paragraph [ Text "Unfortunately that still sorts it, just in a way that probably ends up depending on some combination of variant names, variant order, and insertion order." ]
+            , Paragraph [ Text "For example, if you use a hashmap, how will you hash custom types? ", Code "hash (variantName + data)", Text "? ", Code "hash (variantIndex + data)", Text "? If you don't use any of those, what is left? If you use a binary tree then instead of a hash function you need some kind of comparable function internally but you have the same problem. You need to compare keys based on ", Italic "something", Text ". Even if you don't care about performance and your dict is just a list internally with ", Code "==", Text " used on every existing key to check for duplicates you end up with it depending on insertion order." ]
+            , Paragraph [ Text "It's starting to feel like a game of whack-a-mole isn't it? Every time we try to force one property to be valid, another one breaks. Maybe we can solve this by thinking outside of the box?" ]
             ]
-        , Paragraph [ Text "You might argue I've skipped an obvious approach to sorting `toList`'s output, just don't sort at all! We'll leave it as an implementation detail of our Dict type. Maybe a hashmap, binary tree, or red-black tree?" ]
-        , Paragraph [ Text "Unfortunately that still sorts it, just in a way that probably ends up depending on some combination of variant names, variant order, and insertion order." ]
-        , Paragraph [ Text "For example, if you're hashing a custom type, what property will you use? The name of each variant? The variant order? If you don't use any of those, what is left? If you use a binary tree or red-black tree then instead of a hash function you need some kind of comparable function internally but you have the same problem. You need to compare based on *something* in the key. Even if you don't care about performance and your dict is just a list internally with ", InlineCode "==", Text " used on every existing key to check for duplicate keys (this is [pzp-1997/assoc-list](package.elm-lang.org/packages/pzp1997/assoc-list/latest/)'s approach) you still have to pick at least one of these 3 sorting approaches." ]
-        , Paragraph [ Text "It's starting to feel like a game of whack-a-mole isn't it? Every time we try to force all 4 properties to be valid, one pops back up. Maybe we can solve this by thinking outside of the box?" ]
-        , Paragraph [ Text "For example, in our custom type example, what if we could define a unique function for each non-comparable type that tells the dict how to sort it? Maybe we could introduce some new syntax and make it look like this:" ]
-        , CodeBlock """type Color
+        , Section "Time for some lateral thinking"
+            [ Paragraph [ Text "In our custom type example, what if we could define a unique function for each non-comparable type that tells the dict how to sort it? Maybe we could introduce some new syntax and have it look like this:" ]
+            , CodeBlock """type Color
     = Red
     | Green
     | Blue
@@ -1439,20 +1457,23 @@ colorToInt a =
         Green -> 1
         Blue -> 2
 """
-        , Paragraph [ Text "I'd argue you this doesn't so much give you all 4 properties as it just forces us to give up 1 (non-comparable keys) but lets us make any type comparable. You can do this of course, and languages like Haskell let you do it, with various other trade-offs (how does this work with anonymous/structural records for example)." ]
-        , Paragraph [ Text "How about a framing challenge? From the start I said we'd say a Dict type has the following functions" ]
-        , CodeBlock """get : key -> Dict key value -> Maybe value
+            , Paragraph [ Text "I'd argue you this doesn't so much give you all 4 properties. We're instead giving up 1 (non-comparable keys) but added a way to make any type comparable. And yes, you can do this. Languages like Haskell support it and it comes with various other trade-offs (for example, how does this work with anonymous/structural records)." ]
+            , Paragraph [ Text "How about a framing challenge? From the start I said our Dict type has the following functions" ]
+            , CodeBlock """get : key -> Dict key value -> Maybe value
+
 insert : key -> value -> Dict key value -> Dict key value
+
 fromList : List (key, value) -> Dict key value
+
 toList : Dict key value -> List (key, value)
 """
-        , Paragraph [ Text "but ", InlineCode "toList", Text " is causing us lots of trouble. What if we just remove it?" ]
-        , Paragraph [ Text "Well we can. But we'd also need to remove any other functions iterate over the dict's key-value pairs (foldl and foldr for example). That's quite limiting." ]
-        , Paragraph [ Text "Okay what if we keep toList but change it to this?" ]
-        , CodeBlock """toList : (key -> key -> Order) -> Dict key value -> List (key, value)"""
-        , Paragraph [ Text "Now the user has to choose how to sort the key-value pairs, problem solved!" ]
-        , Paragraph [ Text "That indeed solves it but it's not ideal. The first is that it's inconvenient. The second is that there are some types that can't easily be sorted by the user. For example" ]
-        , CodeBlock """import Package exposing (OpaqueType)
+            , Paragraph [ Text "but ", Code "toList", Text " is causing us lots of trouble. What if we just remove it?" ]
+            , Paragraph [ Text "Well we can. But we'd also need to remove any other functions that iterate over the dict's key-value pairs (", Code "foldl", Text " and ", Code "foldr", Text " for example). That's quite limiting." ]
+            , Paragraph [ Text "Okay what if we keep toList but change it to this?" ]
+            , CodeBlock """toList : (key -> key -> Order) -> Dict key value -> List (key, value)"""
+            , Paragraph [ Text "Now the user has to choose how to sort the key-value pairs, problem solved!" ]
+            , Paragraph [ Text "That indeed solves it but it's not ideal. The first is that it's inconvenient. The second is that there are some types that can't easily be sorted by the user. For example" ]
+            , CodeBlock """import SomePackage exposing (OpaqueType)
 
 dict : Dict OpaqueType Int
 dict = ...
@@ -1461,11 +1482,17 @@ list =
     toList sortOpaqueType dict
 
 sortOpaqueType =
-    Debug.todo "How am I supposed to sort an opaque type that doesn't expose anything useful?? "
+    Debug.todo "How am I supposed to sort an opaque type that doesn't expose anything useful?"
 """
-        , Paragraph [ Text "Maybe this situation is rare. Or at least rare enough that this approach is practical? Hard to say." ]
-        , Paragraph [ Text "Summary" ]
-        , Paragraph [ Text "To me it wasn't at all obvious from the start that I'd encounter so many trade-offs when all I wanted was a Dict type that didn't demand comparable keys. While I independently discovered this, I'm sure either many others have also figured this out, or alternatively, I've made a mistake somewhere and my conclusions aren't sound. I sure hope it's the latter. I really want all 4 of those properties in a dict package..." ]
+            , Paragraph [ Text "Maybe this situation is rare. Or at least rare enough that this approach is practical? Hard to say." ]
+            ]
+        , Section "Conclusion"
+            [ Paragraph [ Text "It wasn't at all obvious to me from the start that I'd encounter so many trade-offs when all I wanted was a Dict type that didn't demand comparable keys. While I independently discovered this, I'm sure either other people have also figured this out, or alternatively, I've made a mistake somewhere and my conclusions are incorrect. I sure hope it's the latter. I ", Italic "really", Text " want all 4 of those properties in a dict package..." ]
+            , NumberList [ Text "Oh. And you probably want to know which properties I ended up choosing for the Dict and Set type in lamdera/containers. It was a difficult choices but here's what I settled on:" ]
+                [ Paragraph [ Text "Obviously I included support for non-comparable keys. This whole package would be pointless without it." ]
+                , Paragraph [ Text "I gave up ", Code """fromList [ ("X", 0), ("Y", 1) ] == fromList [ ("Y", 1), ("X", 0) ]""", Text ". This means if you want to check if two Dicts or Sets are equal, you'll need to use an extra function called ", Code "unorderedEquals", Text ". This isn't ideal since you can't use it on a larger data structure that contains a Set." ]
+                ]
+            ]
         ]
         websiteReleasedAt
         (date 2021 Sep 7)

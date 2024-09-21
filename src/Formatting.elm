@@ -1,6 +1,9 @@
 module Formatting exposing (..)
 
+import Html exposing (Html)
+import Html.Attributes
 import Icons
+import Parser exposing ((|.), (|=), Parser)
 import Route exposing (Route)
 import SyntaxHighlight
 import Ui
@@ -11,130 +14,255 @@ import Ui.Prose
 type Formatting
     = Paragraph (List Inline)
     | CodeBlock String
-    | BulletList (List Inline) (List (List Formatting))
-    | NumberList (List Inline) (List (List Formatting))
-    | LetterList (List Inline) (List (List Formatting))
+    | BulletList (List Inline) (List Formatting)
+    | NumberList (List Inline) (List Formatting)
+    | LetterList (List Inline) (List Formatting)
     | Image { source : String, description : String }
     | SimpleParagraph String
+    | Group (List Formatting)
+    | Section String (List Formatting)
 
 
 type Inline
     = Bold String
     | Italic String
     | Link String Route
-    | InlineCode String
+    | Code String
     | Text String
     | ExternalLink String String
+    | Footnote (List Inline)
 
 
 view : List Formatting -> Ui.Element msg
 view list =
-    Ui.column
-        [ Ui.spacing 32 ]
+    Html.div
+        []
         (List.map viewHelper list)
+        |> Ui.html
 
 
-viewHelper : Formatting -> Ui.Element msg
+codeHighlight : String -> Html msg
+codeHighlight string =
+    case Parser.run (parser []) string of
+        Ok ok ->
+            List.map parsedCodeToString ok |> Html.span []
+
+        Err error ->
+            Debug.toString error |> Html.text
+
+
+type ParsedCode
+    = Symbol String
+    | Function String
+    | Type2 String
+    | Number2 String
+    | Text2 String
+    | Whitespace String
+
+
+parsedCodeToString : ParsedCode -> Html msg
+parsedCodeToString parsedCode =
+    case parsedCode of
+        Symbol text ->
+            Html.span [ Html.Attributes.style "color" "rgb(200, 150, 0)" ] [ Html.text text ]
+
+        Function text ->
+            Html.span [ Html.Attributes.style "color" "rgb(78, 30, 89)" ] [ Html.text text ]
+
+        Type2 text ->
+            Html.span [ Html.Attributes.style "color" "rgb(30, 80, 89)" ] [ Html.text text ]
+
+        Number2 text ->
+            Html.span [ Html.Attributes.style "color" "rgb(76, 89, 30)" ] [ Html.text text ]
+
+        Text2 text ->
+            Html.span [ Html.Attributes.style "color" "rgb(30, 89, 31)" ] [ Html.text text ]
+
+        Whitespace text ->
+            Html.text text
+
+
+appendChar char text =
+    String.fromChar char ++ text
+
+
+parser : List ParsedCode -> Parser (List ParsedCode)
+parser parsedSoFar =
+    Parser.oneOf
+        [ Parser.end |> Parser.map (\() -> List.reverse parsedSoFar)
+        , Parser.chompIf (\_ -> True)
+            |> Parser.getChompedString
+            |> Parser.andThen
+                (\text ->
+                    case String.toList text of
+                        [ char ] ->
+                            if Char.isAlpha char then
+                                Parser.chompWhile Char.isAlphaNum
+                                    |> Parser.getChompedString
+                                    |> Parser.andThen
+                                        (\text2 ->
+                                            (if Char.isLower char then
+                                                Function (appendChar char text2) :: parsedSoFar
+
+                                             else
+                                                Type2 (appendChar char text2) :: parsedSoFar
+                                            )
+                                                |> parser
+                                        )
+
+                            else if Char.isDigit char then
+                                Parser.chompWhile Char.isDigit
+                                    |> Parser.getChompedString
+                                    |> Parser.andThen (\text3 -> Number2 (appendChar char text3) :: parsedSoFar |> parser)
+
+                            else if char == '"' then
+                                parseString
+                                    |> Parser.andThen
+                                        (\text3 ->
+                                            Text2 ("\"" ++ text3 ++ "\"")
+                                                :: parsedSoFar
+                                                |> parser
+                                        )
+
+                            else if char == ' ' || char == '\n' || char == '\u{000D}' || char == '\u{00A0}' then
+                                Parser.spaces
+                                    |> Parser.getChompedString
+                                    |> Parser.andThen (\text2 -> Whitespace (appendChar char text2) :: parsedSoFar |> parser)
+
+                            else
+                                Parser.chompWhile (\char2 -> char2 /= ' ' && char2 /= '"' && not (Char.isAlphaNum char2))
+                                    |> Parser.getChompedString
+                                    |> Parser.andThen (\text2 -> Symbol (appendChar char text2) :: parsedSoFar |> parser)
+
+                        _ ->
+                            Parser.problem "I got a weird unicode token that I don't know how to handle"
+                )
+        ]
+
+
+parseString : Parser String
+parseString =
+    Parser.succeed (Debug.log "text")
+        |= (Parser.chompWhile (\char2 -> char2 /= '"') |> Parser.getChompedString)
+        |. Parser.chompIf (\char -> char == '"')
+
+
+
+--|. Parser.chompIf (\char -> char == '"')
+
+
+viewHelper : Formatting -> Html msg
 viewHelper item =
     case item of
         Paragraph items ->
-            Ui.Prose.paragraph [] (List.map inlineView items)
+            Html.p [] (List.map inlineView items)
 
         CodeBlock text ->
             case SyntaxHighlight.elm text of
                 Ok ok ->
-                    SyntaxHighlight.toBlockHtml Nothing ok
-                        |> Ui.html
-                        |> Ui.el
-                            [ codeBackground
-                            , codeBorder
-                            , Ui.border 1
-                            , Ui.rounded 4
-                            , Ui.paddingXY 8 0
-                            ]
+                    Html.div
+                        [ Html.Attributes.style "border" "1px rgb(210,210,210) solid"
+                        , Html.Attributes.style "padding" "0 8px 0px 8px"
+                        , Html.Attributes.style "border-radius" "8px"
+                        , Html.Attributes.style "background" "rgb(240,240,240)"
+                        ]
+                        [ SyntaxHighlight.toBlockHtml Nothing ok ]
 
+                --|> Ui.html
+                --|> Ui.el
+                --    [ codeBackground
+                --    , codeBorder
+                --    , Ui.border 1
+                --    , Ui.rounded 4
+                --    , Ui.paddingXY 8 0
+                --    ]
                 Err _ ->
-                    Ui.text text
+                    Html.text text
 
         BulletList leading formattings ->
-            listHelper (\_ -> "•") leading formattings
+            Html.div
+                []
+                [ Html.p [] (List.map inlineView leading)
+                , Html.ul
+                    [ Html.Attributes.style "padding-left" "20px" ]
+                    (List.map (\item2 -> Html.li [] [ viewHelper item2 ]) formattings)
+                ]
 
         NumberList leading formattings ->
-            listHelper (\index -> String.fromInt (index + 1) ++ ".") leading formattings
+            Html.div
+                []
+                [ Html.p [] (List.map inlineView leading)
+                , Html.ol
+                    [ Html.Attributes.style "padding-left" "20px" ]
+                    (List.map (\item2 -> Html.li [] [ viewHelper item2 ]) formattings)
+                ]
 
         LetterList leading formattings ->
-            listHelper
-                (\index -> String.fromChar (Char.fromCode (Char.toCode 'A' + index)) ++ ".")
-                leading
-                formattings
+            Html.div
+                []
+                [ Html.p [] (List.map inlineView leading)
+                , Html.ol
+                    [ Html.Attributes.type_ "A", Html.Attributes.style "padding-left" "20px" ]
+                    (List.map (\item2 -> Html.li [] [ viewHelper item2 ]) formattings)
+                ]
 
         Image a ->
-            Ui.image [] { source = a.source, description = a.description, onLoad = Nothing }
+            Html.img [ Html.Attributes.src a.source, Html.Attributes.alt a.description ] []
 
         SimpleParagraph text ->
-            Ui.text text
+            Html.p [] [ Html.text text ]
+
+        Group formattings ->
+            Html.div [] (List.map viewHelper formattings)
+
+        Section title formattings ->
+            Html.div
+                [ Html.Attributes.style "padding-top" "16px" ]
+                (Html.h2 [] [ Html.text title ] :: List.map viewHelper formattings)
 
 
-listHelper : (Int -> String) -> List Inline -> List (List Formatting) -> Ui.Element msg
-listHelper iconFunc leading formattings =
-    Ui.column
-        [ Ui.spacing 12 ]
-        [ Ui.Prose.paragraph [] (List.map inlineView leading)
-        , Ui.column
-            [ Ui.spacing 12, Ui.paddingLeft 4 ]
-            (List.indexedMap
-                (\index item2 ->
-                    Ui.row
-                        [ Ui.spacing 6 ]
-                        [ Ui.el
-                            [ Ui.alignTop, Ui.width Ui.shrink, Ui.Font.bold ]
-                            (Ui.text (iconFunc index))
-                        , view item2
-                        ]
-                )
-                formattings
-            )
-        ]
-
-
-inlineView : Inline -> Ui.Element msg
+inlineView : Inline -> Html msg
 inlineView inline =
     case inline of
         Bold text ->
-            Ui.el [ Ui.Font.bold ] (Ui.text text)
+            Html.b [] [ Html.text text ]
 
         Italic text ->
-            Ui.el [ Ui.Font.italic ] (Ui.text text)
+            Html.i [] [ Html.text text ]
 
         Link text url ->
-            Ui.el [ Ui.link (Route.toString url), Ui.Font.color (Ui.rgb 20 100 255) ] (Ui.text text)
+            Html.a [ Html.Attributes.href (Route.toString url) ] [ Html.text text ]
 
-        InlineCode text ->
-            case SyntaxHighlight.elm text of
-                Ok ok ->
-                    SyntaxHighlight.toInlineHtml ok
-                        |> Ui.html
-                        |> Ui.el
-                            [ codeBackground
-                            , codeBorder
-                            , Ui.border 1
-                            , Ui.rounded 4
-                            , Ui.paddingXY 4 0
-                            , Ui.width Ui.shrink
-                            ]
-
-                Err _ ->
-                    Ui.el
-                        [ Ui.Font.family [ Ui.Font.monospace ]
-                        , Ui.width Ui.shrink
-                        ]
-                        (Ui.text text)
+        Code text ->
+            Html.code
+                [ Html.Attributes.style "border" "1px rgb(210,210,210) solid"
+                , Html.Attributes.style "padding" "0 4px 2px 4px"
+                , Html.Attributes.style "border-radius" "4px"
+                , Html.Attributes.style "background" "rgb(240,240,240)"
+                , Html.Attributes.style "font-size" "16px"
+                ]
+                [ codeHighlight text ]
 
         Text text ->
-            Ui.text text
+            Html.text text
 
         ExternalLink text url ->
-            externalLink 16 text url
+            externalLinkHtml text url
+
+        Footnote content ->
+            Html.text "[*]"
+
+
+externalLinkHtml : String -> String -> Html msg
+externalLinkHtml text url =
+    Html.a
+        [ Html.Attributes.href ("https://" ++ url)
+        , Html.Attributes.target "_blank"
+        , Html.Attributes.rel "noopener noreferrer"
+        ]
+        [ Html.text text
+        , Icons.externaLinkHtml
+        ]
 
 
 externalLink : Int -> String -> String -> Ui.Element msg
