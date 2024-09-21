@@ -37,7 +37,7 @@ view : List Formatting -> Ui.Element msg
 view list =
     Html.div
         []
-        (List.map viewHelper list)
+        (SyntaxHighlight.useTheme SyntaxHighlight.gitHub :: List.map viewHelper list)
         |> Ui.html
 
 
@@ -53,33 +53,41 @@ codeHighlight string =
 
 type ParsedCode
     = Symbol String
+    | ListBracket Char
     | Function String
     | Type2 String
     | Number2 String
     | Text2 String
     | Whitespace String
+    | EqualsSign String
 
 
 parsedCodeToString : ParsedCode -> Html msg
 parsedCodeToString parsedCode =
     case parsedCode of
         Symbol text ->
-            Html.span [ Html.Attributes.style "color" "rgb(200, 150, 0)" ] [ Html.text text ]
+            Html.span [ Html.Attributes.style "color" "#df5000" ] [ Html.text text ]
+
+        ListBracket char ->
+            Html.span [ Html.Attributes.style "color" "#005cc5" ] [ Html.text (String.fromChar char) ]
 
         Function text ->
-            Html.span [ Html.Attributes.style "color" "rgb(78, 30, 89)" ] [ Html.text text ]
+            Html.span [ Html.Attributes.style "color" "#24292e" ] [ Html.text text ]
 
         Type2 text ->
-            Html.span [ Html.Attributes.style "color" "rgb(30, 80, 89)" ] [ Html.text text ]
+            Html.span [ Html.Attributes.style "color" "#005cc5" ] [ Html.text text ]
 
         Number2 text ->
-            Html.span [ Html.Attributes.style "color" "rgb(76, 89, 30)" ] [ Html.text text ]
+            Html.span [ Html.Attributes.style "color" "#005cc5" ] [ Html.text text ]
 
         Text2 text ->
-            Html.span [ Html.Attributes.style "color" "rgb(30, 89, 31)" ] [ Html.text text ]
+            Html.span [ Html.Attributes.style "color" "#df5000" ] [ Html.text text ]
 
         Whitespace text ->
             Html.text text
+
+        EqualsSign text ->
+            Html.span [ Html.Attributes.style "color" "#d73a49" ] [ Html.text text ]
 
 
 appendChar char text =
@@ -119,7 +127,7 @@ parser parsedSoFar =
                                 parseString
                                     |> Parser.andThen
                                         (\text3 ->
-                                            Text2 ("\"" ++ text3 ++ "\"")
+                                            Text2 text3
                                                 :: parsedSoFar
                                                 |> parser
                                         )
@@ -128,6 +136,14 @@ parser parsedSoFar =
                                 Parser.spaces
                                     |> Parser.getChompedString
                                     |> Parser.andThen (\text2 -> Whitespace (appendChar char text2) :: parsedSoFar |> parser)
+
+                            else if char == '[' || char == ']' then
+                                parser (ListBracket char :: parsedSoFar)
+
+                            else if char == '=' then
+                                Parser.chompWhile (\char2 -> char2 == '=')
+                                    |> Parser.getChompedString
+                                    |> Parser.andThen (\text2 -> EqualsSign (appendChar char text2) :: parsedSoFar |> parser)
 
                             else
                                 Parser.chompWhile (\char2 -> char2 /= ' ' && char2 /= '"' && not (Char.isAlphaNum char2))
@@ -142,8 +158,8 @@ parser parsedSoFar =
 
 parseString : Parser String
 parseString =
-    Parser.succeed (Debug.log "text")
-        |= (Parser.chompWhile (\char2 -> char2 /= '"') |> Parser.getChompedString)
+    Parser.succeed (\text -> "\"" ++ text ++ "\"")
+        |= (Parser.chompWhile (\char -> char /= '"') |> Parser.getChompedString)
         |. Parser.chompIf (\char -> char == '"')
 
 
@@ -164,7 +180,6 @@ viewHelper item =
                         [ Html.Attributes.style "border" "1px rgb(210,210,210) solid"
                         , Html.Attributes.style "padding" "0 8px 0px 8px"
                         , Html.Attributes.style "border-radius" "8px"
-                        , Html.Attributes.style "background" "rgb(240,240,240)"
                         ]
                         [ SyntaxHighlight.toBlockHtml Nothing ok ]
 
@@ -238,7 +253,6 @@ inlineView inline =
                 [ Html.Attributes.style "border" "1px rgb(210,210,210) solid"
                 , Html.Attributes.style "padding" "0 4px 2px 4px"
                 , Html.Attributes.style "border-radius" "4px"
-                , Html.Attributes.style "background" "rgb(240,240,240)"
                 , Html.Attributes.style "font-size" "16px"
                 ]
                 [ codeHighlight text ]

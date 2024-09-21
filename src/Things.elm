@@ -1260,11 +1260,11 @@ thingsIHaveDone =
         [ Paragraph
             [ Text "This package lets Elm users finally have a Dict and Set type that does not require "
             , Code "comparable"
-            , Text " keys or a comparison function while also being similar in performance to the built-in Dict and Set types."
+            , Text " keys while also being similar in performance to the built-in Dict and Set types."
             ]
-        , Paragraph [ Text "In this article I want to discuss an interesting set of trade-offs I discovered when designing a Dict/Set data structure that, as far as I can tell, are unavoidable regardless of which programming language you use." ]
+        , Paragraph [ Text "In this article I want to show a discovery I made. It's a set of trade-offs I faced that, as far as I can tell, are unavoidable regardless of how you go about designing a Dict/Set data structure." ]
         , BulletList
-            [ Text "But first some thanks are in order." ]
+            [ Text "But first some thanks are in order!" ]
             [ Paragraph
                 [ Text "Thank you "
                 , ExternalLink "Robin" "github.com/robinheghan"
@@ -1280,7 +1280,7 @@ thingsIHaveDone =
             , Paragraph
                 [ Text "Thank you "
                 , ExternalLink "miniBill" "github.com/miniBill"
-                , Text " for the Dict test suite. Without it I would have missed a critical bug."
+                , Text " for the Dict test suite. Without it I would have missed some critical bugs."
                 ]
             ]
         , Section "So here's what I discovered"
@@ -1306,7 +1306,7 @@ toList : Dict key value -> List (key, value)
                     , Code "f dictA == f dictB"
                     , Text " where "
                     , Code "f"
-                    , Text " is an arbitrary function"
+                    , Text " can be any function"
                     ]
                 , Paragraph [ Text "Renaming/reordering record fields or custom type variants should never change the output of ", Code "toList" ]
                 ]
@@ -1315,7 +1315,7 @@ toList : Dict key value -> List (key, value)
                 , Bold "it's impossible to have more than 3 of these properties in a Dict type"
                 , Text "."
                 ]
-            , Paragraph [ Italic "Note that while I'm just going to talk about Dict in this article, all of these properties apply to Set as well." ]
+            , Paragraph [ Italic "Note that while I'm going to focus on Dict in this article, all of these properties apply to Set as well." ]
             ]
         , Section "So why care?"
             [ NumberList [ Text "I expect some readers will wonder why these properties matter. Maybe they feel arbitrary. Let me make a case for why they are important:" ]
