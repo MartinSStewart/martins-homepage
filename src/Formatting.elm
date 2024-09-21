@@ -120,11 +120,13 @@ inlineView inline =
                             , Ui.border 1
                             , Ui.rounded 4
                             , Ui.paddingXY 4 0
+                            , Ui.width Ui.shrink
                             ]
 
                 Err _ ->
                     Ui.el
                         [ Ui.Font.family [ Ui.Font.monospace ]
+                        , Ui.width Ui.shrink
                         ]
                         (Ui.text text)
 
