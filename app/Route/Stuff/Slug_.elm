@@ -128,7 +128,6 @@ view app sharedModel =
                 )
             , Ui.widthMax 800
             , Ui.centerX
-            , Ui.height Ui.fill
             , Ui.spacing 24
             ]
             [ Ui.column
@@ -172,5 +171,6 @@ view app sharedModel =
 
               else
                 Formatting.view thing.description
+            , Ui.el [ Ui.height (Ui.px 100) ] Ui.none
             ]
     }

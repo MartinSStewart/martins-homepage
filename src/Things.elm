@@ -1481,6 +1481,8 @@ sortBy = Debug.todo "How do I sort an opaque type that doesn't expose anything u
             , NumberList [ Text "Oh. And you probably want to know which properties I ended up choosing for the Dict and Set type in lamdera/containers. It was a difficult choices but here's what I settled on:" ]
                 [ Paragraph [ Text "Obviously I included support for non-comparable keys. This whole package would be pointless without it." ]
                 , Paragraph [ Text "I gave up ", Code """fromList [ ("X", 0), ("Y", 1) ] == fromList [ ("Y", 1), ("X", 0) ]""", Text ". This means if you want to check if two Dicts or Sets are equal, you'll need to use an extra function called ", Code "unorderedEquals", Text ". This isn't ideal since you can't use it on a larger data structure that contains a Set." ]
+                , Paragraph [ Text "I kept 3." ]
+                , Paragraph [ Text "I kept 4. Both 3 and 4 are preserved for the same reason. They are properties guaranteed by Elm and that ultimately seemed more valuable than property 2." ]
                 ]
             ]
         ]
