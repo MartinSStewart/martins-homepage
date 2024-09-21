@@ -4,19 +4,18 @@ import BackendTask exposing (BackendTask)
 import Date exposing (Date)
 import Dict
 import FatalError exposing (FatalError)
+import Formatting exposing (Formatting)
 import Head
 import Head.Seo as Seo
-import Markdown.Block exposing (Block)
-import Markdown.Parser
-import MarkdownThemed
+import Icons
 import Pages.Url
 import PagesMsg exposing (PagesMsg)
-import ParserUtils
 import RouteBuilder exposing (App, StatelessRoute)
-import Shared
-import Things exposing (Tag, ThingType)
+import Shared exposing (Breakpoints(..))
+import Things exposing (Tag, ThingType(..))
 import Ui
 import Ui.Font
+import Ui.Responsive
 import View exposing (View)
 
 
@@ -55,7 +54,7 @@ type alias Thing =
     { name : String
     , website : Maybe String
     , tags : List Tag
-    , description : List Block
+    , description : List Formatting
     , pageLastUpdated : Date
     , pageCreatedAt : Date
     , thingType : ThingType
@@ -70,22 +69,17 @@ data : RouteParams -> BackendTask FatalError Data
 data routeParams =
     case Dict.get routeParams.slug Things.thingsIHaveDone of
         Just thing ->
-            case Markdown.Parser.parse thing.description of
-                Ok description ->
-                    BackendTask.succeed
-                        { thing =
-                            { name = thing.name
-                            , website = thing.website
-                            , tags = thing.tags
-                            , description = description
-                            , pageLastUpdated = thing.pageLastUpdated
-                            , pageCreatedAt = thing.pageCreatedAt
-                            , thingType = thing.thingType
-                            }
-                        }
-
-                Err error ->
-                    FatalError.fromString (ParserUtils.errorsToString "Things.elm" error) |> BackendTask.fail
+            BackendTask.succeed
+                { thing =
+                    { name = thing.name
+                    , website = thing.website
+                    , tags = thing.tags
+                    , description = thing.description
+                    , pageLastUpdated = thing.pageLastUpdated
+                    , pageCreatedAt = thing.pageCreatedAt
+                    , thingType = thing.thingType
+                    }
+                }
 
         Nothing ->
             BackendTask.fail (FatalError.fromString "Page not found")
@@ -122,26 +116,61 @@ view app sharedModel =
     { title = thing.name
     , body =
         Ui.column
-            [ Ui.padding 16
-            , Ui.widthMax Shared.contentMaxWidth
-            , Ui.centerX
-            , Ui.height Ui.fill
-            ]
-            [ Ui.el [ Ui.Font.size 36 ] (Ui.text thing.name)
-            , Ui.text
-                ("Created at "
-                    ++ Date.toIsoString thing.pageCreatedAt
-                    ++ (if thing.pageLastUpdated == thing.pageCreatedAt then
-                            ""
+            [ Ui.Responsive.paddingXY
+                Shared.breakpoints
+                (\label ->
+                    case label of
+                        Mobile ->
+                            { x = Ui.Responsive.value 8, y = Ui.Responsive.value 16 }
 
-                        else
-                            " " ++ "(updated at " ++ Date.toIsoString thing.pageLastUpdated ++ ")"
-                       )
+                        NotMobile ->
+                            { x = Ui.Responsive.value 16, y = Ui.Responsive.value 16 }
                 )
+            , Ui.widthMax 800
+            , Ui.centerX
+            , Ui.spacing 24
+            ]
+            [ Ui.column
+                []
+                [ case thing.website of
+                    Just url ->
+                        Formatting.externalLink 36 thing.name url
+
+                    Nothing ->
+                        Ui.el [ Ui.Font.size 36 ] (Ui.text thing.name)
+                , Ui.row
+                    [ Ui.spacing 16 ]
+                    [ Ui.text
+                        ("Created at "
+                            ++ Date.toIsoString thing.pageCreatedAt
+                            ++ (if thing.pageLastUpdated == thing.pageCreatedAt then
+                                    ""
+
+                                else
+                                    " " ++ "(updated at " ++ Date.toIsoString thing.pageLastUpdated ++ ")"
+                               )
+                        )
+                    , case thing.thingType of
+                        OtherThing other ->
+                            case other.repo of
+                                Just repo ->
+                                    Formatting.externalLink 16 "View source code" repo
+
+                                Nothing ->
+                                    Ui.none
+
+                        JobThing _ ->
+                            Ui.none
+
+                        PodcastThing _ ->
+                            Ui.none
+                    ]
+                ]
             , if List.isEmpty thing.description then
                 Ui.text "TODO"
 
               else
-                MarkdownThemed.render thing.description
+                Formatting.view thing.description
+            , Ui.el [ Ui.height (Ui.px 100) ] Ui.none
             ]
     }

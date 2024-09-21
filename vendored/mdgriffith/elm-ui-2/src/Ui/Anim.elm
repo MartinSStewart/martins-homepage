@@ -318,39 +318,18 @@ toAttr trigger incomingCss =
 
 transitionWithTrigger : Trigger -> Duration -> List Animated -> Attribute msg
 transitionWithTrigger trigger dur attrs =
-    Animator.css
-        (Animator.Timeline.init []
-            |> Animator.Timeline.to dur attrs
-            |> Animator.Timeline.update (Time.millisToPosix 1)
-        )
-        (\animated ->
-            ( animated, [] )
-        )
+    Animator.transition dur attrs
+        |> Animator.toCss
         |> toAttr trigger
-
-
-addPsuedoClass : String -> Animator.Css -> Animator.Css
-addPsuedoClass psuedo css =
-    { css
-        | hash = css.hash ++ psuedo
-    }
 
 
 {-| -}
 transition : Duration -> List Animated -> Attribute msg
 transition dur attrs =
-    let
-        css =
-            Animator.css
-                (Animator.Timeline.init []
-                    |> Animator.Timeline.to dur attrs
-                    |> Animator.Timeline.update (Time.millisToPosix 1)
-                )
-                (\animated ->
-                    ( animated, [] )
-                )
-    in
-    Two.styleList css.props
+    Animator.transition dur attrs
+        |> Animator.toCss
+        |> .props
+        |> Two.styleList
 
 
 {-| -}

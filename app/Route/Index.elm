@@ -4,7 +4,8 @@ import Array exposing (Array)
 import BackendTask exposing (BackendTask)
 import Browser.Dom
 import Browser.Events
-import Date exposing (Date)
+import Color.Manipulate
+import Date exposing (Date, Month)
 import Dict exposing (Dict)
 import Effect exposing (Effect)
 import FatalError exposing (FatalError)
@@ -21,11 +22,13 @@ import Shared exposing (Breakpoints(..))
 import Svg exposing (Svg)
 import Svg.Attributes
 import Task
-import Things exposing (Tag, ThingType(..))
+import Things exposing (Tag(..), ThingType(..))
+import Time exposing (Month(..))
 import Ui
 import Ui.Font
 import Ui.Input
 import Ui.Responsive
+import Ui.Shadow
 import UrlPath
 import View exposing (View)
 
@@ -44,8 +47,8 @@ type Msg
 
 
 type SortBy
-    = Alphabetically
-    | Chronologically
+    = Alphabetical
+    | Chronological
     | Quality
 
 
@@ -92,6 +95,12 @@ type Line
     = NoLine
     | HorizontalLine { xStart : Float, xEnd : Float, y : Float }
     | StaggeredLine { xStart : Float, xEnd : Float, y0 : Float, y1 : Float, x : Float }
+
+
+type Tier
+    = TopTier
+    | MiddleTier
+    | WorstTier
 
 
 update : App Data ActionData RouteParams -> Shared.Model -> Msg -> Model -> ( Model, Effect Msg )
@@ -209,14 +218,24 @@ getElements =
         ]
 
 
+worstTier : List String
+worstTier =
+    List.Extra.dropWhile (\a -> a /= "sanctum") Things.qualityOrder
+
+
 topOfLowTier : List String
 topOfLowTier =
-    List.Extra.dropWhile (\a -> a /= "sanctum") Things.qualityOrder |> List.take Shared.maxColumns
+    List.take Shared.maxColumns worstTier
+
+
+middleTier : List String
+middleTier =
+    List.Extra.dropWhile (\a -> a /= "secret-santa-game") Things.qualityOrder
 
 
 topOfTopTier : List String
 topOfTopTier =
-    List.Extra.dropWhile (\a -> a /= "secret-santa-game") Things.qualityOrder |> List.take Shared.maxColumns
+    List.take Shared.maxColumns middleTier
 
 
 data : BackendTask FatalError Data
@@ -411,8 +430,27 @@ view :
     -> View (PagesMsg Msg)
 view app _ model =
     let
-        thingsDone =
-            app.data.thingsIHaveDone
+        thingsDone0 : Dict String ( Tier, Thing )
+        thingsDone0 =
+            Dict.map (\_ thing -> ( TopTier, thing )) app.data.thingsIHaveDone
+
+        thingsDone1 : Dict String ( Tier, Thing )
+        thingsDone1 =
+            List.foldl
+                (\name dict ->
+                    Dict.update name (Maybe.map (Tuple.mapFirst (\_ -> MiddleTier))) dict
+                )
+                thingsDone0
+                middleTier
+
+        thingsDone2 : Dict String ( Tier, Thing )
+        thingsDone2 =
+            List.foldl
+                (\name dict ->
+                    Dict.update name (Maybe.map (Tuple.mapFirst (\_ -> WorstTier))) dict
+                )
+                thingsDone1
+                worstTier
 
         filterSet : Set String
         filterSet =
@@ -421,16 +459,16 @@ view app _ model =
                 (Array.toList model.filter)
                 |> Set.fromList
 
-        thingsSorted : List ( String, Thing )
+        thingsSorted : List ( String, ( Tier, Thing ) )
         thingsSorted =
             case model.sortBy of
-                Alphabetically ->
-                    Dict.toList thingsDone
+                Alphabetical ->
+                    Dict.toList thingsDone2
 
                 Quality ->
                     List.foldl
                         (\name list ->
-                            case Dict.get name thingsDone of
+                            case Dict.get name thingsDone2 of
                                 Just thing ->
                                     ( name, thing ) :: list
 
@@ -441,13 +479,13 @@ view app _ model =
                         Things.qualityOrder
                         |> List.reverse
 
-                Chronologically ->
-                    Dict.toList thingsDone
-                        |> List.sortWith (\( _, a ) ( _, b ) -> Date.compare (thingDate b) (thingDate a))
+                Chronological ->
+                    Dict.toList thingsDone2
+                        |> List.sortWith (\( _, ( _, a ) ) ( _, ( _, b ) ) -> Date.compare (thingDate b) (thingDate a))
 
-        filterThings viewFunc ( name, thing ) =
+        filterThings viewFunc ( name, ( tier, thing ) ) =
             if Set.isEmpty filterSet then
-                viewFunc ( name, thing ) |> Just
+                viewFunc name tier thing |> Just
 
             else if
                 Array.toList model.filter
@@ -462,7 +500,7 @@ view app _ model =
                                 thing.tags
                         )
             then
-                viewFunc ( name, thing ) |> Just
+                viewFunc name tier thing |> Just
 
             else
                 Nothing
@@ -500,18 +538,26 @@ view app _ model =
                 , Ui.column
                     [ Ui.spacing 8 ]
                     [ filterView model
-                    , Ui.row
-                        [ Ui.wrap
-                        , Ui.spacing Shared.tileSpacing
-                        , Ui.contentCenterX
-                        , Ui.Responsive.visible Shared.breakpoints [ NotMobile ]
-                        ]
-                        (List.filterMap (filterThings thingsViewNotMobile) thingsSorted)
-                    , Ui.column
-                        [ Ui.spacing Shared.tileSpacing
-                        , Ui.Responsive.visible Shared.breakpoints [ Mobile ]
-                        ]
-                        (List.filterMap (filterThings thingsViewMobile) thingsSorted)
+                    , if model.sortBy == Chronological then
+                        timelineView app.data.thingsIHaveDone model
+
+                      else
+                        Ui.row
+                            [ Ui.wrap
+                            , Ui.spacing Shared.tileSpacing
+                            , Ui.contentCenterX
+                            , Ui.Responsive.visible Shared.breakpoints [ NotMobile ]
+                            ]
+                            (List.filterMap (filterThings thingsViewNotMobile) thingsSorted)
+                    , if model.sortBy == Chronological then
+                        Ui.none
+
+                      else
+                        Ui.column
+                            [ Ui.spacing Shared.tileSpacing
+                            , Ui.Responsive.visible Shared.breakpoints [ Mobile ]
+                            ]
+                            (List.filterMap (filterThings thingsViewMobile) thingsSorted)
                     ]
                 ]
                 |> Ui.map PagesMsg.fromMsg
@@ -519,9 +565,278 @@ view app _ model =
     }
 
 
+timelineView : Dict String Thing -> Model -> Ui.Element msg
+timelineView things model =
+    let
+        things2 : Dict ( Int, Int ) (List Thing)
+        things2 =
+            List.foldl
+                (\( _, thing ) dict ->
+                    case thing.thingType of
+                        OtherThing { releasedAt } ->
+                            Dict.update
+                                ( Date.year releasedAt, Date.monthNumber releasedAt - 1 )
+                                (\maybe -> Maybe.withDefault [] maybe |> (::) thing |> Just)
+                                dict
+
+                        JobThing _ ->
+                            dict
+
+                        PodcastThing { releasedAt } ->
+                            Dict.update
+                                ( Date.year releasedAt, Date.monthNumber releasedAt )
+                                (\maybe -> Maybe.withDefault [] maybe |> (::) thing |> Just)
+                                dict
+                )
+                Dict.empty
+                (Dict.toList things)
+
+        durations : List { startedAt : Int, endedAt : Int, name : String, color : Ui.Color, columnIndex : Int }
+        durations =
+            List.filterMap
+                (\( _, thing ) ->
+                    case thing.thingType of
+                        OtherThing { releasedAt } ->
+                            Nothing
+
+                        JobThing { startedAt, endedAt, columnIndex } ->
+                            Just
+                                { startedAt = yearAndMonthToCount (Date.year startedAt) (Date.month startedAt)
+                                , endedAt =
+                                    case endedAt of
+                                        Just a ->
+                                            yearAndMonthToCount (Date.year a) (Date.month a)
+
+                                        Nothing ->
+                                            currentDate2
+                                , name = thing.name ++ " job"
+                                , color =
+                                    if List.member Lamdera thing.tags then
+                                        Things.lamderaColor
+
+                                    else if List.member CSharp thing.tags then
+                                        Things.csharpColor
+
+                                    else if List.member Elm thing.tags then
+                                        Things.elmColor
+
+                                    else if List.member GameMaker thing.tags then
+                                        Things.gameMakerColor
+
+                                    else
+                                        Ui.rgb 0 0 0
+                                , columnIndex = columnIndex
+                                }
+
+                        PodcastThing { releasedAt } ->
+                            Nothing
+                )
+                (Dict.toList things)
+    in
+    timelineViewHelper currentDate2 9 [] things2 durations model
+
+
+yearAndMonthToCount : Int -> Month -> Int
+yearAndMonthToCount year month =
+    12 * (year - 1993) + (Date.monthToNumber month - 1)
+
+
+bornAt : Int
+bornAt =
+    yearAndMonthToCount 1993 Oct
+
+
+darkAgesEnd : Int
+darkAgesEnd =
+    yearAndMonthToCount 2007 Jan
+
+
+gameMakerEraEnd : Int
+gameMakerEraEnd =
+    yearAndMonthToCount 2016 Nov
+
+
+csharpEraEnd =
+    yearAndMonthToCount 2018 Nov
+
+
+currentDate2 =
+    yearAndMonthToCount 2024 Jul
+
+
+timelineBlock : Ui.Color -> String -> Int -> Int -> Int -> Maybe (Ui.Element msg)
+timelineBlock color text startDate endDate count =
+    if endDate <= count || startDate > count then
+        Nothing
+
+    else
+        Ui.el
+            [ Ui.width (Ui.px 24)
+            , Ui.height Ui.fill
+            , Ui.background color
+            , if endDate == count + 6 then
+                Ui.inFront
+                    (Ui.el
+                        [ Ui.rotate (Ui.turns 0.75)
+                        , Ui.Font.exactWhitespace
+                        , Ui.Font.color (Ui.rgb 255 255 255)
+                        , Ui.move { x = -2, y = 0, z = 0 }
+                        ]
+                        (Ui.text text)
+                    )
+
+              else
+                Ui.noAttr
+            ]
+            Ui.none
+            |> Just
+
+
+timelineViewHelper :
+    Int
+    -> Int
+    -> List (Ui.Element msg)
+    -> Dict ( Int, Int ) (List Thing)
+    -> List { startedAt : Int, endedAt : Int, name : String, color : Ui.Color, columnIndex : Int }
+    -> Model
+    -> Ui.Element msg
+timelineViewHelper currentDate count list thingsSorted durations model =
+    let
+        month : Int
+        month =
+            modBy 12 count
+
+        year : Int
+        year =
+            1993 + count // 12
+
+        columns : List (Ui.Element msg)
+        columns =
+            List.foldl
+                (\{ startedAt, endedAt, name, color, columnIndex } list2 ->
+                    case timelineBlock color name startedAt endedAt count of
+                        Just a ->
+                            List.Extra.setAt (columnIndex - 1) (Just a) list2
+
+                        Nothing ->
+                            list2
+                )
+                (List.repeat 2 Nothing)
+                durations
+                |> List.Extra.dropWhileRight (\a -> a == Nothing)
+                |> List.map (Maybe.withDefault (Ui.el [ Ui.width (Ui.px 24), Ui.height Ui.fill ] Ui.none))
+    in
+    if currentDate <= count then
+        Ui.column [] list
+
+    else
+        timelineViewHelper
+            currentDate
+            (count + 1)
+            (Ui.row
+                [ Ui.spacing 8
+                , Ui.behindContent
+                    (Ui.el
+                        [ Ui.height (Ui.px 1)
+                        , Ui.background (Ui.rgb 200 200 200)
+                        ]
+                        Ui.none
+                    )
+                , Ui.height (Ui.px 40)
+                ]
+                ([ Ui.el
+                    [ Ui.Font.family [ Ui.Font.monospace ]
+                    , Ui.Font.size 16
+                    , Ui.width Ui.shrink
+                    , if Dict.member ( year, month ) thingsSorted then
+                        Ui.Font.bold
+
+                      else
+                        Ui.noAttr
+                    ]
+                    (Ui.text (String.fromInt year ++ " " ++ monthToString month))
+                 , timelineBlock (Ui.rgb 100 100 100) "No programming dark ages" bornAt darkAgesEnd count
+                    |> Maybe.withDefault Ui.none
+                 , timelineBlock Things.gameMakerColor "GameMaker era" darkAgesEnd gameMakerEraEnd count
+                    |> Maybe.withDefault Ui.none
+                 , timelineBlock Things.csharpColor "C# era" gameMakerEraEnd csharpEraEnd count
+                    |> Maybe.withDefault Ui.none
+                 , timelineBlock Things.elmColor "Elm era" csharpEraEnd currentDate count |> Maybe.withDefault Ui.none
+                 ]
+                    ++ columns
+                    ++ [ case Dict.get ( year, month ) thingsSorted of
+                            Just things ->
+                                List.map
+                                    (\thing ->
+                                        Ui.image
+                                            [ Ui.width (Ui.px 39)
+                                            , Ui.height (Ui.px 39)
+                                            , Ui.alignBottom
+                                            ]
+                                            { source = thing.previewImage, description = thing.name, onLoad = Nothing }
+                                    )
+                                    things
+                                    |> Ui.row [ Ui.spacing 4 ]
+
+                            Nothing ->
+                                Ui.none
+                       ]
+                )
+                :: list
+            )
+            thingsSorted
+            durations
+            model
+
+
+monthToString : Int -> String
+monthToString month =
+    case month of
+        0 ->
+            "Jan"
+
+        1 ->
+            "Feb"
+
+        2 ->
+            "Mar"
+
+        3 ->
+            "Apr"
+
+        4 ->
+            "May"
+
+        5 ->
+            "Jun"
+
+        6 ->
+            "Jul"
+
+        7 ->
+            "Aug"
+
+        8 ->
+            "Sep"
+
+        9 ->
+            "Oct"
+
+        10 ->
+            "Nov"
+
+        _ ->
+            "Dec"
+
+
+containerBackgroundColor : Ui.Color
+containerBackgroundColor =
+    Ui.rgb 245 245 245
+
+
 containerBackground : Ui.Attribute msg
 containerBackground =
-    Ui.background (Ui.rgb 245 245 245)
+    Ui.background containerBackgroundColor
 
 
 containerBorder : Ui.Color
@@ -529,6 +844,7 @@ containerBorder =
     Ui.rgb 210 210 210
 
 
+sorByButtonAttributes : SortBy -> SortBy -> List (Ui.Attribute Msg)
 sorByButtonAttributes selected sortBy =
     [ Ui.Input.button (PressedSortBy sortBy)
     , Ui.border 1
@@ -566,14 +882,14 @@ sortByView model =
             , Ui.el
                 (Ui.borderWith { left = 0, right = 0, top = 1, bottom = 1 }
                     :: tooltip "Sort by title names"
-                    :: sorByButtonAttributes model.sortBy Alphabetically
+                    :: sorByButtonAttributes model.sortBy Alphabetical
                 )
                 (Ui.text "A to Z")
             , Ui.el
                 (Ui.roundedWith { topLeft = 0, topRight = 16, bottomLeft = 0, bottomRight = 16 }
                     :: Ui.border 1
-                    :: tooltip "Sort by when things were released. For stuff that doesn't have a clear release date, this is when it first become known to or used by several people"
-                    :: sorByButtonAttributes model.sortBy Chronologically
+                    :: tooltip "Sort by when things were released. For stuff that doesn't have a clear release date, this is when it first became known to or used by several people (or when I abandoned it)"
+                    :: sorByButtonAttributes model.sortBy Chronological
                 )
                 (Ui.text "Newest to oldest")
             ]
@@ -599,8 +915,8 @@ filterView model =
         ]
 
 
-thingsViewMobile : ( String, Thing ) -> Ui.Element Msg
-thingsViewMobile ( name, thing ) =
+thingsViewMobile : String -> Tier -> Thing -> Ui.Element Msg
+thingsViewMobile name tier thing =
     Ui.row
         [ containerBackground
         , Ui.borderColor containerBorder
@@ -640,12 +956,80 @@ thingsViewMobile ( name, thing ) =
         ]
 
 
-thingsViewNotMobile : ( String, Thing ) -> Ui.Element Msg
-thingsViewNotMobile ( name, thing ) =
+worstTierColor =
+    Ui.rgb 200 100 100
+
+
+topTierBackground =
+    Color.Manipulate.weightedMix containerBackgroundColor Things.elmColor 0.9
+
+
+worstTierBackground =
+    Color.Manipulate.weightedMix containerBackgroundColor worstTierColor 0.9
+
+
+thingsViewNotMobile : String -> Tier -> Thing -> Ui.Element Msg
+thingsViewNotMobile name tier thing =
     Ui.column
         [ Ui.width (Ui.px Shared.tileWidth)
-        , containerBackground
-        , Ui.borderColor containerBorder
+        , Ui.background
+            (case tier of
+                MiddleTier ->
+                    containerBackgroundColor
+
+                TopTier ->
+                    topTierBackground
+
+                WorstTier ->
+                    worstTierBackground
+            )
+        , Ui.borderColor
+            (case tier of
+                MiddleTier ->
+                    containerBorder
+
+                TopTier ->
+                    Things.elmColor
+
+                WorstTier ->
+                    worstTierColor
+            )
+        , Ui.Shadow.shadows
+            [ { x = 0
+              , y = 0
+              , size = 0
+              , blur = 4
+              , color =
+                    (case tier of
+                        MiddleTier ->
+                            containerBorder
+
+                        TopTier ->
+                            Things.elmColor
+
+                        WorstTier ->
+                            containerBorder
+                    )
+                        |> Color.Manipulate.fadeOut 0.8
+              }
+            , { x = 0
+              , y = 0
+              , size = 0
+              , blur = 2
+              , color =
+                    (case tier of
+                        MiddleTier ->
+                            containerBorder
+
+                        TopTier ->
+                            Things.elmColor
+
+                        WorstTier ->
+                            worstTierColor
+                    )
+                        |> Color.Manipulate.fadeOut 0.8
+              }
+            ]
         , Ui.border 1
         , Ui.rounded 4
         , Ui.alignTop

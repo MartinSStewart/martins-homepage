@@ -9,13 +9,12 @@ module Route.AboutMe exposing (Model, Msg, RouteParams, route, Data, ActionData)
 import BackendTask
 import Effect
 import FatalError
+import Formatting exposing (Formatting(..), Inline(..))
 import Head
 import Html
-import Markdown.Block exposing (Block)
-import Markdown.Parser
-import MarkdownThemed
 import PagesMsg
 import ParserUtils
+import Route exposing (Route(..))
 import RouteBuilder
 import Shared exposing (Breakpoints(..))
 import Ui
@@ -76,7 +75,7 @@ subscriptions routeParams path shared model =
 
 
 type alias Data =
-    { description : List Block }
+    { description : List Formatting }
 
 
 type alias ActionData =
@@ -85,16 +84,27 @@ type alias ActionData =
 
 data : BackendTask.BackendTask FatalError.FatalError Data
 data =
-    let
-        descriptionResult =
-            Markdown.Parser.parse "I'm Martin Stewart! I'm a Swedish American (American Swede?) living in Stockholm.\n\nI like making things, mostly computer programs, and this website is an attempt at keeping track of all the stuff that I've made. Some of that stuff is [cool](/stuff/circuit-breaker), other stuff is [cringey garbage](/stuff/demon-clutched-walkaround) but worth remembering anyway.\n\nI also like biking, jogging, walking, bouldering, and board games (ordered by velocity).\n\nIf you want to say hello, I'm Martin Stewart on Elm Slack and [MartinS](https://discourse.elm-lang.org/u/martins) on Elm Discourse."
-    in
-    case descriptionResult of
-        Ok description ->
-            BackendTask.succeed { description = description }
-
-        Err error ->
-            FatalError.fromString (ParserUtils.errorsToString "" error) |> BackendTask.fail
+    BackendTask.succeed
+        { description =
+            [ Paragraph
+                [ Text "I'm Martin Stewart! I'm a Swedish American (American Swede?) living in Stockholm." ]
+            , Paragraph
+                [ Text "I like making things, mostly computer programs, and this website is an attempt at keeping track of all the stuff that I've made. Some of that stuff is "
+                , Link "cool" (Stuff__Slug_ { slug = "circuit-breaker" })
+                , Text ", other stuff is "
+                , Link "cringey garbage" (Stuff__Slug_ { slug = "demon-clutched-walkaround" })
+                , Text " but worth remembering anyway."
+                ]
+            , Paragraph
+                [ Text "I also like biking, jogging, walking, bouldering, and board games (ordered by velocity)."
+                ]
+            , Paragraph
+                [ Text "If you want to say hello, I'm Martin Stewart on Elm Slack and "
+                , ExternalLink "MartinS" "discourse.elm-lang.org/u/martins"
+                , Text " on Elm Discourse."
+                ]
+            ]
+        }
 
 
 head : RouteBuilder.App Data ActionData RouteParams -> List Head.Tag
@@ -140,7 +150,7 @@ view app shared model =
                     , Ui.spacing 16
                     ]
                     [ Ui.el [ Ui.Font.size 32, Ui.Font.bold, Ui.Font.lineHeight 1.1 ] (Ui.text "About me")
-                    , MarkdownThemed.render app.data.description
+                    , Formatting.view app.data.description
                     ]
                 , Ui.image
                     [ Ui.Responsive.visible Shared.breakpoints [ Mobile ]
