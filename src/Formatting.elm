@@ -2,9 +2,12 @@ module Formatting exposing (..)
 
 import Html exposing (Html)
 import Html.Attributes
+import Html.Events
+import Html.Lazy
 import Icons
 import Parser exposing ((|.), (|=), Parser)
 import Route exposing (Route)
+import Set exposing (Set)
 import SyntaxHighlight
 import Ui
 import Ui.Font
@@ -29,17 +32,22 @@ type Inline
     | Link String Route
     | Code String
     | Text String
+    | AltText String String
     | ExternalLink String String
     | Footnote (List Inline)
 
 
-view : List Formatting -> Ui.Element msg
-view list =
+type alias Model a =
+    { a | selectedAltText : Set String }
+
+
+view : (String -> msg) -> Model a -> List Formatting -> Ui.Element msg
+view onPressAltText model list =
     Html.div
         []
         (Html.node "style" [] [ Html.text "pre { white-space: pre-wrap; }" ]
             :: SyntaxHighlight.useTheme SyntaxHighlight.gitHub
-            :: List.map (viewHelper 0) list
+            :: List.map (viewHelper onPressAltText 0 model) list
         )
         |> Ui.html
 
@@ -166,15 +174,11 @@ parseString =
         |. Parser.chompIf (\char -> char == '"')
 
 
-
---|. Parser.chompIf (\char -> char == '"')
-
-
-viewHelper : Int -> Formatting -> Html msg
-viewHelper depth item =
+viewHelper : (String -> msg) -> Int -> Model a -> Formatting -> Html msg
+viewHelper onPressAltText depth model item =
     case item of
         Paragraph items ->
-            Html.p [] (List.map inlineView items)
+            Html.p [] (List.map (inlineView onPressAltText model) items)
 
         CodeBlock text ->
             case SyntaxHighlight.elm text of
@@ -200,28 +204,37 @@ viewHelper depth item =
         BulletList leading formattings ->
             Html.div
                 []
-                [ Html.p [] (List.map inlineView leading)
+                [ Html.p [] (List.map (inlineView onPressAltText model) leading)
                 , Html.ul
                     [ Html.Attributes.style "padding-left" "20px" ]
-                    (List.map (\item2 -> Html.li [] [ viewHelper depth item2 ]) formattings)
+                    (List.map
+                        (\item2 -> Html.li [] [ Html.Lazy.lazy4 viewHelper onPressAltText depth model item2 ])
+                        formattings
+                    )
                 ]
 
         NumberList leading formattings ->
             Html.div
                 []
-                [ Html.p [] (List.map inlineView leading)
+                [ Html.p [] (List.map (inlineView onPressAltText model) leading)
                 , Html.ol
                     [ Html.Attributes.style "padding-left" "20px" ]
-                    (List.map (\item2 -> Html.li [] [ viewHelper depth item2 ]) formattings)
+                    (List.map
+                        (\item2 -> Html.li [] [ Html.Lazy.lazy4 viewHelper onPressAltText depth model item2 ])
+                        formattings
+                    )
                 ]
 
         LetterList leading formattings ->
             Html.div
                 []
-                [ Html.p [] (List.map inlineView leading)
+                [ Html.p [] (List.map (inlineView onPressAltText model) leading)
                 , Html.ol
                     [ Html.Attributes.type_ "A", Html.Attributes.style "padding-left" "20px" ]
-                    (List.map (\item2 -> Html.li [] [ viewHelper depth item2 ]) formattings)
+                    (List.map
+                        (\item2 -> Html.li [] [ Html.Lazy.lazy4 viewHelper onPressAltText depth model item2 ])
+                        formattings
+                    )
                 ]
 
         Image a ->
@@ -231,12 +244,12 @@ viewHelper depth item =
             Html.p [] [ Html.text text ]
 
         Group formattings ->
-            Html.div [] (List.map (viewHelper depth) formattings)
+            Html.div [] (List.map (Html.Lazy.lazy4 viewHelper onPressAltText depth model) formattings)
 
         Section title formattings ->
             let
                 content =
-                    List.map (viewHelper (depth + 1)) formattings
+                    List.map (Html.Lazy.lazy4 viewHelper onPressAltText (depth + 1) model) formattings
             in
             case depth of
                 0 ->
@@ -255,8 +268,8 @@ viewHelper depth item =
                         (Html.h4 [] [ Html.text title ] :: content)
 
 
-inlineView : Inline -> Html msg
-inlineView inline =
+inlineView : (String -> msg) -> Model a -> Inline -> Html msg
+inlineView onPressAltText model inline =
     case inline of
         Bold text ->
             Html.b [] [ Html.text text ]
@@ -284,6 +297,34 @@ inlineView inline =
 
         Footnote content ->
             Html.text "[*]"
+
+        AltText text altText ->
+            let
+                showAltText =
+                    Set.member altText model.selectedAltText
+            in
+            Html.span
+                (if showAltText then
+                    []
+
+                 else
+                    [ Html.Attributes.title altText
+                    , Html.Events.onClick (onPressAltText altText)
+                    , Html.Attributes.style "cursor" "pointer"
+                    ]
+                )
+                (Html.text text
+                    :: (if showAltText then
+                            [ Html.text " "
+                            , Html.span
+                                [ Html.Attributes.style "background" "#dff2ff", Html.Attributes.style "padding" "0 2px 1px 2px" ]
+                                [ Html.text altText ]
+                            ]
+
+                        else
+                            [ Html.sup [] [ Html.text "(?)" ] ]
+                       )
+                )
 
 
 externalLinkHtml : String -> String -> Html msg

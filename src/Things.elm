@@ -1258,10 +1258,12 @@ thingsIHaveDone =
       )
     , lamderaPackage "containers"
         [ Paragraph
-            [ Text "This package lets Elm users finally have a Dict and Set type that does not require "
+            [ Text "This package uses "
+            , AltText "kernel code" "(a term by the Elm community when referring to JS code directly invoked from Elm code. It's not possible for ordinary apps or packages to contain their own kernel code)"
+            , Text " to allow Elm programmers to finally have a Dict and Set type that does not require "
             , Code "comparable"
-            , Text " keys (or require any workarounds) while also being similar in performance to the built-in "
-            , ExternalLink "Dict" "package.elm-lang.org/packages/elm/core/latest/Dict"
+            , Text " keys (or require any workarounds) while also being similar in performance to the "
+            , ExternalLink "built-in Dict" "package.elm-lang.org/packages/elm/core/latest/Dict"
             , Text " and "
             , ExternalLink "Set" "package.elm-lang.org/packages/elm/core/latest/Set"
             , Text " types."
@@ -1284,7 +1286,9 @@ thingsIHaveDone =
             , Paragraph
                 [ Text "Thank you "
                 , ExternalLink "miniBill" "github.com/miniBill"
-                , Text " for the Dict test suite. Without it I would have missed some critical bugs."
+                , Text " for the "
+                , ExternalLink "Dict test suite" "github.com/miniBill/elm-fast-dict/tree/main/tests"
+                , Text ". Without it I would have missed some critical bugs."
                 ]
             ]
         , Section "So here's what I discovered"
@@ -1298,7 +1302,7 @@ fromList : List (key, value) -> Dict key value
 toList : Dict key value -> List (key, value)
 """
             , NumberList [ Text "Now let me list some properties that are really nice to have in a Dict type:" ]
-                [ Paragraph [ Text "The ", Code "key", Text " type variable doesn't have to be comparable" ]
+                [ Paragraph [ Text "The ", Code "key", Text " type variable doesn't have to be ", Code "comparable" ]
                 , Paragraph
                     [ Text "Two dicts with exactly the same key-value pairs are equal regardless of insertion order. For example, "
                     , Code """fromList [ ("X", 0), ("Y", 1) ] == fromList [ ("Y", 1), ("X", 0) ]"""
@@ -1310,9 +1314,10 @@ toList : Dict key value -> List (key, value)
                     , Code "f dictA == f dictB"
                     , Text " where "
                     , Code "f"
-                    , Text " can be any function"
+                    , Text " can be any "
+                    , AltText "function" "(I believe in mathematics, something that has this property is referred to as being well-defined)"
                     ]
-                , Paragraph [ Text "Renaming/reordering record fields or custom type variants should never change the order of key-value pairs returned from ", Code "toList" ]
+                , Paragraph [ Text "Renaming/reordering record fields or ", AltText "custom type variants" "(custom types is Elm's word for discriminated unions. And a variant is one of the possible values for the discriminated union)", Text " should never change the order of key-value pairs returned from ", Code "toList" ]
                 ]
             , Paragraph
                 [ Text "My discovery is that, as far as I can tell, regardless of what programming language you use or performance characteristics you allow for, "
@@ -1323,17 +1328,15 @@ toList : Dict key value -> List (key, value)
             ]
         , Section "Why should I care?"
             [ NumberList [ Text "I expect some readers will wonder why these properties matter. Maybe they feel arbitrary. Let me make a case for why they are important:" ]
-                [ Paragraph [ Text "We want keys to be non-comparable for the sake of convenience and type-safety. It's annoying when I have ", Code "type Id = Id String", Text " or ", Code "{ x : Int, y : Int }", Text " and I have to convert them into a comparable type before I can use it as a key. This leads to boilerplate code and increased risk mixing up types which can lead to bugs." ]
+                [ Paragraph [ Text "We want keys to be non-comparable for the sake of convenience and type-safety. It's annoying when I have ", Code "type Id = Id String", Text " or ", Code "{ x : Int, y : Int }", Text " and I have to convert them into a ", Code "comparable", Text " type before I can use it as a key. This leads to boilerplate code and increased risk mixing up types which can lead to bugs." ]
                 , Paragraph [ Text "Having two Dicts be equal based on contents, regardless of insertion order is nice but often not that big a deal. But for Sets it's kind of their whole purpose. And Sets are essentially just an alias for ", Code "Dict\u{00A0}key\u{00A0}()" ]
                 , BulletList
                     [ Code "dictA == dictB"
                     , Text " implies "
                     , Code "f dictA == f dictB"
                     , Text " is quite handy:"
-
-                    --, Footnote [ Text "In mathematics something with this property is refered to as being ", ExternalLink "well-defined" "en.wikipedia.org/wiki/Well-defined_expression" ]
                     ]
-                    [ Paragraph [ Text "If two values are equal and the same function is applied to both, you can save yourself CPU time by only computing one and reusing the result" ]
+                    [ Paragraph [ Text "If two values are equal and the same function is applied to both, you can save yourself CPU time by only computing one and reusing the result. This can also be used for caching." ]
                     , Paragraph [ Text "It's easier to reason about what some code does if you are certain that ", Code "==", Text " means two values are indistinguishable no matter what you do to them." ]
                     , Paragraph
                         [ Text "Any code written in Elm will have this property. It would be a shame for lamdera/containers to introduce some kernel code that violates this property!"
@@ -1345,7 +1348,7 @@ toList : Dict key value -> List (key, value)
         , Section "Rock solid mathematical proof"
             [ Paragraph [ Text "I don't have a mathematical proof to back this claim but let me explain why I believe it is true." ]
             , NumberList [ Text "First, lets consider the built-in Dict type. Which of the 4 properties does it support?" ]
-                [ Paragraph [ Text "Well it fails on 1. You can only have comparable keys." ]
+                [ Paragraph [ Text "Well it fails on 1. You can only have ", Code "comparable", Text " keys." ]
                 , Paragraph
                     [ Text "It passes on 2. You'll find that "
                     , Code """fromList [ ("X", 0), ("Y", 1) ] == fromList [ ("Y", 1), ("X", 0) ]"""
@@ -1353,13 +1356,15 @@ toList : Dict key value -> List (key, value)
                     ]
                 , Paragraph
                     [ Text "Passes on 3. ", Code "dictA == dictB", Text " implies ", Code "f dictA == f dictB" ]
-                , Paragraph [ Text "And passes on 4. Since the built-in Dict only allows comparable keys, there's no way for renames or reorderings to affect ", Code "toList" ]
+                , Paragraph [ Text "And passes on 4. Since the built-in Dict only allows ", Code "comparable", Text " keys, records and custom types aren't allowed. Which in turn means there's no way for renames or reorderings to affect ", Code "toList" ]
                 ]
-            , Paragraph [ Text "It's nice that the built-in Dict passes on 2, 3, and 4. But comparable keys are really restrictive! So lets try allowing for non-comparable keys while trying to keep those other nice properties." ]
+            , Paragraph [ Text "It's nice that the built-in Dict passes on 2, 3, and 4. But ", Code "comparable", Text " keys are really restrictive! So lets try allowing for non-comparable keys while trying to keep those other nice properties." ]
             , Paragraph
                 [ Text "Well, the question we immediately encounter is, how should "
                 , Code "toList"
-                , Text " sort the list of key-value pairs? With the built-in Dict this is easy because all of the keys are comparable values. But what do we do if we have non-comparable keys? For example, suppose we have the following custom type being used as our key."
+                , Text " sort the list of key-value pairs? With the built-in Dict this is easy because all of the keys are "
+                , Code "comparable"
+                , Text " values. But what do we do if we have non-comparable keys? For example, suppose we have the following custom type being used as our key."
                 ]
             , CodeBlock """type Color
     = Red
@@ -1431,7 +1436,7 @@ b = toList dictA == toList dictB --> False
                 ]
             , Paragraph [ Text "You might argue I've skipped an obvious approach to sorting ", Code "toList", Text "'s output. Just don't sort at all! We'll leave it as an implementation detail of our Dict type. Maybe a hashmap or binary tree?" ]
             , Paragraph [ Text "Unfortunately that still sorts it, just in a way that probably ends up depending on some combination of variant names, variant order, and insertion order." ]
-            , Paragraph [ Text "For example, if you use a hashmap, how will you hash custom types? Maybe ", Code "hash (variantName + data)", Text "? Or perhaps ", Code "hash (variantIndex + data)", Text "? If you don't use any of those, what is left? If you use a binary tree then instead of a hash function you need some kind of comparable function internally but you have the same problem. You need to compare keys based on ", Italic "something", Text ". Even if you don't care about performance and your dict is just a list with ", Code "==", Text " used on every existing key to check for duplicates you end up with it depending on insertion order." ]
+            , Paragraph [ Text "For example, if you use a hashmap, how will you hash custom types? Maybe ", Code "hash (variantName + data)", Text "? Or perhaps ", Code "hash (variantIndex + data)", Text "? If you don't use any of those, what is left? If you use a binary tree then instead of a hash function you need some kind of ", Code "comparable", Text " function internally but you have the same problem. You need to compare keys based on ", Italic "something", Text ". Even if you don't care about performance and your dict is just a list with ", Code "==", Text " used on every existing key to check for duplicates you end up with it depending on insertion order." ]
             , Paragraph [ Text "It's starting to feel like a game of whack-a-mole isn't it? Every time we try to force one property to be valid, another one breaks. Maybe we can solve this by thinking outside of the box?" ]
             ]
         , Section "Time for some lateral thinking"
@@ -1453,7 +1458,7 @@ colorToInt a =
         Green -> 1
         Blue -> 2
 """
-            , Paragraph [ Text "I'd argue you this doesn't so much give you all 4 properties. We're instead giving up 1 (non-comparable keys) but with a way to make any type comparable. And yes, you can do this. Languages like Haskell support it and it comes with its own set of trade-offs (for example, how does this work with anonymous/structural records)." ]
+            , Paragraph [ Text "I'd argue you this doesn't so much give you all 4 properties. We're instead giving up 1 (non-comparable keys) but with a way to make any type ", Code "comparable", Text ". And yes, you can do this. Languages like Haskell support it and it comes with its own set of trade-offs (for example, how does this work with anonymous/structural records)." ]
             , Paragraph [ Text "How about a framing challenge? From the start I said our Dict type has the following functions" ]
             , CodeBlock """get : key -> Dict key value -> Maybe value
 
@@ -1481,7 +1486,7 @@ sortBy = Debug.todo "How do I sort an opaque type that doesn't expose anything u
             , Paragraph [ Text "Maybe this situation is rare enough that this approach is practical? Hard to say." ]
             ]
         , Section "Conclusion"
-            [ Paragraph [ Text "It wasn't at all obvious to me from the start that I'd encounter so many trade-offs when all I wanted was a Dict type that didn't demand comparable keys. While I independently discovered this, I'm sure either other people have also figured this out, or alternatively, I've made a mistake somewhere and my conclusions are incorrect. I sure hope it's the latter. I ", Italic "really", Text " want all 4 of those properties in a dict package..." ]
+            [ Paragraph [ Text "It wasn't at all obvious to me from the start that I'd encounter so many trade-offs when all I wanted was a Dict type that didn't demand ", Code "comparable", Text " keys. While I independently discovered this, I'm sure either other people have also figured this out, or alternatively, I've made a mistake somewhere and my conclusions are incorrect. I sure hope it's the latter. I ", Italic "really", Text " want all 4 of those properties in a dict package..." ]
             , NumberList [ Text "Oh. And you probably want to know which properties I ended up choosing for the Dict and Set type in lamdera/containers. It was a difficult choices but here's what I settled on:" ]
                 [ Paragraph [ Text "Obviously I included support for non-comparable keys. This whole package would be pointless without it." ]
                 , Paragraph [ Text "I gave up ", Code """fromList [ ("X", 0), ("Y", 1) ] == fromList [ ("Y", 1), ("X", 0) ]""", Text ". This means if you want to check if two Dicts or Sets are equal, you'll need to use an extra function called ", Code "unorderedEquals", Text ". This isn't ideal since you can't use it on a larger data structure that contains a Set." ]
@@ -1495,7 +1500,7 @@ sortBy = Debug.todo "How do I sort an opaque type that doesn't expose anything u
                     [ Paragraph [ Text "If we pick all but 1 then we have the built-in Dict." ]
                     , Paragraph [ Text "If we pick all but 2 then you get this package." ]
                     , Paragraph [ Text "If we pick all but 3, one example would be a Dict with a ", Code "toList", Text " function that returns keys by insertion order and ", Code "==", Text " ignores insertion order. There no existing packages that support this since Elm guarantees property 3. You'd need kernel code to implement it." ]
-                    , Paragraph [ Text "If we pick all but 4, ", Code "toList", Text " sorts keys alphabetically, ", Code "==", Text " ignores order, keys are not required to be comparable, but as a result, renaming fields/variants can affect ", Code "toList", Text ". Like with 3, there's no existing packages that do this since Elm guarantees 4 and you'd need kernel code to work around that." ]
+                    , Paragraph [ Text "If we pick all but 4, ", Code "toList", Text " sorts keys alphabetically, ", Code "==", Text " ignores order, keys are not required to be ", Code "comparable", Text ", but as a result, renaming fields/variants can affect ", Code "toList", Text ". Like with 3, there's no existing packages that do this since Elm guarantees 4 and you'd need kernel code to work around that." ]
                     ]
                 ]
             , Section "Can this package be used with the normal Elm compiler?"
