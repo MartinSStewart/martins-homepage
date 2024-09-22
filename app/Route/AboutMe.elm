@@ -16,6 +16,7 @@ import PagesMsg
 import ParserUtils
 import Route exposing (Route(..))
 import RouteBuilder
+import Set exposing (Set)
 import Shared exposing (Breakpoints(..))
 import Ui
 import Ui.Font
@@ -26,11 +27,11 @@ import View
 
 
 type alias Model =
-    {}
+    { selectedAltText : Set String }
 
 
 type Msg
-    = NoOp
+    = PressedAltText String
 
 
 type alias RouteParams =
@@ -54,7 +55,7 @@ init :
     -> Shared.Model
     -> ( Model, Effect.Effect Msg )
 init app shared =
-    ( {}, Effect.none )
+    ( { selectedAltText = Set.empty }, Effect.none )
 
 
 update :
@@ -65,8 +66,8 @@ update :
     -> ( Model, Effect.Effect Msg )
 update app shared msg model =
     case msg of
-        NoOp ->
-            ( model, Effect.none )
+        PressedAltText altText ->
+            ( { model | selectedAltText = Set.insert altText model.selectedAltText }, Effect.none )
 
 
 subscriptions : RouteParams -> UrlPath.UrlPath -> Shared.Model -> Model -> Sub Msg
@@ -150,7 +151,10 @@ view app shared model =
                     , Ui.spacing 16
                     ]
                     [ Ui.el [ Ui.Font.size 32, Ui.Font.bold, Ui.Font.lineHeight 1.1 ] (Ui.text "About me")
-                    , Formatting.view app.data.description
+                    , Formatting.view
+                        (\text -> PressedAltText text |> PagesMsg.fromMsg)
+                        model
+                        app.data.description
                     ]
                 , Ui.image
                     [ Ui.Responsive.visible Shared.breakpoints [ Mobile ]

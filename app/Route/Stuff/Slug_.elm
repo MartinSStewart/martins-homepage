@@ -3,6 +3,7 @@ module Route.Stuff.Slug_ exposing (ActionData, Data, Model, Msg, route)
 import BackendTask exposing (BackendTask)
 import Date exposing (Date)
 import Dict
+import Effect exposing (Effect)
 import FatalError exposing (FatalError)
 import Formatting exposing (Formatting)
 import Head
@@ -10,7 +11,8 @@ import Head.Seo as Seo
 import Icons
 import Pages.Url
 import PagesMsg exposing (PagesMsg)
-import RouteBuilder exposing (App, StatelessRoute)
+import RouteBuilder exposing (App, StatefulRoute, StatelessRoute)
+import Set exposing (Set)
 import Shared exposing (Breakpoints(..))
 import Things exposing (Tag, ThingType(..))
 import Ui
@@ -20,25 +22,45 @@ import View exposing (View)
 
 
 type alias Model =
-    {}
+    { selectedAltText : Set String }
 
 
-type alias Msg =
-    ()
+type Msg
+    = PressedAltText String
 
 
 type alias RouteParams =
     { slug : String }
 
 
-route : StatelessRoute RouteParams Data ActionData
+init _ _ =
+    ( { selectedAltText = Set.empty }, Effect.none )
+
+
+route : StatefulRoute RouteParams Data ActionData Model Msg
 route =
     RouteBuilder.preRender
         { head = head
         , pages = pages
         , data = data
         }
-        |> RouteBuilder.buildNoState { view = view }
+        |> RouteBuilder.buildWithLocalState
+            { view = view
+            , init = init
+            , update = update
+            , subscriptions = subscriptions
+            }
+
+
+update : App data action routeParams -> Shared.Model -> Msg -> Model -> ( Model, Effect msg )
+update _ _ msg model =
+    case msg of
+        PressedAltText altText ->
+            ( { model | selectedAltText = Set.insert altText model.selectedAltText }, Effect.none )
+
+
+subscriptions _ _ _ _ =
+    Sub.none
 
 
 pages : BackendTask FatalError (List RouteParams)
@@ -106,8 +128,9 @@ head app =
 view :
     App Data ActionData RouteParams
     -> Shared.Model
+    -> Model
     -> View (PagesMsg Msg)
-view app sharedModel =
+view app sharedModel model =
     let
         thing : Thing
         thing =
@@ -170,7 +193,10 @@ view app sharedModel =
                 Ui.text "TODO"
 
               else
-                Formatting.view thing.description
+                Formatting.view
+                    (\text -> PressedAltText text |> PagesMsg.fromMsg)
+                    model
+                    thing.description
             , Ui.el [ Ui.height (Ui.px 100) ] Ui.none
             ]
     }
