@@ -39,7 +39,7 @@ view list =
         []
         (Html.node "style" [] [ Html.text "pre { white-space: pre-wrap; }" ]
             :: SyntaxHighlight.useTheme SyntaxHighlight.gitHub
-            :: List.map viewHelper list
+            :: List.map (viewHelper 0) list
         )
         |> Ui.html
 
@@ -170,8 +170,8 @@ parseString =
 --|. Parser.chompIf (\char -> char == '"')
 
 
-viewHelper : Formatting -> Html msg
-viewHelper item =
+viewHelper : Int -> Formatting -> Html msg
+viewHelper depth item =
     case item of
         Paragraph items ->
             Html.p [] (List.map inlineView items)
@@ -203,7 +203,7 @@ viewHelper item =
                 [ Html.p [] (List.map inlineView leading)
                 , Html.ul
                     [ Html.Attributes.style "padding-left" "20px" ]
-                    (List.map (\item2 -> Html.li [] [ viewHelper item2 ]) formattings)
+                    (List.map (\item2 -> Html.li [] [ viewHelper depth item2 ]) formattings)
                 ]
 
         NumberList leading formattings ->
@@ -212,7 +212,7 @@ viewHelper item =
                 [ Html.p [] (List.map inlineView leading)
                 , Html.ol
                     [ Html.Attributes.style "padding-left" "20px" ]
-                    (List.map (\item2 -> Html.li [] [ viewHelper item2 ]) formattings)
+                    (List.map (\item2 -> Html.li [] [ viewHelper depth item2 ]) formattings)
                 ]
 
         LetterList leading formattings ->
@@ -221,7 +221,7 @@ viewHelper item =
                 [ Html.p [] (List.map inlineView leading)
                 , Html.ol
                     [ Html.Attributes.type_ "A", Html.Attributes.style "padding-left" "20px" ]
-                    (List.map (\item2 -> Html.li [] [ viewHelper item2 ]) formattings)
+                    (List.map (\item2 -> Html.li [] [ viewHelper depth item2 ]) formattings)
                 ]
 
         Image a ->
@@ -231,12 +231,28 @@ viewHelper item =
             Html.p [] [ Html.text text ]
 
         Group formattings ->
-            Html.div [] (List.map viewHelper formattings)
+            Html.div [] (List.map (viewHelper depth) formattings)
 
         Section title formattings ->
-            Html.div
-                [ Html.Attributes.style "padding-top" "16px" ]
-                (Html.h2 [] [ Html.text title ] :: List.map viewHelper formattings)
+            let
+                content =
+                    List.map (viewHelper (depth + 1)) formattings
+            in
+            case depth of
+                0 ->
+                    Html.div
+                        [ Html.Attributes.style "padding-top" "16px" ]
+                        (Html.h2 [] [ Html.text title ] :: content)
+
+                1 ->
+                    Html.div
+                        []
+                        (Html.h3 [] [ Html.text title ] :: content)
+
+                _ ->
+                    Html.div
+                        []
+                        (Html.h4 [] [ Html.text title ] :: content)
 
 
 inlineView : Inline -> Html msg

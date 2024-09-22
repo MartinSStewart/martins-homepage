@@ -1260,7 +1260,11 @@ thingsIHaveDone =
         [ Paragraph
             [ Text "This package lets Elm users finally have a Dict and Set type that does not require "
             , Code "comparable"
-            , Text " keys (or require any workarounds) while also being similar in performance to the built-in Dict and Set types."
+            , Text " keys (or require any workarounds) while also being similar in performance to the built-in "
+            , ExternalLink "Dict" "package.elm-lang.org/packages/elm/core/latest/Dict"
+            , Text " and "
+            , ExternalLink "Set" "package.elm-lang.org/packages/elm/core/latest/Set"
+            , Text " types."
             ]
         , Paragraph [ Text "In this article I want to show a discovery I made while working on this. It's a set of significant trade-offs I faced that, as far as I can tell, are unavoidable regardless of how you go about designing a Dict/Set data structure." ]
         , BulletList
@@ -1351,11 +1355,11 @@ toList : Dict key value -> List (key, value)
                     [ Text "Passes on 3. ", Code "dictA == dictB", Text " implies ", Code "f dictA == f dictB" ]
                 , Paragraph [ Text "And passes on 4. Since the built-in Dict only allows comparable keys, there's no way for renames or reorderings to affect ", Code "toList" ]
                 ]
-            , Paragraph [ Text "It's nice that elm/dict passes on 2, 3, and 4. But comparable keys are really restrictive! So lets try allowing for non-comparable keys while trying to keep those other nice properties." ]
+            , Paragraph [ Text "It's nice that the built-in Dict passes on 2, 3, and 4. But comparable keys are really restrictive! So lets try allowing for non-comparable keys while trying to keep those other nice properties." ]
             , Paragraph
                 [ Text "Well, the question we immediately encounter is, how should "
                 , Code "toList"
-                , Text " sort the list of key-value pairs? With elm/dict this is easy because all of the keys are comparable values. But what do we do if we have non-comparable keys? For example, suppose we have the following custom type being used as our key."
+                , Text " sort the list of key-value pairs? With the built-in Dict this is easy because all of the keys are comparable values. But what do we do if we have non-comparable keys? For example, suppose we have the following custom type being used as our key."
                 ]
             , CodeBlock """type Color
     = Red
@@ -1485,9 +1489,22 @@ sortBy = Debug.todo "How do I sort an opaque type that doesn't expose anything u
                 , Paragraph [ Text "I kept 4. Both 3 and 4 are preserved for the same reason. They are properties guaranteed by Elm and that ultimately seemed more valuable than property 2." ]
                 ]
             ]
+        , Section "Questions I got as feedback"
+            [ Section "Is it possible to pick any combination of 3 properties?"
+                [ NumberList [ Text "It is! Let's look at the possibilities:" ]
+                    [ Paragraph [ Text "If we pick all but 1 then we have the built-in Dict." ]
+                    , Paragraph [ Text "If we pick all but 2 then you get this package." ]
+                    , Paragraph [ Text "If we pick all but 3, one example would be a Dict with a ", Code "toList", Text " function that returns keys by insertion order and ", Code "==", Text " ignores insertion order. There no existing packages that support this since Elm guarantees property 3. You'd need kernel code to implement it." ]
+                    , Paragraph [ Text "If we pick all but 4, ", Code "toList", Text " sorts keys alphabetically, ", Code "==", Text " ignores order, keys are not required to be comparable, but as a result, renaming fields/variants can affect ", Code "toList", Text ". Like with 3, there's no existing packages that do this since Elm guarantees 4 and you'd need kernel code to work around that." ]
+                    ]
+                ]
+            , Section "Can this package be used with the normal Elm compiler?"
+                [ Paragraph [ Text "This package is only supported in the Lamdera compiler. In part this is because it contains kernel code and it's unlikely I'd be allowed to publish it to the Elm package ecosystem. But even if I was allowed, it also overrides ", Code "Debug.toString", Text " and ", Code "==", Text " which is only possible due to some changes to the compiler. On top of that, the --optimize flag special cases the built-in Dict and Set when generating custom type tags and I had to special case that special case so that it would also handle lamdera/containers." ]
+                ]
+            ]
         ]
-        websiteReleasedAt
-        (date 2021 Sep 7)
+        (date 2024 Sep 22)
+        (date 2024 Sep 22)
     ]
         |> Dict.fromList
 
