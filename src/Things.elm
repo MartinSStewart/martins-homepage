@@ -1500,7 +1500,7 @@ sortBy = Debug.todo "How do I sort an opaque type that doesn't expose any data I
                 ]
             , Paragraph [ Text "Both 3 and 4 are preserved for the same reason. They are properties guaranteed by Elm and that ultimately seemed more valuable than 2." ]
             ]
-        , Section "Followup questions I've gotten"
+        , Section "Follow-up questions I've gotten"
             [ Section "Is it possible to pick any combination of three properties?"
                 [ NumberList [ Text "It is! Let's look at the possibilities:" ]
                     [ Paragraph [ Text "If we pick all but 1 then we have the built-in Dict." ]
