@@ -1329,7 +1329,7 @@ toList : Dict key value -> List (key, value)
                 ]
             , Paragraph [ Italic "For the sake of brevity, I'll refer to these properties by number through-out the rest of the article. " ]
             ]
-        , Section "Why should I care?"
+        , Section "Why should you care?"
             [ NumberList [ Text "I expect some readers will wonder why these properties matter. Maybe they feel arbitrary. Let me make a case for why they are important:" ]
                 [ Paragraph [ Text "We want keys to be non-comparable for the sake of convenience and type-safety. It's annoying when I have ", Code "type Id = Id String", Text " or ", Code "{ x : Int, y : Int }", Text " and I have to convert them into a ", Code "comparable", Text " type before they can be used as a key. This leads to boilerplate code and increased risk of mixing up types which can lead to bugs." ]
                 , Paragraph [ Text "Having two Dicts be equal based on contents, regardless of insertion order is nice but often not that big a deal. But for Sets it's kind of their whole purpose. And Sets are essentially just an alias for ", Code "Dict\u{00A0}key\u{00A0}()" ]
