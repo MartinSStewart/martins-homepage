@@ -1396,7 +1396,7 @@ myDict =
                 ]
             , LetterList [ Text "Do any of these approaches to sorting let us keep all 4 of the nice-to-have properties?" ]
                 [ Paragraph
-                    [ Text "Violates 4. If we rename a variant, it could potentially change it's alphabetical ordering and thereby change the output of "
+                    [ Text "Violates 4. If we rename a variant, it could potentially change its alphabetical ordering and thereby change the output of "
                     , Code "toList"
                     , Text "."
                     ]
