@@ -31,6 +31,7 @@ type Inline
     | Italic String
     | Link String Route
     | Code String
+    | Code2 String
     | Text String
     | AltText String String
     | ExternalLink String String
@@ -283,11 +284,20 @@ inlineView onPressAltText model inline =
         Code text ->
             Html.code
                 [ Html.Attributes.style "border" "1px rgb(210,210,210) solid"
-                , Html.Attributes.style "padding" "0 4px 2px 4px"
+                , Html.Attributes.style "padding" "0 4px 1px 4px"
                 , Html.Attributes.style "border-radius" "4px"
                 , Html.Attributes.style "font-size" "16px"
                 ]
                 [ codeHighlight text ]
+
+        Code2 text ->
+            Html.code
+                [ Html.Attributes.style "border" "1px rgb(210,210,210) solid"
+                , Html.Attributes.style "padding" "0 4px 1px 4px"
+                , Html.Attributes.style "border-radius" "4px"
+                , Html.Attributes.style "font-size" "16px"
+                ]
+                [ Html.text text ]
 
         Text text ->
             Html.text text
@@ -315,9 +325,9 @@ inlineView onPressAltText model inline =
                 )
                 (Html.text text
                     :: (if showAltText then
-                            [ Html.text " "
+                            [ Html.sup [ Html.Attributes.style "opacity" "0" ] [ Html.text " " ]
                             , Html.span
-                                [ Html.Attributes.style "background" "#dff2ff", Html.Attributes.style "padding" "0 2px 1px 2px" ]
+                                [ Html.Attributes.style "background" "#dff2ff", Html.Attributes.style "padding" "0 2px 2px 2px" ]
                                 [ Html.text altText ]
                             ]
 
