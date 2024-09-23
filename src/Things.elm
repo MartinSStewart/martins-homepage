@@ -1042,7 +1042,7 @@ thingsIHaveDone =
         , thingType =
             OtherThing
                 { releasedAt = date 2019 Nov 1
-                , repo = Just "https://gitlab.com/MartinSStewart/how-many-words-jo"
+                , repo = Just "gitlab.com/MartinSStewart/how-many-words-jo"
                 }
         }
       )
