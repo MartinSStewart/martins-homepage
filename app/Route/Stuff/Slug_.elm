@@ -80,6 +80,7 @@ type alias Thing =
     , pageLastUpdated : Date
     , pageCreatedAt : Date
     , thingType : ThingType
+    , previewImage : String
     }
 
 
@@ -91,17 +92,23 @@ data : RouteParams -> BackendTask FatalError Data
 data routeParams =
     case Dict.get routeParams.slug Things.thingsIHaveDone of
         Just thing ->
-            BackendTask.succeed
-                { thing =
-                    { name = thing.name
-                    , website = thing.website
-                    , tags = thing.tags
-                    , description = thing.description
-                    , pageLastUpdated = thing.pageLastUpdated
-                    , pageCreatedAt = thing.pageCreatedAt
-                    , thingType = thing.thingType
-                    }
-                }
+            case Formatting.checkFormatting thing.description of
+                Ok () ->
+                    BackendTask.succeed
+                        { thing =
+                            { name = thing.name
+                            , website = thing.website
+                            , tags = thing.tags
+                            , description = thing.description
+                            , pageLastUpdated = thing.pageLastUpdated
+                            , pageCreatedAt = thing.pageCreatedAt
+                            , thingType = thing.thingType
+                            , previewImage = thing.previewImage
+                            }
+                        }
+
+                Err error ->
+                    BackendTask.fail (FatalError.fromString error)
 
         Nothing ->
             BackendTask.fail (FatalError.fromString "Page not found")
@@ -153,42 +160,7 @@ view app sharedModel model =
             , Ui.centerX
             , Ui.spacing 24
             ]
-            [ Ui.column
-                []
-                [ case thing.website of
-                    Just url ->
-                        Formatting.externalLink 36 thing.name url
-
-                    Nothing ->
-                        Ui.el [ Ui.Font.size 36 ] (Ui.text thing.name)
-                , Ui.row
-                    [ Ui.spacing 16 ]
-                    [ Ui.text
-                        ("Created at "
-                            ++ Date.toIsoString thing.pageCreatedAt
-                            ++ (if thing.pageLastUpdated == thing.pageCreatedAt then
-                                    ""
-
-                                else
-                                    " " ++ "(updated at " ++ Date.toIsoString thing.pageLastUpdated ++ ")"
-                               )
-                        )
-                    , case thing.thingType of
-                        OtherThing other ->
-                            case other.repo of
-                                Just repo ->
-                                    Formatting.externalLink 16 "View source code" repo
-
-                                Nothing ->
-                                    Ui.none
-
-                        JobThing _ ->
-                            Ui.none
-
-                        PodcastThing _ ->
-                            Ui.none
-                    ]
-                ]
+            [ title thing
             , if List.isEmpty thing.description then
                 Ui.text "TODO"
 
@@ -200,3 +172,52 @@ view app sharedModel model =
             , Ui.el [ Ui.height (Ui.px 100) ] Ui.none
             ]
     }
+
+
+title : Thing -> Ui.Element msg
+title thing =
+    Ui.row
+        [ Ui.spacing 8 ]
+        [ Ui.image
+            [ Ui.width (Ui.px 64)
+            , Ui.alignBottom
+            , Ui.Responsive.visible Shared.breakpoints [ NotMobile ]
+            ]
+            { source = thing.previewImage, description = "Preview image", onLoad = Nothing }
+        , Ui.column
+            []
+            [ case thing.website of
+                Just url ->
+                    Formatting.externalLink 36 thing.name url
+
+                Nothing ->
+                    Ui.el [ Ui.Font.size 36 ] (Ui.text thing.name)
+            , Ui.row
+                [ Ui.spacing 16 ]
+                [ Ui.text
+                    ("Page created at "
+                        ++ Date.toIsoString thing.pageCreatedAt
+                        ++ (if thing.pageLastUpdated == thing.pageCreatedAt then
+                                ""
+
+                            else
+                                " " ++ "(updated at " ++ Date.toIsoString thing.pageLastUpdated ++ ")"
+                           )
+                    )
+                , case thing.thingType of
+                    OtherThing other ->
+                        case other.repo of
+                            Just repo ->
+                                Formatting.externalLink 16 "View source code" repo
+
+                            Nothing ->
+                                Ui.none
+
+                    JobThing _ ->
+                        Ui.none
+
+                    PodcastThing _ ->
+                        Ui.none
+                ]
+            ]
+        ]

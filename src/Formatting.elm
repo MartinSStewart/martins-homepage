@@ -1,11 +1,13 @@
-module Formatting exposing (..)
+module Formatting exposing (Formatting(..), Inline(..), Model, checkFormatting, externalLink, view)
 
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events
 import Html.Lazy
 import Icons
+import List.Extra
 import Parser exposing ((|.), (|=), Parser)
+import Result.Extra
 import Route exposing (Route)
 import Set exposing (Set)
 import SyntaxHighlight
@@ -35,7 +37,6 @@ type Inline
     | Text String
     | AltText String String
     | ExternalLink String String
-    | Footnote (List Inline)
 
 
 type alias Model a =
@@ -45,7 +46,7 @@ type alias Model a =
 view : (String -> msg) -> Model a -> List Formatting -> Ui.Element msg
 view onPressAltText model list =
     Html.div
-        []
+        [ Html.Attributes.style "line-height" "1.5" ]
         (Html.node "style" [] [ Html.text "pre { white-space: pre-wrap; }" ]
             :: SyntaxHighlight.useTheme SyntaxHighlight.gitHub
             :: List.map (viewHelper onPressAltText 0 model) list
@@ -72,6 +73,109 @@ type ParsedCode
     | Text2 String
     | Whitespace String
     | EqualsSign String
+
+
+checkFormatting : List Formatting -> Result String ()
+checkFormatting content =
+    Result.Extra.combineMap checkFormattingHelper content |> Result.map (\_ -> ())
+
+
+checkFormattingHelper : Formatting -> Result String ()
+checkFormattingHelper formatting =
+    case formatting of
+        Paragraph inlines ->
+            Result.Extra.combineMap checkInlineFormatting inlines |> Result.map (\_ -> ())
+
+        CodeBlock string ->
+            Ok ()
+
+        BulletList inlines content ->
+            case ( Result.Extra.combineMap checkInlineFormatting inlines, checkFormatting content ) of
+                ( Ok _, Ok _ ) ->
+                    Ok ()
+
+                ( Err error, _ ) ->
+                    Err error
+
+                ( _, Err error ) ->
+                    Err error
+
+        NumberList inlines content ->
+            case ( Result.Extra.combineMap checkInlineFormatting inlines, checkFormatting content ) of
+                ( Ok _, Ok _ ) ->
+                    Ok ()
+
+                ( Err error, _ ) ->
+                    Err error
+
+                ( _, Err error ) ->
+                    Err error
+
+        LetterList inlines content ->
+            case ( Result.Extra.combineMap checkInlineFormatting inlines, checkFormatting content ) of
+                ( Ok _, Ok _ ) ->
+                    Ok ()
+
+                ( Err error, _ ) ->
+                    Err error
+
+                ( _, Err error ) ->
+                    Err error
+
+        Image record ->
+            Ok ()
+
+        SimpleParagraph string ->
+            Ok ()
+
+        Group content ->
+            checkFormatting content
+
+        Section string content ->
+            checkFormatting content
+
+
+checkInlineFormatting inline =
+    case inline of
+        Text _ ->
+            Ok ()
+
+        Bold _ ->
+            Ok ()
+
+        Italic _ ->
+            Ok ()
+
+        Link string route ->
+            case route of
+                Route.Stuff__Slug_ { slug } ->
+                    if String.contains "/" slug then
+                        Err ("Stuff route " ++ slug ++ " shouldn't contain /")
+
+                    else
+                        Ok ()
+
+                Route.AboutMe ->
+                    Ok ()
+
+                Route.Index ->
+                    Ok ()
+
+        Code _ ->
+            Ok ()
+
+        Code2 _ ->
+            Ok ()
+
+        AltText _ _ ->
+            Ok ()
+
+        ExternalLink _ string ->
+            if String.contains ")" string then
+                Err (string ++ " is an invalid url")
+
+            else
+                Ok ()
 
 
 parsedCodeToString : ParsedCode -> Html msg
@@ -304,9 +408,6 @@ inlineView onPressAltText model inline =
 
         ExternalLink text url ->
             externalLinkHtml text url
-
-        Footnote content ->
-            Html.text "[*]"
 
         AltText text altText ->
             let
