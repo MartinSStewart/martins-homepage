@@ -11,16 +11,13 @@ import Effect
 import FatalError
 import Formatting exposing (Formatting(..), Inline(..))
 import Head
-import Html
 import PagesMsg
-import ParserUtils
 import Route exposing (Route(..))
 import RouteBuilder
 import Set exposing (Set)
 import Shared exposing (Breakpoints(..))
 import Ui
 import Ui.Font
-import Ui.Prose
 import Ui.Responsive
 import UrlPath
 import View

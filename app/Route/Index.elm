@@ -5,7 +5,7 @@ import BackendTask exposing (BackendTask)
 import Browser.Dom
 import Browser.Events
 import Color.Manipulate
-import Date exposing (Date, Month)
+import Date exposing (Date)
 import Dict exposing (Dict)
 import Effect exposing (Effect)
 import FatalError exposing (FatalError)
@@ -16,7 +16,7 @@ import List.Extra
 import Pages.Url
 import PagesMsg exposing (PagesMsg)
 import Route
-import RouteBuilder exposing (App, StatelessRoute)
+import RouteBuilder exposing (App)
 import Set exposing (Set)
 import Shared exposing (Breakpoints(..))
 import Svg exposing (Svg)

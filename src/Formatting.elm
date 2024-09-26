@@ -5,7 +5,6 @@ import Html.Attributes
 import Html.Events
 import Html.Lazy
 import Icons
-import List.Extra
 import Parser exposing ((|.), (|=), Parser)
 import Result.Extra
 import Route exposing (Route)
@@ -13,7 +12,6 @@ import Set exposing (Set)
 import SyntaxHighlight
 import Ui
 import Ui.Font
-import Ui.Prose
 
 
 type Formatting
@@ -22,7 +20,6 @@ type Formatting
     | BulletList (List Inline) (List Formatting)
     | NumberList (List Inline) (List Formatting)
     | LetterList (List Inline) (List Formatting)
-    | Image { source : String, description : String }
     | SimpleParagraph String
     | Group (List Formatting)
     | Section String (List Formatting)
@@ -121,9 +118,6 @@ checkFormattingHelper formatting =
 
                 ( _, Err error ) ->
                     Err error
-
-        Image record ->
-            Ok ()
 
         SimpleParagraph string ->
             Ok ()
@@ -342,9 +336,6 @@ viewHelper onPressAltText depth model item =
                     )
                 ]
 
-        Image a ->
-            Html.img [ Html.Attributes.src a.source, Html.Attributes.alt a.description ] []
-
         SimpleParagraph text ->
             Html.p [] [ Html.text text ]
 
@@ -460,11 +451,3 @@ externalLink fontSize text url =
         [ Ui.text text
         , Ui.el [ Ui.Font.size (round (toFloat fontSize * 12 / 16)), Ui.paddingLeft 2 ] Icons.externaLink
         ]
-
-
-codeBackground =
-    Ui.background (Ui.rgb 240 240 240)
-
-
-codeBorder =
-    Ui.borderColor (Ui.rgb 210 210 210)

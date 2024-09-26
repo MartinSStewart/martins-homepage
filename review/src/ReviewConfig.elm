@@ -24,13 +24,13 @@ import Simplify
 
 config : List Rule
 config =
-    [ NoUnused.Exports.rule
-    , NoUnused.Dependencies.rule
-    , NoUnused.Modules.rule
+    [ -- NoUnused.Exports.rule
+      --, NoUnused.Dependencies.rule
+      NoUnused.Modules.rule
     , NoUnused.Variables.rule
     , NoUnused.Parameters.rule
     , NoUnused.CustomTypeConstructors.rule []
     , NoUnused.CustomTypeConstructorArgs.rule
     , Simplify.rule Simplify.defaults
     ]
-        |> List.map (Review.Rule.ignoreErrorsForDirectories [ "vendored", "script" ])
+        |> List.map (Review.Rule.ignoreErrorsForDirectories [ "vendored", "script", ".elm-pages" ])

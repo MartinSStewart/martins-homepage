@@ -29,9 +29,7 @@ template =
 
 
 type Msg
-    = SharedMsg SharedMsg
-    | MenuClicked
-    | UiAnimMsg Ui.Anim.Msg
+    = UiAnimMsg Ui.Anim.Msg
 
 
 type alias Data =
@@ -70,12 +68,6 @@ init flags maybePagePath =
 update : Msg -> Model -> ( Model, Effect Msg )
 update msg model =
     case msg of
-        SharedMsg globalMsg ->
-            ( model, Effect.none )
-
-        MenuClicked ->
-            ( { model | showMenu = not model.showMenu }, Effect.none )
-
         UiAnimMsg uiAnimMsg ->
             ( { model | uiAnimModel = Ui.Anim.update UiAnimMsg uiAnimMsg model.uiAnimModel }, Effect.none )
 

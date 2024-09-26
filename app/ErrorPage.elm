@@ -1,7 +1,6 @@
 module ErrorPage exposing (ErrorPage(..), Model, Msg, head, init, internalError, notFound, statusCode, update, view)
 
 import Head
-import Html exposing (Html)
 import Ui
 import Ui.Prose
 import View exposing (View)

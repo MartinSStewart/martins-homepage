@@ -8,10 +8,9 @@ import FatalError exposing (FatalError)
 import Formatting exposing (Formatting)
 import Head
 import Head.Seo as Seo
-import Icons
 import Pages.Url
 import PagesMsg exposing (PagesMsg)
-import RouteBuilder exposing (App, StatefulRoute, StatelessRoute)
+import RouteBuilder exposing (App, StatefulRoute)
 import Set exposing (Set)
 import Shared exposing (Breakpoints(..))
 import Things exposing (Tag, ThingType(..))
