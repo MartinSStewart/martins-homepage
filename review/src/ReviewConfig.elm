@@ -24,9 +24,10 @@ import Simplify
 
 config : List Rule
 config =
-    [ -- NoUnused.Exports.rule
-      --, NoUnused.Dependencies.rule
-      NoUnused.Modules.rule
+    [ NoUnused.Exports.rule
+
+    --, NoUnused.Dependencies.rule
+    , NoUnused.Modules.rule
     , NoUnused.Variables.rule
     , NoUnused.Parameters.rule
     , NoUnused.CustomTypeConstructors.rule []

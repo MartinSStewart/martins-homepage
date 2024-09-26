@@ -51,7 +51,7 @@ init :
     RouteBuilder.App Data ActionData RouteParams
     -> Shared.Model
     -> ( Model, Effect.Effect Msg )
-init app shared =
+init _ _ =
     ( { selectedAltText = Set.empty }, Effect.none )
 
 
@@ -61,14 +61,14 @@ update :
     -> Msg
     -> Model
     -> ( Model, Effect.Effect Msg )
-update app shared msg model =
+update _ _ msg model =
     case msg of
         PressedAltText altText ->
             ( { model | selectedAltText = Set.insert altText model.selectedAltText }, Effect.none )
 
 
 subscriptions : RouteParams -> UrlPath.UrlPath -> Shared.Model -> Model -> Sub Msg
-subscriptions routeParams path shared model =
+subscriptions _ _ _ _ =
     Sub.none
 
 
@@ -106,7 +106,7 @@ data =
 
 
 head : RouteBuilder.App Data ActionData RouteParams -> List Head.Tag
-head app =
+head _ =
     []
 
 
@@ -115,7 +115,7 @@ view :
     -> Shared.Model
     -> Model
     -> View.View (PagesMsg.PagesMsg Msg)
-view app shared model =
+view app _ model =
     { title = "About me"
     , body =
         Ui.row

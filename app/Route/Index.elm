@@ -539,7 +539,7 @@ view app _ model =
                     [ Ui.spacing 8 ]
                     [ filterView model
                     , if model.sortBy == Chronological then
-                        timelineView app.data.thingsIHaveDone model
+                        timelineView app.data.thingsIHaveDone
 
                       else
                         Ui.row
@@ -565,8 +565,8 @@ view app _ model =
     }
 
 
-timelineView : Dict String Thing -> Model -> Ui.Element msg
-timelineView things model =
+timelineView : Dict String Thing -> Ui.Element msg
+timelineView things =
     let
         things2 : Dict ( Int, Int ) (List Thing)
         things2 =
@@ -633,7 +633,7 @@ timelineView things model =
                 )
                 (Dict.toList things)
     in
-    timelineViewHelper currentDate2 9 [] things2 durations model
+    timelineViewHelper currentDate2 9 [] things2 durations
 
 
 yearAndMonthToCount : Int -> Month -> Int
@@ -698,9 +698,8 @@ timelineViewHelper :
     -> List (Ui.Element msg)
     -> Dict ( Int, Int ) (List Thing)
     -> List { startedAt : Int, endedAt : Int, name : String, color : Ui.Color, columnIndex : Int }
-    -> Model
     -> Ui.Element msg
-timelineViewHelper currentDate count list thingsSorted durations model =
+timelineViewHelper currentDate count list thingsSorted durations =
     let
         month : Int
         month =
@@ -786,7 +785,6 @@ timelineViewHelper currentDate count list thingsSorted durations model =
             )
             thingsSorted
             durations
-            model
 
 
 monthToString : Int -> String
@@ -916,7 +914,7 @@ filterView model =
 
 
 thingsViewMobile : String -> Tier -> Thing -> Ui.Element Msg
-thingsViewMobile name tier thing =
+thingsViewMobile name _ thing =
     Ui.row
         [ containerBackground
         , Ui.borderColor containerBorder

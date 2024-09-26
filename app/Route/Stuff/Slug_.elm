@@ -136,7 +136,7 @@ view :
     -> Shared.Model
     -> Model
     -> View (PagesMsg Msg)
-view app sharedModel model =
+view app _ model =
     let
         thing : Thing
         thing =

@@ -63,7 +63,7 @@ perform :
     }
     -> Effect pageMsg
     -> Cmd msg
-perform ({ fromPageMsg, key } as helpers) effect =
+perform { fromPageMsg } effect =
     Cmd.map fromPageMsg effect
 
 
