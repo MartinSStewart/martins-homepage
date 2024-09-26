@@ -33,3 +33,4 @@ config =
     , NoUnused.CustomTypeConstructorArgs.rule
     , Simplify.rule Simplify.defaults
     ]
+        |> List.map (Review.Rule.ignoreErrorsForDirectories [ "vendored", "script" ])
