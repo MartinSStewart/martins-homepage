@@ -20,7 +20,6 @@ type Formatting
     | BulletList (List Inline) (List Formatting)
     | NumberList (List Inline) (List Formatting)
     | LetterList (List Inline) (List Formatting)
-    | SimpleParagraph String
     | Group (List Formatting)
     | Section String (List Formatting)
 
@@ -119,9 +118,6 @@ checkFormattingHelper formatting =
                 ( _, Err error ) ->
                     Err error
 
-        SimpleParagraph string ->
-            Ok ()
-
         Group content ->
             checkFormatting content
 
@@ -129,6 +125,7 @@ checkFormattingHelper formatting =
             checkFormatting content
 
 
+checkInlineFormatting : Inline -> Result String ()
 checkInlineFormatting inline =
     case inline of
         Text _ ->
@@ -140,7 +137,7 @@ checkInlineFormatting inline =
         Italic _ ->
             Ok ()
 
-        Link string route ->
+        Link _ route ->
             case route of
                 Route.Stuff__Slug_ { slug } ->
                     if String.contains "/" slug then
@@ -165,7 +162,7 @@ checkInlineFormatting inline =
             Ok ()
 
         ExternalLink _ string ->
-            if String.contains ")" string then
+            if String.contains ")" string || String.contains "://" string then
                 Err (string ++ " is an invalid url")
 
             else
@@ -335,9 +332,6 @@ viewHelper onPressAltText depth model item =
                         formattings
                     )
                 ]
-
-        SimpleParagraph text ->
-            Html.p [] [ Html.text text ]
 
         Group formattings ->
             Html.div [] (List.map (Html.Lazy.lazy4 viewHelper onPressAltText depth model) formattings)
