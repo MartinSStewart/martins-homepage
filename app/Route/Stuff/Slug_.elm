@@ -18,6 +18,7 @@ import Shared exposing (Breakpoints(..))
 import Things exposing (Tag, ThingType(..))
 import Ui
 import Ui.Font
+import Ui.Prose
 import Ui.Responsive
 import View exposing (View)
 
@@ -68,7 +69,7 @@ route =
 
 update : App data action routeParams -> Shared.Model -> Msg -> Model -> ( Model, Effect msg )
 update _ _ msg model =
-    case Debug.log "a" msg of
+    case msg of
         PressedAltText altText ->
             ( { model | selectedAltText = Set.insert altText model.selectedAltText }, Effect.none )
 
@@ -93,7 +94,7 @@ subscriptions _ _ _ model =
             (Json.Decode.field "key" Json.Decode.string
                 |> Json.Decode.andThen
                     (\key ->
-                        if Debug.log "key" key == "ArrowLeft" then
+                        if key == "ArrowLeft" then
                             Json.Decode.succeed (PressedArrowKey LeftArrowKey)
 
                         else if key == "ArrowRight" then
@@ -221,6 +222,10 @@ view app _ model =
     }
 
 
+dateView date =
+    Ui.el [ Ui.Font.bold ] (Ui.text (Date.toIsoString date))
+
+
 title : Thing -> Ui.Element msg
 title thing =
     Ui.row
@@ -240,22 +245,43 @@ title thing =
                 Nothing ->
                     Ui.el [ Ui.Font.size 36 ] (Ui.text thing.name)
             , Ui.row
-                [ Ui.spacing 16, Ui.Font.size 14 ]
-                [ Ui.text
-                    ("Page created at "
-                        ++ Date.toIsoString thing.pageCreatedAt
-                        ++ (if thing.pageLastUpdated == thing.pageCreatedAt then
-                                ""
+                [ Ui.wrap, Ui.spacing 16, Ui.Font.size 14 ]
+                [ case thing.thingType of
+                    OtherThing { releasedAt } ->
+                        "Released at " ++ Date.toIsoString releasedAt |> Ui.text
 
-                            else
-                                " " ++ "(updated at " ++ Date.toIsoString thing.pageLastUpdated ++ ")"
-                           )
-                    )
+                    JobThing { startedAt, endedAt, elmPercentage } ->
+                        Ui.Prose.paragraph
+                            []
+                            ([ Ui.text "Employed between "
+                             , dateView startedAt
+                             , Ui.text " and "
+                             ]
+                                ++ (case endedAt of
+                                        Just a ->
+                                            [ dateView a
+                                            , Ui.text
+                                                (" ("
+                                                    ++ String.fromInt (Date.diff Date.Months startedAt a)
+                                                    ++ "\u{00A0}months)"
+                                                )
+                                            ]
+
+                                        Nothing ->
+                                            [ Ui.el [ Ui.Font.bold ] (Ui.text "present day") ]
+                                   )
+                            )
+
+                    PodcastThing { releasedAt } ->
+                        "Released at " ++ Date.toIsoString releasedAt |> Ui.text
+
+                    GameMakerThing { releasedAt } ->
+                        Ui.text ("Released at " ++ Date.toIsoString releasedAt)
                 , case thing.thingType of
                     OtherThing other ->
                         case other.repo of
                             Just repo ->
-                                Formatting.externalLink 16 "View source code" repo
+                                Formatting.externalLink 14 "View\u{00A0}source\u{00A0}code" repo
 
                             Nothing ->
                                 Ui.none

@@ -745,7 +745,7 @@ thingsIHaveDone =
         , description = []
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/ambue/ambue-logo.svg"
         , thingType =
             JobThing
                 { startedAt = date 2023 Aug 15
@@ -757,7 +757,7 @@ thingsIHaveDone =
       )
     , ( "demon-clutched-walkaround"
       , { name = "Demon Clutched walkaround"
-        , website = Just "ambue.com/"
+        , website = Nothing
         , tags = [ Game, GameMaker ]
         , description = []
         , pageLastUpdated = websiteReleasedAt
