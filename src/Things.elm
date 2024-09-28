@@ -939,14 +939,24 @@ thingsIHaveDone =
       , { name = "Break the facade"
         , website = Nothing
         , tags = [ Game, GameMaker, GameJam ]
-        , description = [ Paragraph [ Text "A game I made for the 5th Game Maker Community game jam (aka GMC Jam). We had 3 days to make a game themed around the word \"facade\". ", Link "Last time I participated" (Stuff__Slug_ { slug = "sanctum" }), Text " I got 16th place, but this time I tied for 1st! As a result, I won a Mr. Karoshi tshirt ![Mr. Karoshi is a puzzle game where you help an office worker kill themselves](/break-the-facade/mr-karoshi.jpg), a coffee mug with YoYo Games branding, and free copy of Game Maker Studio pro (which let me export games to HTML5)!" ] ]
+        , description =
+            [ Paragraph [ Text "A game I made for the 5th Game Maker Community game jam (aka GMC Jam). Participants had 72 hours to make a game themed around the word \"facade\"." ]
+            , Paragraph [ Text "I made a game where you switch between controlling a black and a white character. White, and white objects, can move through the black space and Black and black objects can move through the white space. The goal is to get both of them to the level exit (the gradient seen on the right in the screenshot below)." ]
+            , Image "/break-the-facade/screen1.png" [ Text "Black is pushing a block into place so White can jump out with the spring" ]
+            , Paragraph [ Link "Last time I participated in the GMC Jam" (Stuff__Slug_ { slug = "sanctum" }), Text " I got 16th place, but this time I tied for 1st! As a result, I won a ", AltText "Mr.\u{00A0}Karoshi tshirt" "(Mr.\u{00A0}Karoshi is a rather grim puzzle game where you help an office worker kill themselves)", Text ", a coffee mug with YoYo Games branding, and free copy of Game Maker Studio pro!" ]
+
+            --, Image "/break-the-facade/screen0.png" [ Quote "One man's wall is another man's way...", Text " this probably sounded poetic when I was a teenager" ]
+            , Image "/break-the-facade/mr-karoshi.jpg" [ Text "The Mr.\u{00A0}Karoshi t-shirt I won" ]
+            , Paragraph [ Text "I think my favorite thing to come out of that years GMC Jam was a Youtuber named raocow deciding to play every game ", AltText "made for it" "(I believe that was the only GMC Jam he did. I can't find the source but I think he said it was too much work playing 60 or so mostly bad video games)", Text ". ", ExternalLink "Here he is playing Break the Facade" "www.youtube.com/watch?v=7ITH8CZXkbk", Text ". Judging by his comments towards the end of the video and the video description being ", Quote "I've oft repeated how much I like this general sort of both game and looks, so it'd be useless to repeat, even if I pretty much just did.", Text " I think it's safe to say he enjoyed playing it!" ]
+            , Image "/break-the-facade/zig-winna-banner.png" [ Text "Someone drew banners for the top 3 places (or perhaps more, not sure). Here's mine! And yes, I picked Ziggler1 as my username on the GMC forums." ]
+            ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/game-maker-preview.png"
+        , previewImage = "/break-the-facade/btfIconHighRes.png"
         , thingType =
-            OtherThing
+            GameMakerThing
                 { releasedAt = date 2012 Jan 30
-                , repo = Nothing
+                , download = "/break-the-facade/break-the-facade.exe"
                 }
         }
       )
@@ -954,14 +964,14 @@ thingsIHaveDone =
       , { name = "Secret santa game"
         , website = Nothing
         , tags = [ Game, GameMaker ]
-        , description = [ Paragraph [ Text "I participated in a secret santa event where everyone made a little game for another randomly chosen participant. This is the game I made and in my opinion it's the has by far the highest fun to effort ratio of anything I've ever made." ] ]
+        , description = [ Paragraph [ Text "I participated in a secret santa event where everyone made a little game for another randomly chosen participant. This is the game I made and in my opinion it has by far the highest fun-to-effort ratio of anything I've ever made." ] ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/game-maker-preview.png"
         , thingType =
-            OtherThing
+            GameMakerThing
                 { releasedAt = date 2015 Mar 7
-                , repo = Nothing
+                , download = "/secret-santa-game/secret-santa-game.exe"
                 }
         }
       )
@@ -1015,7 +1025,7 @@ thingsIHaveDone =
         , website = Nothing
         , tags = [ Elm ]
         , description =
-            [ Paragraph [ Text "I made a simple website that lists my friends birthdays ordered by how soon it will be. When it is someone's birthday, the website will show \"Happy Birthday <name>!\" with a image of a party hat. For a while me and my friends used this. Eventually though ", Link "my discord bot" (Stuff__Slug_ { slug = "discord-bot" }), Text " took over keeping track of birthdays." ]
+            [ Paragraph [ Text "I made a simple website that lists my friends birthdays ordered by how soon it will be. When it is someone's birthday, the website will show ", Quote "Happy Birthday <name>!", Text " with a image of a party hat. For a while me and my friends used this. Eventually though ", Link "my discord bot" (Stuff__Slug_ { slug = "discord-bot" }), Text " took over keeping track of birthdays." ]
             , Paragraph [ Text "Unfortunately I can't show the website itself or the code since it has personal information." ]
             ]
         , pageLastUpdated = websiteReleasedAt
@@ -1260,7 +1270,11 @@ thingsIHaveDone =
       , { name = "Emils turn"
         , website = Nothing
         , tags = [ Elm, Lamdera ]
-        , description = [ Paragraph [ Text "A simple app that helps me and my friend Emil remember whose turn it is to buy brownies to snack on after we take a break from bouldering. Took 20-30 minutes to make. ![Martin's turn](/emils-tur/image0.png) ![Emil's turn](/emils-tur/image1.png)" ] ]
+        , description =
+            [ Paragraph [ Text "A simple app that helps me and my climbing buddy Emil remember whose turn it is to buy brownies to snack on after we take a break from bouldering. Took 20-30 minutes to make." ]
+            , Image "/emils-tur/image0.png" [ Text "My turn to buy brownies!" ]
+            , Image "/emils-tur/image1.png" [ Text "Emil's turn to buy brownies!" ]
+            ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/lamdera-preview.svg"
@@ -1403,3 +1417,4 @@ type ThingType
           releasedAt : Date
         }
     | PodcastThing { releasedAt : Date }
+    | GameMakerThing { download : String, releasedAt : Date }

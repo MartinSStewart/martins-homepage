@@ -327,6 +327,9 @@ thingDate thing =
         PodcastThing record ->
             record.releasedAt
 
+        GameMakerThing record ->
+            record.releasedAt
+
 
 svgLine : String -> String -> String -> String -> Line -> Ui.Element msg
 svgLine aboveTier belowTier aboveColor belowColor line =
@@ -591,6 +594,12 @@ timelineView things =
                                 ( Date.year releasedAt, Date.monthNumber releasedAt )
                                 (\maybe -> Maybe.withDefault [] maybe |> (::) thing |> Just)
                                 dict
+
+                        GameMakerThing { releasedAt } ->
+                            Dict.update
+                                ( Date.year releasedAt, Date.monthNumber releasedAt )
+                                (\maybe -> Maybe.withDefault [] maybe |> (::) thing |> Just)
+                                dict
                 )
                 Dict.empty
                 (Dict.toList things)
@@ -632,7 +641,10 @@ timelineView things =
                                 , columnIndex = columnIndex
                                 }
 
-                        PodcastThing { releasedAt } ->
+                        PodcastThing _ ->
+                            Nothing
+
+                        GameMakerThing _ ->
                             Nothing
                 )
                 (Dict.toList things)

@@ -157,7 +157,7 @@ view app _ model =
                 )
             , Ui.widthMax 800
             , Ui.centerX
-            , Ui.spacing 24
+            , Ui.spacing 8
             ]
             [ title thing
             , if List.isEmpty thing.description then
@@ -217,6 +217,9 @@ title thing =
 
                     PodcastThing _ ->
                         Ui.none
+
+                    GameMakerThing { download } ->
+                        Formatting.downloadLink "Windows exe" download
                 ]
             ]
         ]

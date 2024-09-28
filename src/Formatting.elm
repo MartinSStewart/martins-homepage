@@ -1,4 +1,4 @@
-module Formatting exposing (Formatting(..), Inline(..), Model, checkFormatting, externalLink, view)
+module Formatting exposing (Formatting(..), Inline(..), Model, checkFormatting, downloadLink, externalLink, view)
 
 import Html exposing (Html)
 import Html.Attributes
@@ -34,6 +34,7 @@ type Inline
     | Text String
     | AltText String String
     | ExternalLink String String
+    | Quote String
 
 
 type alias Model a =
@@ -171,6 +172,9 @@ checkInlineFormatting inline =
 
             else
                 Ok ()
+
+        Quote string ->
+            Ok ()
 
 
 parsedCodeToString : ParsedCode -> Html msg
@@ -362,9 +366,21 @@ viewHelper onPressAltText depth model item =
                         (Html.h4 [] [ Html.text title ] :: content)
 
         Image url altText ->
-            Html.img
-                [ Html.Attributes.src url, Html.Attributes.style "width" "100%" ]
-                (List.map (inlineView onPressAltText model) altText)
+            Html.figure
+                [ Html.Attributes.style "padding-bottom" "16px", Html.Attributes.style "margin" "0" ]
+                [ Html.img
+                    [ Html.Attributes.src url
+                    , Html.Attributes.style "max-width" "100%"
+                    , Html.Attributes.style "max-height" "500px"
+                    , Html.Attributes.style "border-radius" "4px"
+                    ]
+                    []
+                , Html.figcaption
+                    [ Html.Attributes.style "font-size" "14px"
+                    , Html.Attributes.style "padding" "0 8px 0 8px "
+                    ]
+                    (List.map (inlineView onPressAltText model) altText)
+                ]
 
 
 inlineView : (String -> msg) -> Model a -> Inline -> Html msg
@@ -431,6 +447,9 @@ inlineView onPressAltText model inline =
                        )
                 )
 
+        Quote text ->
+            Html.q [] [ Html.text text ]
+
 
 externalLinkHtml : String -> String -> Html msg
 externalLinkHtml text url =
@@ -454,3 +473,19 @@ externalLink fontSize text url =
         [ Ui.text text
         , Ui.el [ Ui.Font.size (round (toFloat fontSize * 12 / 16)), Ui.paddingLeft 2 ] Icons.externaLink
         ]
+
+
+downloadLink : String -> String -> Ui.Element msg
+downloadLink text url =
+    Html.a
+        [ Html.Attributes.href url
+        , String.split "/" url
+            |> List.reverse
+            |> List.head
+            |> Maybe.withDefault url
+            |> Html.Attributes.download
+        ]
+        [ Html.text text
+        , Icons.downloadHtml
+        ]
+        |> Ui.html
