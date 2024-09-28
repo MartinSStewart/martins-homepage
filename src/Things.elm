@@ -967,6 +967,7 @@ thingsIHaveDone =
         , description =
             [ Paragraph [ Text "I participated in a secret santa event where everyone made a little game for another randomly chosen participant. This is the game I made. In my opinion it has by far the highest fun-to-effort ratio of anything I've ever made." ]
             , Video "res.cloudinary.com/dqqkfcvf6/video/upload/f_auto:video,q_auto/v1/martins-homepage/xdxibprfxfthcrtmjtiu"
+            , Paragraph [ Text "The song that plays in the game is Norwegian Pirate by Two Steps From Hell" ]
             ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt

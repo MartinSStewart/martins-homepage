@@ -1,6 +1,7 @@
-module Route.Stuff.Slug_ exposing (ActionData, Data, Model, Msg, route)
+port module Route.Stuff.Slug_ exposing (ActionData, Data, Model, Msg, route)
 
 import BackendTask exposing (BackendTask)
+import Browser.Events
 import Date exposing (Date)
 import Dict
 import Effect exposing (Effect)
@@ -8,6 +9,7 @@ import FatalError exposing (FatalError)
 import Formatting exposing (Formatting)
 import Head
 import Head.Seo as Seo
+import Json.Decode
 import Pages.Url
 import PagesMsg exposing (PagesMsg)
 import RouteBuilder exposing (App, StatefulRoute)
@@ -20,12 +22,25 @@ import Ui.Responsive
 import View exposing (View)
 
 
+port skipForwardVideo : () -> Cmd msg
+
+
+port skipBackwardVideo : () -> Cmd msg
+
+
 type alias Model =
-    { selectedAltText : Set String }
+    { selectedAltText : Set String, videoIsPlaying : Bool }
 
 
 type Msg
     = PressedAltText String
+    | StartedVideo
+    | PressedArrowKey ArrowKey
+
+
+type ArrowKey
+    = LeftArrowKey
+    | RightArrowKey
 
 
 type alias RouteParams =
@@ -33,7 +48,7 @@ type alias RouteParams =
 
 
 init _ _ =
-    ( { selectedAltText = Set.empty }, Effect.none )
+    ( { selectedAltText = Set.empty, videoIsPlaying = False }, Effect.none )
 
 
 route : StatefulRoute RouteParams Data ActionData Model Msg
@@ -53,13 +68,44 @@ route =
 
 update : App data action routeParams -> Shared.Model -> Msg -> Model -> ( Model, Effect msg )
 update _ _ msg model =
-    case msg of
+    case Debug.log "a" msg of
         PressedAltText altText ->
             ( { model | selectedAltText = Set.insert altText model.selectedAltText }, Effect.none )
 
+        StartedVideo ->
+            ( { model | videoIsPlaying = True }, Effect.none )
 
-subscriptions _ _ _ _ =
-    Sub.none
+        PressedArrowKey arrowKey ->
+            ( model
+            , case arrowKey of
+                LeftArrowKey ->
+                    skipBackwardVideo ()
+
+                RightArrowKey ->
+                    skipForwardVideo ()
+            )
+
+
+subscriptions : a -> b -> c -> Model -> Sub Msg
+subscriptions _ _ _ model =
+    if model.videoIsPlaying then
+        Browser.Events.onKeyDown
+            (Json.Decode.field "key" Json.Decode.string
+                |> Json.Decode.andThen
+                    (\key ->
+                        if Debug.log "key" key == "ArrowLeft" then
+                            Json.Decode.succeed (PressedArrowKey LeftArrowKey)
+
+                        else if key == "ArrowRight" then
+                            Json.Decode.succeed (PressedArrowKey RightArrowKey)
+
+                        else
+                            Json.Decode.fail ""
+                    )
+            )
+
+    else
+        Sub.none
 
 
 pages : BackendTask FatalError (List RouteParams)
@@ -165,7 +211,9 @@ view app _ model =
 
               else
                 Formatting.view
-                    (\text -> PressedAltText text |> PagesMsg.fromMsg)
+                    { pressedAltText = \text -> PressedAltText text |> PagesMsg.fromMsg
+                    , startedVideo = StartedVideo |> PagesMsg.fromMsg
+                    }
                     model
                     thing.description
             , Ui.el [ Ui.height (Ui.px 100) ] Ui.none

@@ -5,6 +5,7 @@ import Html.Attributes
 import Html.Events
 import Html.Lazy
 import Icons
+import Json.Decode
 import Parser exposing ((|.), (|=), Parser)
 import Result.Extra
 import Route exposing (Route)
@@ -42,13 +43,19 @@ type alias Model a =
     { a | selectedAltText : Set String }
 
 
-view : (String -> msg) -> Model a -> List Formatting -> Ui.Element msg
-view onPressAltText model list =
+type alias MsgConfig msg =
+    { pressedAltText : String -> msg
+    , startedVideo : msg
+    }
+
+
+view : MsgConfig msg -> Model a -> List Formatting -> Ui.Element msg
+view msgConfig model list =
     Html.div
         [ Html.Attributes.style "line-height" "1.5" ]
         (Html.node "style" [] [ Html.text "pre { white-space: pre-wrap; }" ]
             :: SyntaxHighlight.useTheme SyntaxHighlight.gitHub
-            :: List.map (viewHelper onPressAltText 0 model) list
+            :: List.map (viewHelper msgConfig 0 model) list
         )
         |> Ui.html
 
@@ -290,11 +297,11 @@ parseString =
         |. Parser.chompIf (\char -> char == '"')
 
 
-viewHelper : (String -> msg) -> Int -> Model a -> Formatting -> Html msg
-viewHelper onPressAltText depth model item =
+viewHelper : MsgConfig msg -> Int -> Model a -> Formatting -> Html msg
+viewHelper msgConfig depth model item =
     case item of
         Paragraph items ->
-            Html.p [] (List.map (inlineView onPressAltText model) items)
+            Html.p [] (List.map (inlineView msgConfig model) items)
 
         CodeBlock text ->
             case SyntaxHighlight.elm text of
@@ -320,11 +327,11 @@ viewHelper onPressAltText depth model item =
         BulletList leading formattings ->
             Html.div
                 []
-                [ Html.p [] (List.map (inlineView onPressAltText model) leading)
+                [ Html.p [] (List.map (inlineView msgConfig model) leading)
                 , Html.ul
                     [ Html.Attributes.style "padding-left" "20px" ]
                     (List.map
-                        (\item2 -> Html.li [] [ Html.Lazy.lazy4 viewHelper onPressAltText depth model item2 ])
+                        (\item2 -> Html.li [] [ Html.Lazy.lazy4 viewHelper msgConfig depth model item2 ])
                         formattings
                     )
                 ]
@@ -332,11 +339,11 @@ viewHelper onPressAltText depth model item =
         NumberList leading formattings ->
             Html.div
                 []
-                [ Html.p [] (List.map (inlineView onPressAltText model) leading)
+                [ Html.p [] (List.map (inlineView msgConfig model) leading)
                 , Html.ol
                     [ Html.Attributes.style "padding-left" "20px" ]
                     (List.map
-                        (\item2 -> Html.li [] [ Html.Lazy.lazy4 viewHelper onPressAltText depth model item2 ])
+                        (\item2 -> Html.li [] [ Html.Lazy.lazy4 viewHelper msgConfig depth model item2 ])
                         formattings
                     )
                 ]
@@ -344,22 +351,22 @@ viewHelper onPressAltText depth model item =
         LetterList leading formattings ->
             Html.div
                 []
-                [ Html.p [] (List.map (inlineView onPressAltText model) leading)
+                [ Html.p [] (List.map (inlineView msgConfig model) leading)
                 , Html.ol
                     [ Html.Attributes.type_ "A", Html.Attributes.style "padding-left" "20px" ]
                     (List.map
-                        (\item2 -> Html.li [] [ Html.Lazy.lazy4 viewHelper onPressAltText depth model item2 ])
+                        (\item2 -> Html.li [] [ Html.Lazy.lazy4 viewHelper msgConfig depth model item2 ])
                         formattings
                     )
                 ]
 
         Group formattings ->
-            Html.div [] (List.map (Html.Lazy.lazy4 viewHelper onPressAltText depth model) formattings)
+            Html.div [] (List.map (Html.Lazy.lazy4 viewHelper msgConfig depth model) formattings)
 
         Section title formattings ->
             let
                 content =
-                    List.map (Html.Lazy.lazy4 viewHelper onPressAltText (depth + 1) model) formattings
+                    List.map (Html.Lazy.lazy4 viewHelper msgConfig (depth + 1) model) formattings
             in
             case depth of
                 0 ->
@@ -391,7 +398,7 @@ viewHelper onPressAltText depth model item =
                     [ Html.Attributes.style "font-size" "14px"
                     , Html.Attributes.style "padding" "0 8px 0 8px "
                     ]
-                    (List.map (inlineView onPressAltText model) altText)
+                    (List.map (inlineView msgConfig model) altText)
                 ]
 
         Video url ->
@@ -399,12 +406,13 @@ viewHelper onPressAltText depth model item =
                 [ Html.Attributes.src ("https://" ++ url)
                 , Html.Attributes.style "max-width" "100%"
                 , Html.Attributes.controls True
+                , Html.Events.on "play" (Json.Decode.succeed msgConfig.startedVideo)
                 ]
                 []
 
 
-inlineView : (String -> msg) -> Model a -> Inline -> Html msg
-inlineView onPressAltText model inline =
+inlineView : MsgConfig msg -> Model a -> Inline -> Html msg
+inlineView msgConfig model inline =
     case inline of
         Bold text ->
             Html.b [] [ Html.text text ]
@@ -450,7 +458,7 @@ inlineView onPressAltText model inline =
 
                  else
                     [ Html.Attributes.title altText
-                    , Html.Events.onClick (onPressAltText altText)
+                    , Html.Events.onClick (msgConfig.pressedAltText altText)
                     , Html.Attributes.style "cursor" "pointer"
                     ]
                 )
@@ -458,7 +466,9 @@ inlineView onPressAltText model inline =
                     :: (if showAltText then
                             [ Html.sup [ Html.Attributes.style "opacity" "0" ] [ Html.text " " ]
                             , Html.span
-                                [ Html.Attributes.style "background" "#dff2ff", Html.Attributes.style "padding" "0 2px 2px 2px" ]
+                                [ Html.Attributes.style "background" "#dff2ff"
+                                , Html.Attributes.style "padding" "0 2px 2px 2px"
+                                ]
                                 [ Html.text altText ]
                             ]
 

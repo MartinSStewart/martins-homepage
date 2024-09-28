@@ -29,6 +29,7 @@ type alias Model =
 
 type Msg
     = PressedAltText String
+    | StartedVideo
 
 
 type alias RouteParams =
@@ -65,6 +66,9 @@ update _ _ msg model =
     case msg of
         PressedAltText altText ->
             ( { model | selectedAltText = Set.insert altText model.selectedAltText }, Effect.none )
+
+        StartedVideo ->
+            ( model, Effect.none )
 
 
 subscriptions : RouteParams -> UrlPath.UrlPath -> Shared.Model -> Model -> Sub Msg
@@ -149,7 +153,9 @@ view app _ model =
                     ]
                     [ Ui.el [ Ui.Font.size 32, Ui.Font.bold, Ui.Font.lineHeight 1.1 ] (Ui.text "About me")
                     , Formatting.view
-                        (\text -> PressedAltText text |> PagesMsg.fromMsg)
+                        { pressedAltText = \text -> PressedAltText text |> PagesMsg.fromMsg
+                        , startedVideo = StartedVideo |> PagesMsg.fromMsg
+                        }
                         model
                         app.data.description
                     ]
