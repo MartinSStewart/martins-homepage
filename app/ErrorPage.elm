@@ -1,14 +1,12 @@
-module ErrorPage exposing (ErrorPage(..), Model, Msg, head, init, internalError, notFound, statusCode, update, view)
+module ErrorPage exposing (ErrorPage(..), Model, Msg, init, internalError, notFound, statusCode, update, view)
 
-import Head
-import Html exposing (Html)
 import Ui
 import Ui.Prose
 import View exposing (View)
 
 
-type Msg
-    = Increment
+type alias Msg =
+    ()
 
 
 type alias Model =
@@ -17,22 +15,15 @@ type alias Model =
 
 
 init : ErrorPage -> ( Model, Cmd Msg )
-init errorPage =
+init _ =
     ( { count = 0 }
     , Cmd.none
     )
 
 
 update : ErrorPage -> Msg -> Model -> ( Model, Cmd Msg )
-update errorPage msg model =
-    case msg of
-        Increment ->
-            ( { model | count = model.count + 1 }, Cmd.none )
-
-
-head : ErrorPage -> List Head.Tag
-head errorPage =
-    []
+update _ _ model =
+    ( model, Cmd.none )
 
 
 type ErrorPage
@@ -51,7 +42,7 @@ internalError =
 
 
 view : ErrorPage -> Model -> View Msg
-view error model =
+view error _ =
     { body =
         Ui.column
             [ Ui.contentCenterX, Ui.contentCenterY ]
@@ -72,7 +63,7 @@ view error model =
             NotFound ->
                 "Page Not Found"
 
-            InternalError string ->
+            InternalError _ ->
                 "Unexpected Error"
     }
 

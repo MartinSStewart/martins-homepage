@@ -1,11 +1,10 @@
-module Formatting exposing (Formatting(..), Inline(..), Model, checkFormatting, externalLink, view)
+module Formatting exposing (Formatting(..), Inline(..), Model, checkFormatting, downloadLink, externalLink, view)
 
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events
 import Html.Lazy
 import Icons
-import List.Extra
 import Parser exposing ((|.), (|=), Parser)
 import Result.Extra
 import Route exposing (Route)
@@ -13,7 +12,6 @@ import Set exposing (Set)
 import SyntaxHighlight
 import Ui
 import Ui.Font
-import Ui.Prose
 
 
 type Formatting
@@ -22,10 +20,9 @@ type Formatting
     | BulletList (List Inline) (List Formatting)
     | NumberList (List Inline) (List Formatting)
     | LetterList (List Inline) (List Formatting)
-    | Image { source : String, description : String }
-    | SimpleParagraph String
     | Group (List Formatting)
     | Section String (List Formatting)
+    | Image String (List Inline)
 
 
 type Inline
@@ -37,6 +34,7 @@ type Inline
     | Text String
     | AltText String String
     | ExternalLink String String
+    | Quote String
 
 
 type alias Model a =
@@ -122,19 +120,17 @@ checkFormattingHelper formatting =
                 ( _, Err error ) ->
                     Err error
 
-        Image record ->
-            Ok ()
-
-        SimpleParagraph string ->
-            Ok ()
-
         Group content ->
             checkFormatting content
 
         Section string content ->
             checkFormatting content
 
+        Image url altText ->
+            Ok ()
 
+
+checkInlineFormatting : Inline -> Result String ()
 checkInlineFormatting inline =
     case inline of
         Text _ ->
@@ -146,7 +142,7 @@ checkInlineFormatting inline =
         Italic _ ->
             Ok ()
 
-        Link string route ->
+        Link _ route ->
             case route of
                 Route.Stuff__Slug_ { slug } ->
                     if String.contains "/" slug then
@@ -171,11 +167,14 @@ checkInlineFormatting inline =
             Ok ()
 
         ExternalLink _ string ->
-            if String.contains ")" string then
+            if String.contains ")" string || String.contains "://" string then
                 Err (string ++ " is an invalid url")
 
             else
                 Ok ()
+
+        Quote string ->
+            Ok ()
 
 
 parsedCodeToString : ParsedCode -> Html msg
@@ -342,12 +341,6 @@ viewHelper onPressAltText depth model item =
                     )
                 ]
 
-        Image a ->
-            Html.img [ Html.Attributes.src a.source, Html.Attributes.alt a.description ] []
-
-        SimpleParagraph text ->
-            Html.p [] [ Html.text text ]
-
         Group formattings ->
             Html.div [] (List.map (Html.Lazy.lazy4 viewHelper onPressAltText depth model) formattings)
 
@@ -371,6 +364,23 @@ viewHelper onPressAltText depth model item =
                     Html.div
                         []
                         (Html.h4 [] [ Html.text title ] :: content)
+
+        Image url altText ->
+            Html.figure
+                [ Html.Attributes.style "padding-bottom" "16px", Html.Attributes.style "margin" "0" ]
+                [ Html.img
+                    [ Html.Attributes.src url
+                    , Html.Attributes.style "max-width" "100%"
+                    , Html.Attributes.style "max-height" "500px"
+                    , Html.Attributes.style "border-radius" "4px"
+                    ]
+                    []
+                , Html.figcaption
+                    [ Html.Attributes.style "font-size" "14px"
+                    , Html.Attributes.style "padding" "0 8px 0 8px "
+                    ]
+                    (List.map (inlineView onPressAltText model) altText)
+                ]
 
 
 inlineView : (String -> msg) -> Model a -> Inline -> Html msg
@@ -437,6 +447,9 @@ inlineView onPressAltText model inline =
                        )
                 )
 
+        Quote text ->
+            Html.q [] [ Html.text text ]
+
 
 externalLinkHtml : String -> String -> Html msg
 externalLinkHtml text url =
@@ -462,9 +475,17 @@ externalLink fontSize text url =
         ]
 
 
-codeBackground =
-    Ui.background (Ui.rgb 240 240 240)
-
-
-codeBorder =
-    Ui.borderColor (Ui.rgb 210 210 210)
+downloadLink : String -> String -> Ui.Element msg
+downloadLink text url =
+    Html.a
+        [ Html.Attributes.href url
+        , String.split "/" url
+            |> List.reverse
+            |> List.head
+            |> Maybe.withDefault url
+            |> Html.Attributes.download
+        ]
+        [ Html.text text
+        , Icons.downloadHtml
+        ]
+        |> Ui.html

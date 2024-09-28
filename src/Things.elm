@@ -15,7 +15,7 @@ import Date exposing (Date)
 import Dict exposing (Dict)
 import Formatting exposing (Formatting(..), Inline(..))
 import LamderaContainers
-import Route
+import Route exposing (Route(..))
 import Time exposing (Month(..))
 import Ui
 
@@ -147,7 +147,7 @@ thingsIHaveDone =
       , { name = "town-collab"
         , website = Just "town-collab.app/"
         , tags = [ Elm, Game, Lamdera ]
-        , description = [ SimpleParagraph "A game I've been working on, inspired by an old children's game called Lego Loco" ]
+        , description = [ Paragraph [ Text "A game I've been working on, inspired by an old children's game called Lego Loco" ] ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
@@ -331,7 +331,7 @@ thingsIHaveDone =
         }
       )
     , elmPackage "MartinSStewart" "send-grid" [] websiteReleasedAt (date 2020 Feb 15)
-    , elmPackage "MartinSStewart" "elm-bayer-matrix" [ Paragraph [ Text "A package for generating ", ExternalLink "bayer matrices" "en.wikipedia.org/wiki/Ordered_dithering", Text ". These are useful for producing a dithering effect for partially transparent images. I used it for ", Link "surface-voyage" (Route.Stuff__Slug_ { slug = "surface-voyage" }), Text " to fade out objects too close to the camera. That said, in hindsight it was silly to make a package for 50 lines of code though." ] ] websiteReleasedAt (date 2020 Feb 15)
+    , elmPackage "MartinSStewart" "elm-bayer-matrix" [ Paragraph [ Text "A package for generating ", ExternalLink "bayer matrices" "en.wikipedia.org/wiki/Ordered_dithering", Text ". These are useful for producing a dithering effect for partially transparent images. I used it for ", Link "surface-voyage" (Stuff__Slug_ { slug = "surface-voyage" }), Text " to fade out objects too close to the camera. That said, in hindsight it was silly to make a package for 50 lines of code though." ] ] websiteReleasedAt (date 2020 Feb 15)
     , elmPackage "MartinSStewart" "elm-box-packing" [] websiteReleasedAt (date 2020 Apr 25)
     , elmPackage
         "MartinSStewart"
@@ -360,7 +360,7 @@ thingsIHaveDone =
       , { name = "Elm Camp 2023"
         , website = Just "elm.camp/23-denmark"
         , tags = [ Elm, Lamdera ]
-        , description = [ SimpleParagraph "I helped set up the website for Elm Camp 2023 and I created a simple website for displaying a schedule of events during the unconference. Also I borrowed a fancy camera and took photos while I was there." ]
+        , description = [ Paragraph [ Text "I helped set up the website for Elm Camp 2023 and I created a simple website for displaying a schedule of events during the unconference. Also I borrowed a fancy camera and took photos while I was there." ] ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/elm-camp-preview.png"
@@ -391,8 +391,8 @@ thingsIHaveDone =
         , website = Nothing
         , tags = [ Elm ]
         , description =
-            [ Paragraph [ Text "While working at ", Link "Realia" (Route.Stuff__Slug_ { slug = "realia" }), Text ", the app I was creating needed a map viewer so a user could see which realtors had sold properties in their area (so you could judge if they would do a good job selling your home). Initially I used Google Maps for this. From a user perspective, Google Maps is pretty good. From a programmer perspective it was really awful to work with. So I switched to Mapbox. It's better. And it has an ", ExternalLink "Elm package" "package.elm-lang.org/packages/gampleman/elm-mapbox/latest/", Text " too. Still not great though. So I decided to make my own map viewer written in Elm. I made a proof of concept for the vector tile decoding over the 2022 winter break (the map viewer would still be relying on the Mapbox server for data) and then in 2023 summer I convinced my boss (Sam) to let finish the rest during work time." ]
-            , Paragraph [ Text "Later when I started working at ", Link "Ambue" (Route.Stuff__Slug_ { slug = "ambue" }), Text " my new boss (Stephen) expressed interest in using the map viewer I had created in Elm for viewing homes that belonged to our client's portfolios. I got permission from Sam to open source the map viewer so it could use on at Ambue." ]
+            [ Paragraph [ Text "While working at ", Link "Realia" (Stuff__Slug_ { slug = "realia" }), Text ", the app I was creating needed a map viewer so a user could see which realtors had sold properties in their area (so you could judge if they would do a good job selling your home). Initially I used Google Maps for this. From a user perspective, Google Maps is pretty good. From a programmer perspective it was really awful to work with. So I switched to Mapbox. It's better. And it has an ", ExternalLink "Elm package" "package.elm-lang.org/packages/gampleman/elm-mapbox/latest/", Text " too. Still not great though. So I decided to make my own map viewer written in Elm. I made a proof of concept for the vector tile decoding over the 2022 winter break (the map viewer would still be relying on the Mapbox server for data) and then in 2023 summer I convinced my boss (Sam) to let finish the rest during work time." ]
+            , Paragraph [ Text "Later when I started working at ", Link "Ambue" (Stuff__Slug_ { slug = "ambue" }), Text " my new boss (Stephen) expressed interest in using the map viewer I had created in Elm for viewing homes that belonged to our client's portfolios. I got permission from Sam to open source the map viewer so it could use on at Ambue." ]
             ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
@@ -408,7 +408,7 @@ thingsIHaveDone =
       , { name = "simple-survey"
         , website = Just "simple-survey.lamdera.app/"
         , tags = [ Elm, Lamdera ]
-        , description = [ Paragraph [ Text "A simple survey app! As of time of writing it only lets you create surveys with free text questions. Other survey creation tools can do a lot more than that. But simple-survey has the advantage of not spamming you with ads, not showing cookie/GDPR popups (while still respecting user privacy), or ask you to sign up. Initially it was created so that we could gather some attendee info before the first", Link "elm-camp" (Route.Stuff__Slug_ { slug = "elm-camp-2023" }), Text ". Since then it's been used for the 2024 Elm camp and nothing else that I'm aware of." ] ]
+        , description = [ Paragraph [ Text "A simple survey app! As of time of writing it only lets you create surveys with free text questions. Other survey creation tools can do a lot more than that. But simple-survey has the advantage of not spamming you with ads, not showing cookie/GDPR popups (while still respecting user privacy), or ask you to sign up. Initially it was created so that we could gather some attendee info before the first", Link "elm-camp" (Stuff__Slug_ { slug = "elm-camp-2023" }), Text ". Since then it's been used for the 2024 Elm camp and nothing else that I'm aware of." ] ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
@@ -424,8 +424,8 @@ thingsIHaveDone =
         , website = Just "sheep-game.lamdera.app/"
         , tags = [ Elm, Lamdera ]
         , description =
-            [ SimpleParagraph "A game played with a group of friends where everyone is given the same list of questions and in secret everyone tries to pick the same answers as everyone else. Once everyone is done, for each question you count the number of answers that match your own. Whoever has the most matches in total wins."
-            , SimpleParagraph "I didn't come up with this idea, it's probably a pretty old concept. But I did make this app to speed up the process of collecting answers and displaying the results. My friends and I play it twice a year. I organize the \"summer sheep game\" and a friend organizes the \"winter sheep game\" (that way we both get once chance to participate each year)."
+            [ Paragraph [ Text "A game played with a group of friends where everyone is given the same list of questions and in secret everyone tries to pick the same answers as everyone else. Once everyone is done, for each question you count the number of answers that match your own. Whoever has the most matches in total wins." ]
+            , Paragraph [ Text "I didn't come up with this idea, it's probably a pretty old concept. But I did make this app to speed up the process of collecting answers and displaying the results. My friends and I play it twice a year. I organize the \"summer sheep game\" and a friend organizes the \"winter sheep game\" (that way we both get once chance to participate each year)." ]
             , Paragraph [ ExternalLink "Here's an example" "sheep-game.lamdera.app/join/a217210861", Text " of what it looks like when I played it with some Elm community members" ]
             ]
         , pageLastUpdated = websiteReleasedAt
@@ -520,7 +520,7 @@ thingsIHaveDone =
       , { name = "Sanctum"
         , website = Nothing
         , tags = [ Game, GameMaker, GameJam ]
-        , description = [ SimpleParagraph "I created this for the Game Maker Community game jam #3. Everyone had 3 days to make a game themed around the word \"live\". There were 56 entries and I placed 16th." ]
+        , description = [ Paragraph [ Text "I created this for the Game Maker Community game jam #3. Everyone had 3 days to make a game themed around the word \"live\". There were 56 entries and I placed 16th." ] ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/game-maker-preview.png"
@@ -535,7 +535,7 @@ thingsIHaveDone =
       , { name = "Tetherball EXTREME Zombie Edition"
         , website = Nothing
         , tags = [ Game, GameMaker ]
-        , description = [ Paragraph [ Text "I finished this before ", Link "Sanctum" (Route.Stuff__Slug_ { slug = "sanctum" }), Text " but due to it being part of the Game Maker Community Game it didn't get released until later." ] ]
+        , description = [ Paragraph [ Text "I finished this before ", Link "Sanctum" (Stuff__Slug_ { slug = "sanctum" }), Text " but due to it being part of the Game Maker Community Game it didn't get released until later." ] ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/game-maker-preview.png"
@@ -642,7 +642,7 @@ thingsIHaveDone =
       , { name = "aventyr"
         , website = Just "www.youtube.com/watch?v=Y_ExX2LT_bw"
         , tags = [ Game, CSharp ]
-        , description = [ SimpleParagraph "A 2d portal game I worked on and off on for a couple years. Really it was attempt four at a 2d portal game. The first three attempts were in Game Maker (which includes [enough-portals](/stuff/enough-portals)). It wasn't suited to the complexity or performance requirements so eventually I switched to using C#. I never got close to finishing this game but it's largely responsible for teaching me C# and helping me independently realize that inheritence is bad and pure functions and immutable data are good.\n\nThis is where my profile image originated. I picked [an icon](thenounproject.com/icon/work-in-progress-42732/) for Aventyr's exe file to indicate that it's a work in progress. Then for some reason I started using that icon for profile images (assuming I can be bothered with setting a profile image)" ]
+        , description = [ Paragraph [ Text "A 2d portal game I worked on and off on for a couple years. Really it was attempt four at a 2d portal game. The first three attempts were in Game Maker (which includes ", Link "enough-portals" (Stuff__Slug_ { slug = "enough-portals" }), Text ". It wasn't suited to the complexity or performance requirements so eventually I switched to using C#. I never got close to finishing this game but it's largely responsible for teaching me C# and helping me independently realize that inheritance is bad and pure functions and immutable data are good." ], Paragraph [ Text "This is where my profile image originated. I picked ", ExternalLink "an icon" "thenounproject.com/icon/work-in-progress-42732/", Text " for Aventyr's exe file to indicate that it's a work in progress. Then for some reason I started using that icon for profile images (when I can be bothered with setting a profile image)" ] ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/profile.png"
@@ -674,7 +674,7 @@ thingsIHaveDone =
       , { name = "Crivia"
         , website = Just "www.cliftonbazaar.games/games.php?game=crivia"
         , tags = [ Game, GameMaker, Job ]
-        , description = [ SimpleParagraph "A game I was hired to make for a guy named James Clifton. Crivia or Cricket Trivia is a game about answering trivia questions about the sport Cricket. I was only paid like 60 USD for on and off work spanning 8 months so this kind of stretches the definition of a job but I think at the time I was more concerned with experience and resume building. The game was made in Game Maker with a tiny amount of PHP used for saving highscores to James' website." ]
+        , description = [ Paragraph [ Text "A game I was hired to make for a guy named James Clifton. Crivia or Cricket Trivia is a game about answering trivia questions about the sport Cricket. I was only paid like 60 USD for on and off work spanning 8 months so this kind of stretches the definition of a job but I think at the time I was more concerned with experience and resume building. The game was made in Game Maker with a tiny amount of PHP used for saving highscores to James' website." ] ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/game-maker-preview.png"
@@ -725,7 +725,7 @@ thingsIHaveDone =
       , { name = "Realia"
         , website = Just "realia.se/"
         , tags = [ Elm, Lamdera, Job ]
-        , description = [ SimpleParagraph "[Discourse post](discourse.elm-lang.org/t/using-lamdera-professionally/9142)" ]
+        , description = [ Paragraph [ ExternalLink "Discourse post" "discourse.elm-lang.org/t/using-lamdera-professionally/9142" ] ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
@@ -939,14 +939,24 @@ thingsIHaveDone =
       , { name = "Break the facade"
         , website = Nothing
         , tags = [ Game, GameMaker, GameJam ]
-        , description = [ SimpleParagraph "A game I made for the 5th Game Maker Community game jam (aka GMC Jam). We had 3 days to make a game themed around the word \"facade\". [Last time I participated](/stuff/sanctum) I got 16th place, but this time I tied for 1st! As a result, I won a Mr. Karoshi tshirt ![Mr. Karoshi is a puzzle game where you help an office worker kill themselves](/break-the-facade/mr-karoshi.jpg), a coffee mug with YoYo Games branding, and free copy of Game Maker Studio pro (which let me export games to HTML5)!" ]
+        , description =
+            [ Paragraph [ Text "A game I made for the 5th Game Maker Community game jam (aka GMC Jam). Participants had 72 hours to make a game themed around the word \"facade\"." ]
+            , Paragraph [ Text "I made a game where you switch between controlling a black and a white character. White, and white objects, can move through the black space and Black and black objects can move through the white space. The goal is to get both of them to the level exit (the gradient seen on the right in the screenshot below)." ]
+            , Image "/break-the-facade/screen1.png" [ Text "Black is pushing a crate into place so White can jump out with the spring" ]
+            , Paragraph [ Link "Last time I participated in the GMC Jam" (Stuff__Slug_ { slug = "sanctum" }), Text " I got 16th place, but this time I tied for 1st! As a result, I won a ", AltText "Mr.\u{00A0}Karoshi tshirt" "(Mr.\u{00A0}Karoshi is a rather grim puzzle game where you help an office worker kill themselves)", Text ", a coffee mug with YoYo Games branding, and free copy of Game Maker Studio pro!" ]
+
+            --, Image "/break-the-facade/screen0.png" [ Quote "One man's wall is another man's way...", Text " this probably sounded poetic when I was a teenager" ]
+            , Image "/break-the-facade/mr-karoshi.jpg" [ Text "The Mr.\u{00A0}Karoshi t-shirt I won" ]
+            , Paragraph [ Text "I think my favorite thing to come out of that years GMC Jam was a Youtuber named raocow deciding to play every game ", AltText "made for it" "(I believe that was the only GMC Jam he did. I can't find the source but I think he said it was too much work playing 60 or so mostly bad video games)", Text ". ", ExternalLink "Here he is playing Break the Facade" "www.youtube.com/watch?v=7ITH8CZXkbk", Text ". Judging by his comments towards the end of the video and the video description being ", Quote "I've oft repeated how much I like this general sort of both game and looks, so it'd be useless to repeat, even if I pretty much just did.", Text " I think it's safe to say he enjoyed playing it!" ]
+            , Image "/break-the-facade/zig-winna-banner.png" [ Text "Someone drew banners for the top 3 places (or perhaps more, not sure). Here's mine! And yes, I picked Ziggler1 as my username on the GMC forums. Thanks past me." ]
+            ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/game-maker-preview.png"
+        , previewImage = "/break-the-facade/btfIconHighRes.png"
         , thingType =
-            OtherThing
+            GameMakerThing
                 { releasedAt = date 2012 Jan 30
-                , repo = Nothing
+                , download = "/break-the-facade/break-the-facade.exe"
                 }
         }
       )
@@ -954,14 +964,14 @@ thingsIHaveDone =
       , { name = "Secret santa game"
         , website = Nothing
         , tags = [ Game, GameMaker ]
-        , description = [ SimpleParagraph "I participated in a secret santa event where everyone made a little game for another randomly chosen participant. This is the game I made and in my opinion it's the has by far the highest fun to effort ratio of anything I've ever made." ]
+        , description = [ Paragraph [ Text "I participated in a secret santa event where everyone made a little game for another randomly chosen participant. This is the game I made and in my opinion it has by far the highest fun-to-effort ratio of anything I've ever made." ] ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/game-maker-preview.png"
         , thingType =
-            OtherThing
+            GameMakerThing
                 { releasedAt = date 2015 Mar 7
-                , repo = Nothing
+                , download = "/secret-santa-game/secret-santa-game.exe"
                 }
         }
       )
@@ -969,7 +979,7 @@ thingsIHaveDone =
       , { name = "SSRPG"
         , website = Nothing
         , tags = [ Game, GameMaker ]
-        , description = [ SimpleParagraph "I tried making a hex grid based fire emblem style game with a friend who went by the name SS (no, not *that* SS). Another friend named FQ drew the hex grid art. Unfortunately for them, I didn't get very far with this. Just a very basic turn based movement and combat system." ]
+        , description = [ Paragraph [ Text "I tried making a hex grid based fire emblem style game with a friend who went by the name SS (no, not *that* SS). Another friend named FQ drew the hex grid art. Unfortunately for them, I didn't get very far with this. Just a very basic turn based movement and combat system." ] ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/game-maker-preview.png"
@@ -1014,7 +1024,10 @@ thingsIHaveDone =
       , { name = "Birthday list"
         , website = Nothing
         , tags = [ Elm ]
-        , description = [ SimpleParagraph "I made a simple website that lists my friends birthdays ordered by how soon it will be. When it is someone's birthday, the website will show \"Happy Birthday <name>!\" with a image of a party hat. For a while me and my friends used this. Eventually though [my discord bot](/stuff/discord-bot) took over keeping track of birthdays.\n\nUnfortunately I can't show the website itself or the code since it has personal information." ]
+        , description =
+            [ Paragraph [ Text "I made a simple website that lists my friends birthdays ordered by how soon it will be. When it is someone's birthday, the website will show ", Quote "Happy Birthday <name>!", Text " with a image of a party hat. For a while me and my friends used this. Eventually though ", Link "my discord bot" (Stuff__Slug_ { slug = "discord-bot" }), Text " took over keeping track of birthdays." ]
+            , Paragraph [ Text "Unfortunately I can't show the website itself or the code since it has personal information." ]
+            ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
@@ -1029,7 +1042,10 @@ thingsIHaveDone =
       , { name = "Tile editor"
         , website = Just "martinsstewart.gitlab.io/tile-editor/"
         , tags = [ Elm ]
-        , description = [ SimpleParagraph "For one Christmas I asked for a level tileset as a present and my sister made me one! Then I made this tile editor so that I could make some kind of map with that tileset (just for admiring, you can't interact with it in any way).\n\nHere's a level my sister drew using it ![a level drawn with her tileset and my editor](/tile-editor/level.png)" ]
+        , description =
+            [ Paragraph [ Text "For one Christmas I asked for a level tileset as a present and my sister made me one! Then I made this tile editor so that I could make some kind of map with that tileset (just for admiring, you can't interact with it in any way)." ]
+            , Paragraph [ Text "Here's a level my sister drew using it ![a level drawn with her tileset and my editor](/tile-editor/level.png)" ]
+            ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
@@ -1044,7 +1060,7 @@ thingsIHaveDone =
       , { name = "How many words Jo"
         , website = Just "martinsstewart.gitlab.io/how-many-words-jo/"
         , tags = [ Elm ]
-        , description = [ SimpleParagraph "A friend (named Jo) participates in NaNoWriMo (National Novel Writing Month) each year. I made a website that would track how many words she would need to have written during the month to be on pace to meet her desired word count of 220k (aka a lot of words)." ]
+        , description = [ Paragraph [ Text "A friend (named Jo) participates in NaNoWriMo (National Novel Writing Month) each year. I made a website that would track how many words she would need to have written during the month to be on pace to meet her desired word count of 220k (aka a lot of words)." ] ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
@@ -1059,7 +1075,7 @@ thingsIHaveDone =
       , { name = "Summer home website"
         , website = Nothing
         , tags = [ Elm ]
-        , description = [ SimpleParagraph "My extended family shares ownership of a summer home in Sweden. I decided to make a website that would help people book a visit. And by that I mean, it would just let people pick a start and end date to their visit and then generate an email they could send to the person actually responsible for keep track of who was visiting. There's no link to the website or the code since it contains someone's email address and info about where the house is located. You're not missing out on much though. I did a terrible job of hosting images and the website looks like this now ![a website with broken image links](/summer-home/website.png)" ]
+        , description = [ Paragraph [ Text "My extended family shares ownership of a summer home in Sweden. I decided to make a website that would help people book a visit. And by that I mean, it would just let people pick a start and end date to their visit and then generate an email they could send to the person actually responsible for keep track of who was visiting. There's no link to the website or the code since it contains private information. You're not missing out on much though. The background image doesn't load anymore and the styling messed up." ] ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
@@ -1254,7 +1270,11 @@ thingsIHaveDone =
       , { name = "Emils turn"
         , website = Nothing
         , tags = [ Elm, Lamdera ]
-        , description = [ SimpleParagraph "A simple app that helps me and my friend Emil remember whose turn it is to buy brownies to snack on after we take a break from bouldering. Took 20-30 minutes to make. ![Martin's turn](/emils-tur/image0.png) ![Emil's turn](/emils-tur/image1.png)" ]
+        , description =
+            [ Paragraph [ Text "A simple app that helps me and my climbing buddy Emil remember whose turn it is to buy brownies to snack on after we take a break from bouldering. Took 20-30 minutes to make." ]
+            , Image "/emils-tur/image0.png" [ Text "My turn to buy brownies!" ]
+            , Image "/emils-tur/image1.png" [ Text "Emil's turn to buy brownies!" ]
+            ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/lamdera-preview.svg"
@@ -1397,3 +1417,4 @@ type ThingType
           releasedAt : Date
         }
     | PodcastThing { releasedAt : Date }
+    | GameMakerThing { download : String, releasedAt : Date }

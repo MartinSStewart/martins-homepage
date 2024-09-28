@@ -8,10 +8,9 @@ import FatalError exposing (FatalError)
 import Formatting exposing (Formatting)
 import Head
 import Head.Seo as Seo
-import Icons
 import Pages.Url
 import PagesMsg exposing (PagesMsg)
-import RouteBuilder exposing (App, StatefulRoute, StatelessRoute)
+import RouteBuilder exposing (App, StatefulRoute)
 import Set exposing (Set)
 import Shared exposing (Breakpoints(..))
 import Things exposing (Tag, ThingType(..))
@@ -137,7 +136,7 @@ view :
     -> Shared.Model
     -> Model
     -> View (PagesMsg Msg)
-view app sharedModel model =
+view app _ model =
     let
         thing : Thing
         thing =
@@ -158,7 +157,7 @@ view app sharedModel model =
                 )
             , Ui.widthMax 800
             , Ui.centerX
-            , Ui.spacing 24
+            , Ui.spacing 8
             ]
             [ title thing
             , if List.isEmpty thing.description then
@@ -193,7 +192,7 @@ title thing =
                 Nothing ->
                     Ui.el [ Ui.Font.size 36 ] (Ui.text thing.name)
             , Ui.row
-                [ Ui.spacing 16 ]
+                [ Ui.spacing 16, Ui.Font.size 14 ]
                 [ Ui.text
                     ("Page created at "
                         ++ Date.toIsoString thing.pageCreatedAt
@@ -218,6 +217,9 @@ title thing =
 
                     PodcastThing _ ->
                         Ui.none
+
+                    GameMakerThing { download } ->
+                        Formatting.downloadLink "Windows exe" download
                 ]
             ]
         ]

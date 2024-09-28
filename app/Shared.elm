@@ -1,4 +1,17 @@
-module Shared exposing (Breakpoints(..), Data, Model, Msg(..), SharedMsg(..), breakpoints, contentMaxWidth, headerHeight, maxColumns, pagePadding, template, tileSpacing, tileWidth)
+module Shared exposing
+    ( Breakpoints(..)
+    , Data
+    , Model
+    , Msg(..)
+    , breakpoints
+    , contentMaxWidth
+    , headerHeight
+    , maxColumns
+    , pagePadding
+    , template
+    , tileSpacing
+    , tileWidth
+    )
 
 import BackendTask exposing (BackendTask)
 import Effect exposing (Effect)
@@ -29,17 +42,11 @@ template =
 
 
 type Msg
-    = SharedMsg SharedMsg
-    | MenuClicked
-    | UiAnimMsg Ui.Anim.Msg
+    = UiAnimMsg Ui.Anim.Msg
 
 
 type alias Data =
     ()
-
-
-type SharedMsg
-    = NoOp
 
 
 type alias Model =
@@ -61,7 +68,7 @@ init :
             , pageUrl : Maybe PageUrl
             }
     -> ( Model, Effect Msg )
-init flags maybePagePath =
+init _ _ =
     ( { showMenu = False, uiAnimModel = Ui.Anim.init }
     , Effect.none
     )
@@ -70,12 +77,6 @@ init flags maybePagePath =
 update : Msg -> Model -> ( Model, Effect Msg )
 update msg model =
     case msg of
-        SharedMsg globalMsg ->
-            ( model, Effect.none )
-
-        MenuClicked ->
-            ( { model | showMenu = not model.showMenu }, Effect.none )
-
         UiAnimMsg uiAnimMsg ->
             ( { model | uiAnimModel = Ui.Anim.update UiAnimMsg uiAnimMsg model.uiAnimModel }, Effect.none )
 
@@ -100,7 +101,7 @@ view :
     -> (Msg -> msg)
     -> View msg
     -> { body : List (Html msg), title : String }
-view sharedData page model toMsg pageView =
+view _ page model toMsg pageView =
     { body =
         [ Ui.Anim.layout
             { options = []

@@ -9,7 +9,6 @@ module Effect exposing (Effect, batch, fromCmd, map, none, perform)
 import Browser.Navigation
 import Form
 import Http
-import Json.Decode as Decode
 import Pages.Fetcher
 import Url exposing (Url)
 
@@ -17,13 +16,6 @@ import Url exposing (Url)
 {-| -}
 type alias Effect msg =
     Cmd msg
-
-
-{-| -}
-type alias RequestInfo =
-    { contentType : String
-    , body : String
-    }
 
 
 {-| -}
@@ -71,7 +63,7 @@ perform :
     }
     -> Effect pageMsg
     -> Cmd msg
-perform ({ fromPageMsg, key } as helpers) effect =
+perform { fromPageMsg } effect =
     Cmd.map fromPageMsg effect
 
 

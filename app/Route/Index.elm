@@ -5,7 +5,7 @@ import BackendTask exposing (BackendTask)
 import Browser.Dom
 import Browser.Events
 import Color.Manipulate
-import Date exposing (Date, Month)
+import Date exposing (Date)
 import Dict exposing (Dict)
 import Effect exposing (Effect)
 import FatalError exposing (FatalError)
@@ -15,8 +15,9 @@ import Html.Attributes
 import List.Extra
 import Pages.Url
 import PagesMsg exposing (PagesMsg)
+import Process
 import Route
-import RouteBuilder exposing (App, StatelessRoute)
+import RouteBuilder exposing (App)
 import Set exposing (Set)
 import Shared exposing (Breakpoints(..))
 import Svg exposing (Svg)
@@ -122,7 +123,7 @@ update _ _ msg model =
             )
 
         WindowResized ->
-            ( model
+            ( { model | worstTier = NoLine, topTier = NoLine }
             , if model.sortBy == Quality then
                 getElements
 
@@ -209,11 +210,14 @@ getLines result =
 getElements : Cmd Msg
 getElements =
     Cmd.batch
-        [ List.map (\name -> Browser.Dom.getElement name) topOfLowTier
-            |> Task.sequence
+        [ -- Give the DOM some time to settle before we getElements
+          Process.sleep 100
+            |> Task.andThen
+                (\() -> List.map (\name -> Browser.Dom.getElement name) topOfLowTier |> Task.sequence)
             |> Task.attempt GotWorstTierPosition
-        , List.map (\name -> Browser.Dom.getElement name) topOfTopTier
-            |> Task.sequence
+        , Process.sleep 100
+            |> Task.andThen
+                (\() -> List.map (\name -> Browser.Dom.getElement name) topOfTopTier |> Task.sequence)
             |> Task.attempt GotTopTierPosition
         ]
 
@@ -321,6 +325,9 @@ thingDate thing =
             record.releasedAt
 
         PodcastThing record ->
+            record.releasedAt
+
+        GameMakerThing record ->
             record.releasedAt
 
 
@@ -539,7 +546,7 @@ view app _ model =
                     [ Ui.spacing 8 ]
                     [ filterView model
                     , if model.sortBy == Chronological then
-                        timelineView app.data.thingsIHaveDone model
+                        timelineView app.data.thingsIHaveDone
 
                       else
                         Ui.row
@@ -565,8 +572,8 @@ view app _ model =
     }
 
 
-timelineView : Dict String Thing -> Model -> Ui.Element msg
-timelineView things model =
+timelineView : Dict String Thing -> Ui.Element msg
+timelineView things =
     let
         things2 : Dict ( Int, Int ) (List Thing)
         things2 =
@@ -583,6 +590,12 @@ timelineView things model =
                             dict
 
                         PodcastThing { releasedAt } ->
+                            Dict.update
+                                ( Date.year releasedAt, Date.monthNumber releasedAt )
+                                (\maybe -> Maybe.withDefault [] maybe |> (::) thing |> Just)
+                                dict
+
+                        GameMakerThing { releasedAt } ->
                             Dict.update
                                 ( Date.year releasedAt, Date.monthNumber releasedAt )
                                 (\maybe -> Maybe.withDefault [] maybe |> (::) thing |> Just)
@@ -628,12 +641,15 @@ timelineView things model =
                                 , columnIndex = columnIndex
                                 }
 
-                        PodcastThing { releasedAt } ->
+                        PodcastThing _ ->
+                            Nothing
+
+                        GameMakerThing _ ->
                             Nothing
                 )
                 (Dict.toList things)
     in
-    timelineViewHelper currentDate2 9 [] things2 durations model
+    timelineViewHelper currentDate2 9 [] things2 durations
 
 
 yearAndMonthToCount : Int -> Month -> Int
@@ -698,9 +714,8 @@ timelineViewHelper :
     -> List (Ui.Element msg)
     -> Dict ( Int, Int ) (List Thing)
     -> List { startedAt : Int, endedAt : Int, name : String, color : Ui.Color, columnIndex : Int }
-    -> Model
     -> Ui.Element msg
-timelineViewHelper currentDate count list thingsSorted durations model =
+timelineViewHelper currentDate count list thingsSorted durations =
     let
         month : Int
         month =
@@ -786,7 +801,6 @@ timelineViewHelper currentDate count list thingsSorted durations model =
             )
             thingsSorted
             durations
-            model
 
 
 monthToString : Int -> String
@@ -918,14 +932,16 @@ filterView model =
 thingsViewMobile : String -> Tier -> Thing -> Ui.Element Msg
 thingsViewMobile name tier thing =
     Ui.row
-        [ containerBackground
-        , Ui.borderColor containerBorder
-        , Ui.border 1
-        , Ui.rounded 4
-        , Ui.alignTop
-        , Ui.padding 4
-        , Ui.spacing 4
-        ]
+        ([ containerBackground
+         , Ui.borderColor containerBorder
+         , Ui.border 1
+         , Ui.rounded 4
+         , Ui.alignTop
+         , Ui.padding 4
+         , Ui.spacing 4
+         ]
+            ++ borderAndBackground tier
+        )
         [ Ui.image
             [ Ui.width (Ui.px 100)
             , Ui.height (Ui.px 100)
@@ -956,6 +972,7 @@ thingsViewMobile name tier thing =
         ]
 
 
+worstTierColor : Ui.Color
 worstTierColor =
     Ui.rgb 200 100 100
 
@@ -968,75 +985,82 @@ worstTierBackground =
     Color.Manipulate.weightedMix containerBackgroundColor worstTierColor 0.9
 
 
+borderAndBackground : Tier -> List (Ui.Attribute msg)
+borderAndBackground tier =
+    [ Ui.background
+        (case tier of
+            MiddleTier ->
+                containerBackgroundColor
+
+            TopTier ->
+                topTierBackground
+
+            WorstTier ->
+                worstTierBackground
+        )
+    , Ui.borderColor
+        (case tier of
+            MiddleTier ->
+                containerBorder
+
+            TopTier ->
+                Things.elmColor
+
+            WorstTier ->
+                worstTierColor
+        )
+    , Ui.Shadow.shadows
+        [ { x = 0
+          , y = 0
+          , size = 0
+          , blur = 4
+          , color =
+                (case tier of
+                    MiddleTier ->
+                        containerBorder
+
+                    TopTier ->
+                        Things.elmColor
+
+                    WorstTier ->
+                        containerBorder
+                )
+                    |> Color.Manipulate.fadeOut 0.8
+          }
+        , { x = 0
+          , y = 0
+          , size = 0
+          , blur = 2
+          , color =
+                (case tier of
+                    MiddleTier ->
+                        containerBorder
+
+                    TopTier ->
+                        Things.elmColor
+
+                    WorstTier ->
+                        worstTierColor
+                )
+                    |> Color.Manipulate.fadeOut 0.8
+          }
+        ]
+    ]
+
+
 thingsViewNotMobile : String -> Tier -> Thing -> Ui.Element Msg
 thingsViewNotMobile name tier thing =
     Ui.column
-        [ Ui.width (Ui.px Shared.tileWidth)
-        , Ui.background
-            (case tier of
-                MiddleTier ->
-                    containerBackgroundColor
-
-                TopTier ->
-                    topTierBackground
-
-                WorstTier ->
-                    worstTierBackground
-            )
-        , Ui.borderColor
-            (case tier of
-                MiddleTier ->
-                    containerBorder
-
-                TopTier ->
-                    Things.elmColor
-
-                WorstTier ->
-                    worstTierColor
-            )
-        , Ui.Shadow.shadows
-            [ { x = 0
-              , y = 0
-              , size = 0
-              , blur = 4
-              , color =
-                    (case tier of
-                        MiddleTier ->
-                            containerBorder
-
-                        TopTier ->
-                            Things.elmColor
-
-                        WorstTier ->
-                            containerBorder
-                    )
-                        |> Color.Manipulate.fadeOut 0.8
-              }
-            , { x = 0
-              , y = 0
-              , size = 0
-              , blur = 2
-              , color =
-                    (case tier of
-                        MiddleTier ->
-                            containerBorder
-
-                        TopTier ->
-                            Things.elmColor
-
-                        WorstTier ->
-                            worstTierColor
-                    )
-                        |> Color.Manipulate.fadeOut 0.8
-              }
-            ]
-        , Ui.border 1
-        , Ui.rounded 4
-        , Ui.alignTop
-        , Ui.padding 4
-        , Ui.spacing 4
-        , Ui.id name
-        ]
+        ([ Ui.width (Ui.px Shared.tileWidth)
+         , Ui.border 1
+         , Ui.rounded 4
+         , Ui.alignTop
+         , Ui.padding 4
+         , Ui.spacing 4
+         , Ui.id name
+         ]
+            ++ borderAndBackground tier
+        )
         [ Ui.el
             [ Ui.Font.bold
             , Ui.Font.size 16
