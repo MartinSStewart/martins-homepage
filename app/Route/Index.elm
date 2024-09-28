@@ -15,6 +15,7 @@ import Html.Attributes
 import List.Extra
 import Pages.Url
 import PagesMsg exposing (PagesMsg)
+import Process
 import Route
 import RouteBuilder exposing (App)
 import Set exposing (Set)
@@ -122,7 +123,7 @@ update _ _ msg model =
             )
 
         WindowResized ->
-            ( model
+            ( { model | worstTier = NoLine, topTier = NoLine }
             , if model.sortBy == Quality then
                 getElements
 
@@ -209,11 +210,14 @@ getLines result =
 getElements : Cmd Msg
 getElements =
     Cmd.batch
-        [ List.map (\name -> Browser.Dom.getElement name) topOfLowTier
-            |> Task.sequence
+        [ -- Give the DOM some time to settle before we getElements
+          Process.sleep 100
+            |> Task.andThen
+                (\() -> List.map (\name -> Browser.Dom.getElement name) topOfLowTier |> Task.sequence)
             |> Task.attempt GotWorstTierPosition
-        , List.map (\name -> Browser.Dom.getElement name) topOfTopTier
-            |> Task.sequence
+        , Process.sleep 100
+            |> Task.andThen
+                (\() -> List.map (\name -> Browser.Dom.getElement name) topOfTopTier |> Task.sequence)
             |> Task.attempt GotTopTierPosition
         ]
 
@@ -914,16 +918,18 @@ filterView model =
 
 
 thingsViewMobile : String -> Tier -> Thing -> Ui.Element Msg
-thingsViewMobile name _ thing =
+thingsViewMobile name tier thing =
     Ui.row
-        [ containerBackground
-        , Ui.borderColor containerBorder
-        , Ui.border 1
-        , Ui.rounded 4
-        , Ui.alignTop
-        , Ui.padding 4
-        , Ui.spacing 4
-        ]
+        ([ containerBackground
+         , Ui.borderColor containerBorder
+         , Ui.border 1
+         , Ui.rounded 4
+         , Ui.alignTop
+         , Ui.padding 4
+         , Ui.spacing 4
+         ]
+            ++ borderAndBackground tier
+        )
         [ Ui.image
             [ Ui.width (Ui.px 100)
             , Ui.height (Ui.px 100)
@@ -954,6 +960,7 @@ thingsViewMobile name _ thing =
         ]
 
 
+worstTierColor : Ui.Color
 worstTierColor =
     Ui.rgb 200 100 100
 
@@ -966,75 +973,82 @@ worstTierBackground =
     Color.Manipulate.weightedMix containerBackgroundColor worstTierColor 0.9
 
 
+borderAndBackground : Tier -> List (Ui.Attribute msg)
+borderAndBackground tier =
+    [ Ui.background
+        (case tier of
+            MiddleTier ->
+                containerBackgroundColor
+
+            TopTier ->
+                topTierBackground
+
+            WorstTier ->
+                worstTierBackground
+        )
+    , Ui.borderColor
+        (case tier of
+            MiddleTier ->
+                containerBorder
+
+            TopTier ->
+                Things.elmColor
+
+            WorstTier ->
+                worstTierColor
+        )
+    , Ui.Shadow.shadows
+        [ { x = 0
+          , y = 0
+          , size = 0
+          , blur = 4
+          , color =
+                (case tier of
+                    MiddleTier ->
+                        containerBorder
+
+                    TopTier ->
+                        Things.elmColor
+
+                    WorstTier ->
+                        containerBorder
+                )
+                    |> Color.Manipulate.fadeOut 0.8
+          }
+        , { x = 0
+          , y = 0
+          , size = 0
+          , blur = 2
+          , color =
+                (case tier of
+                    MiddleTier ->
+                        containerBorder
+
+                    TopTier ->
+                        Things.elmColor
+
+                    WorstTier ->
+                        worstTierColor
+                )
+                    |> Color.Manipulate.fadeOut 0.8
+          }
+        ]
+    ]
+
+
 thingsViewNotMobile : String -> Tier -> Thing -> Ui.Element Msg
 thingsViewNotMobile name tier thing =
     Ui.column
-        [ Ui.width (Ui.px Shared.tileWidth)
-        , Ui.background
-            (case tier of
-                MiddleTier ->
-                    containerBackgroundColor
-
-                TopTier ->
-                    topTierBackground
-
-                WorstTier ->
-                    worstTierBackground
-            )
-        , Ui.borderColor
-            (case tier of
-                MiddleTier ->
-                    containerBorder
-
-                TopTier ->
-                    Things.elmColor
-
-                WorstTier ->
-                    worstTierColor
-            )
-        , Ui.Shadow.shadows
-            [ { x = 0
-              , y = 0
-              , size = 0
-              , blur = 4
-              , color =
-                    (case tier of
-                        MiddleTier ->
-                            containerBorder
-
-                        TopTier ->
-                            Things.elmColor
-
-                        WorstTier ->
-                            containerBorder
-                    )
-                        |> Color.Manipulate.fadeOut 0.8
-              }
-            , { x = 0
-              , y = 0
-              , size = 0
-              , blur = 2
-              , color =
-                    (case tier of
-                        MiddleTier ->
-                            containerBorder
-
-                        TopTier ->
-                            Things.elmColor
-
-                        WorstTier ->
-                            worstTierColor
-                    )
-                        |> Color.Manipulate.fadeOut 0.8
-              }
-            ]
-        , Ui.border 1
-        , Ui.rounded 4
-        , Ui.alignTop
-        , Ui.padding 4
-        , Ui.spacing 4
-        , Ui.id name
-        ]
+        ([ Ui.width (Ui.px Shared.tileWidth)
+         , Ui.border 1
+         , Ui.rounded 4
+         , Ui.alignTop
+         , Ui.padding 4
+         , Ui.spacing 4
+         , Ui.id name
+         ]
+            ++ borderAndBackground tier
+        )
         [ Ui.el
             [ Ui.Font.bold
             , Ui.Font.size 16

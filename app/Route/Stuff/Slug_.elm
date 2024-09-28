@@ -192,7 +192,7 @@ title thing =
                 Nothing ->
                     Ui.el [ Ui.Font.size 36 ] (Ui.text thing.name)
             , Ui.row
-                [ Ui.spacing 16 ]
+                [ Ui.spacing 16, Ui.Font.size 14 ]
                 [ Ui.text
                     ("Page created at "
                         ++ Date.toIsoString thing.pageCreatedAt

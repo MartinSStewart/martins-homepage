@@ -22,6 +22,7 @@ type Formatting
     | LetterList (List Inline) (List Formatting)
     | Group (List Formatting)
     | Section String (List Formatting)
+    | Image String (List Inline)
 
 
 type Inline
@@ -123,6 +124,9 @@ checkFormattingHelper formatting =
 
         Section string content ->
             checkFormatting content
+
+        Image url altText ->
+            Ok ()
 
 
 checkInlineFormatting : Inline -> Result String ()
@@ -356,6 +360,11 @@ viewHelper onPressAltText depth model item =
                     Html.div
                         []
                         (Html.h4 [] [ Html.text title ] :: content)
+
+        Image url altText ->
+            Html.img
+                [ Html.Attributes.src url, Html.Attributes.style "width" "100%" ]
+                (List.map (inlineView onPressAltText model) altText)
 
 
 inlineView : (String -> msg) -> Model a -> Inline -> Html msg
