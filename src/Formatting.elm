@@ -23,6 +23,7 @@ type Formatting
     | Group (List Formatting)
     | Section String (List Formatting)
     | Image String (List Inline)
+    | Video String
 
 
 type Inline
@@ -127,7 +128,18 @@ checkFormattingHelper formatting =
             checkFormatting content
 
         Image url altText ->
-            Ok ()
+            if String.contains ")" url || String.contains "://" url then
+                Err (url ++ " is an invalid url")
+
+            else
+                Ok ()
+
+        Video url ->
+            if String.contains ")" url || String.contains "://" url then
+                Err (url ++ " is an invalid url")
+
+            else
+                Ok ()
 
 
 checkInlineFormatting : Inline -> Result String ()
@@ -381,6 +393,14 @@ viewHelper onPressAltText depth model item =
                     ]
                     (List.map (inlineView onPressAltText model) altText)
                 ]
+
+        Video url ->
+            Html.video
+                [ Html.Attributes.src ("https://" ++ url)
+                , Html.Attributes.style "max-width" "100%"
+                , Html.Attributes.controls True
+                ]
+                []
 
 
 inlineView : (String -> msg) -> Model a -> Inline -> Html msg

@@ -964,10 +964,13 @@ thingsIHaveDone =
       , { name = "Secret santa game"
         , website = Nothing
         , tags = [ Game, GameMaker ]
-        , description = [ Paragraph [ Text "I participated in a secret santa event where everyone made a little game for another randomly chosen participant. This is the game I made and in my opinion it has by far the highest fun-to-effort ratio of anything I've ever made." ] ]
+        , description =
+            [ Paragraph [ Text "I participated in a secret santa event where everyone made a little game for another randomly chosen participant. This is the game I made. In my opinion it has by far the highest fun-to-effort ratio of anything I've ever made." ]
+            , Video "res.cloudinary.com/dqqkfcvf6/video/upload/f_auto:video,q_auto/v1/martins-homepage/xdxibprfxfthcrtmjtiu"
+            ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/game-maker-preview.png"
+        , previewImage = "/secret-santa-game/santaHatIconHighRes.png"
         , thingType =
             GameMakerThing
                 { releasedAt = date 2015 Mar 7
