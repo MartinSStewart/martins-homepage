@@ -942,13 +942,13 @@ thingsIHaveDone =
         , description =
             [ Paragraph [ Text "A game I made for the 5th Game Maker Community game jam (aka GMC Jam). Participants had 72 hours to make a game themed around the word \"facade\"." ]
             , Paragraph [ Text "I made a game where you switch between controlling a black and a white character. White, and white objects, can move through the black space and Black and black objects can move through the white space. The goal is to get both of them to the level exit (the gradient seen on the right in the screenshot below)." ]
-            , Image "/break-the-facade/screen1.png" [ Text "Black is pushing a block into place so White can jump out with the spring" ]
+            , Image "/break-the-facade/screen1.png" [ Text "Black is pushing a crate into place so White can jump out with the spring" ]
             , Paragraph [ Link "Last time I participated in the GMC Jam" (Stuff__Slug_ { slug = "sanctum" }), Text " I got 16th place, but this time I tied for 1st! As a result, I won a ", AltText "Mr.\u{00A0}Karoshi tshirt" "(Mr.\u{00A0}Karoshi is a rather grim puzzle game where you help an office worker kill themselves)", Text ", a coffee mug with YoYo Games branding, and free copy of Game Maker Studio pro!" ]
 
             --, Image "/break-the-facade/screen0.png" [ Quote "One man's wall is another man's way...", Text " this probably sounded poetic when I was a teenager" ]
             , Image "/break-the-facade/mr-karoshi.jpg" [ Text "The Mr.\u{00A0}Karoshi t-shirt I won" ]
             , Paragraph [ Text "I think my favorite thing to come out of that years GMC Jam was a Youtuber named raocow deciding to play every game ", AltText "made for it" "(I believe that was the only GMC Jam he did. I can't find the source but I think he said it was too much work playing 60 or so mostly bad video games)", Text ". ", ExternalLink "Here he is playing Break the Facade" "www.youtube.com/watch?v=7ITH8CZXkbk", Text ". Judging by his comments towards the end of the video and the video description being ", Quote "I've oft repeated how much I like this general sort of both game and looks, so it'd be useless to repeat, even if I pretty much just did.", Text " I think it's safe to say he enjoyed playing it!" ]
-            , Image "/break-the-facade/zig-winna-banner.png" [ Text "Someone drew banners for the top 3 places (or perhaps more, not sure). Here's mine! And yes, I picked Ziggler1 as my username on the GMC forums." ]
+            , Image "/break-the-facade/zig-winna-banner.png" [ Text "Someone drew banners for the top 3 places (or perhaps more, not sure). Here's mine! And yes, I picked Ziggler1 as my username on the GMC forums. Thanks past me." ]
             ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
