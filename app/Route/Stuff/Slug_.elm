@@ -197,7 +197,9 @@ view app _ model =
                 (\label ->
                     case label of
                         Mobile ->
-                            { x = Ui.Responsive.value 8, y = Ui.Responsive.value 16 }
+                            { x = Ui.Responsive.value Formatting.sidePaddingMobile
+                            , y = Ui.Responsive.value 16
+                            }
 
                         NotMobile ->
                             { x = Ui.Responsive.value 16, y = Ui.Responsive.value 16 }

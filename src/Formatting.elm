@@ -1,4 +1,4 @@
-module Formatting exposing (Formatting(..), Inline(..), Model, checkFormatting, downloadLink, externalLink, view)
+module Formatting exposing (Formatting(..), Inline(..), Model, checkFormatting, downloadLink, externalLink, sidePaddingMobile, view)
 
 import Html exposing (Html)
 import Html.Attributes
@@ -404,11 +404,21 @@ viewHelper msgConfig depth model item =
         Video url ->
             Html.video
                 [ Html.Attributes.src ("https://" ++ url)
-                , Html.Attributes.style "max-width" "100%"
+                , Html.Attributes.style
+                    "max-width"
+                    ("calc(100% + var(--ui-bp-0) * " ++ String.fromInt (sidePaddingMobile * 2) ++ "px)")
+                , Html.Attributes.style
+                    "margin-left"
+                    ("calc(var(--ui-bp-0) * -" ++ String.fromInt sidePaddingMobile ++ "px)")
                 , Html.Attributes.controls True
                 , Html.Events.on "play" (Json.Decode.succeed msgConfig.startedVideo)
                 ]
                 []
+
+
+sidePaddingMobile : number
+sidePaddingMobile =
+    8
 
 
 inlineView : MsgConfig msg -> Model a -> Inline -> Html msg
