@@ -1054,22 +1054,41 @@ thingsViewNotMobile name tier thing =
         ([ Ui.width (Ui.px Shared.tileWidth)
          , Ui.border 1
          , Ui.rounded 4
+         , Ui.clip
          , Ui.alignTop
-         , Ui.padding 4
-         , Ui.spacing 4
          , Ui.id name
+         , Ui.el
+            [ Ui.Font.bold
+            , Ui.Font.size
+                (if String.length thing.name < 23 then
+                    16
+
+                 else
+                    14
+                )
+            , Ui.Font.lineHeight 1
+            , Ui.paddingWith { left = 4, right = 4, top = 1, bottom = 3 }
+            , Html.Attributes.attribute "elm-pages:prefetch" "" |> Ui.htmlAttribute
+            , Ui.link (Route.toString (Route.Stuff__Slug_ { slug = name }))
+            , Ui.opacity 0.85
+            , Ui.background
+                (case tier of
+                    MiddleTier ->
+                        containerBackgroundColor
+
+                    TopTier ->
+                        topTierBackground
+
+                    WorstTier ->
+                        worstTierBackground
+                )
+            ]
+            (Ui.text thing.name)
+            |> Ui.inFront
          ]
             ++ borderAndBackground tier
         )
-        [ Ui.el
-            [ Ui.Font.bold
-            , Ui.Font.size 16
-            , Ui.Font.lineHeight 1
-            , Html.Attributes.attribute "elm-pages:prefetch" "" |> Ui.htmlAttribute
-            , Ui.link (Route.toString (Route.Stuff__Slug_ { slug = name }))
-            ]
-            (Ui.text thing.name)
-        , Ui.image
+        [ Ui.image
             [ Html.Attributes.attribute "elm-pages:prefetch" "" |> Ui.htmlAttribute
             , Ui.link (Route.toString (Route.Stuff__Slug_ { slug = name }))
             ]
@@ -1079,8 +1098,21 @@ thingsViewNotMobile name tier thing =
             }
         , Ui.row
             [ Ui.wrap
-            , Ui.spacing 4
+            , Ui.spacing 2
             , Ui.contentTop
+            , Ui.paddingWith { left = 3, right = 3, top = 4, bottom = 0 }
+            , Ui.move { x = 0, y = -4, z = 0 }
+            , Ui.background
+                (case tier of
+                    MiddleTier ->
+                        containerBackgroundColor
+
+                    TopTier ->
+                        topTierBackground
+
+                    WorstTier ->
+                        worstTierBackground
+                )
             ]
             (List.map tagView thing.tags)
         ]
@@ -1095,7 +1127,7 @@ tagView tag =
     Ui.el
         [ Ui.background color
         , Ui.rounded 16
-        , Ui.paddingXY 8 2
+        , Ui.paddingWith { left = 6, right = 6, top = 0, bottom = 2 }
         , Ui.Font.size 14
         , Ui.Font.color (Ui.rgb 255 255 255)
         , Ui.Font.noWrap

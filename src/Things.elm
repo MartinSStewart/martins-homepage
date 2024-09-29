@@ -150,7 +150,7 @@ thingsIHaveDone =
         , description = [ Paragraph [ Text "A game I've been working on, inspired by an old children's game called Lego Loco" ] ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/town-collab/icon.webp"
         , thingType =
             OtherThing
                 { releasedAt = date 2023 Feb 11
@@ -165,7 +165,7 @@ thingsIHaveDone =
         , description = [ Paragraph [ Text "An infinite canvas that people can draw ascii art on together. I wrote an ", ExternalLink "announcement post" "discourse.elm-lang.org/t/ascii-collab-draw-ascii-art-together-on-an-infinite-canvas/6273", Text " and a ", ExternalLink "follow up post" "discourse.elm-lang.org/t/ascii-collab-progress-update/7019", Text " about it." ] ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/ascii-collab/preview.png"
         , thingType =
             OtherThing
                 { releasedAt = date 2020 Sep 12
@@ -180,7 +180,7 @@ thingsIHaveDone =
         , description = [ Paragraph [ ExternalLink "Announcement post" "discourse.elm-lang.org/t/i-made-a-meetup-com-clone/7480" ] ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/meetdown/logo.png"
         , thingType =
             OtherThing
                 { releasedAt = date 2021 Jun 27
@@ -241,7 +241,7 @@ thingsIHaveDone =
         , description = [ Paragraph [ ExternalLink "Announcement post" "discourse.elm-lang.org/t/state-of-elm-2022/8284", Text " and ", ExternalLink "results announcement" "discourse.elm-lang.org/t/state-of-elm-survey-results/8362", Text "." ] ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/elm-package-preview.png"
         , thingType =
             OtherThing
                 { releasedAt = date 2022 May 1
@@ -396,7 +396,7 @@ thingsIHaveDone =
             ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/elm-map/preview.png"
         , thingType =
             OtherThing
                 { releasedAt = date 2023 May 17
@@ -728,7 +728,7 @@ thingsIHaveDone =
         , description = [ Paragraph [ ExternalLink "Discourse post" "discourse.elm-lang.org/t/using-lamdera-professionally/9142" ] ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/realia/logo.svg"
         , thingType =
             JobThing
                 { startedAt = date 2021 Aug 18
@@ -777,7 +777,7 @@ thingsIHaveDone =
         , description = []
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/profile.png"
         , thingType =
             OtherThing
                 { releasedAt = websiteReleasedAt
