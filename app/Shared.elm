@@ -143,7 +143,7 @@ pagePadding =
 
 tileWidth : number
 tileWidth =
-    190
+    180
 
 
 tileSpacing : number

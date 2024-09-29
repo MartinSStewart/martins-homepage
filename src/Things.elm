@@ -2,6 +2,7 @@ module Things exposing
     ( Tag(..)
     , Thing
     , ThingType(..)
+    , allTags
     , csharpColor
     , elmColor
     , gameMakerColor
@@ -1396,6 +1397,24 @@ type Tag
     | FSharp
     | Javascript
     | GameJam
+
+
+allTags : List Tag
+allTags =
+    [ Elm
+    , ElmPackage
+    , ElmPages
+    , Game
+    , Lamdera
+    , Podcast
+    , GameMaker
+    , Presentation
+    , Job
+    , CSharp
+    , FSharp
+    , Javascript
+    , GameJam
+    ]
 
 
 type alias Thing =

@@ -35,12 +35,11 @@ import View exposing (View)
 
 
 type alias Model =
-    { sortBy : SortBy, filter : Array Tag, worstTier : Line, topTier : Line }
+    { sortBy : SortBy, filter : Set String, worstTier : Line, topTier : Line }
 
 
 type Msg
-    = PressedAddTag Tag
-    | PressedRemoveTag Tag
+    = ToggledTag Tag Bool
     | PressedSortBy SortBy
     | GotWorstTierPosition (Result Browser.Dom.Error (List Browser.Dom.Element))
     | GotTopTierPosition (Result Browser.Dom.Error (List Browser.Dom.Element))
@@ -89,7 +88,7 @@ route =
 
 init : App data action routeParams -> Shared.Model -> ( Model, Effect Msg )
 init _ _ =
-    ( { sortBy = Quality, filter = Array.empty, worstTier = NoLine, topTier = NoLine }, getElements )
+    ( { sortBy = Quality, filter = Set.empty, worstTier = NoLine, topTier = NoLine }, getElements )
 
 
 type Line
@@ -107,11 +106,17 @@ type Tier
 update : App Data ActionData RouteParams -> Shared.Model -> Msg -> Model -> ( Model, Effect Msg )
 update _ _ msg model =
     case msg of
-        PressedAddTag tag ->
-            ( { model | filter = Array.filter (\a -> a /= tag) model.filter |> Array.push tag }, Cmd.none )
+        ToggledTag tag isChecked ->
+            ( { model
+                | filter =
+                    if isChecked then
+                        Set.insert (Things.tagData tag).text model.filter
 
-        PressedRemoveTag tag ->
-            ( { model | filter = Array.filter (\a -> a /= tag) model.filter }, Cmd.none )
+                    else
+                        Set.remove (Things.tagData tag).text model.filter
+              }
+            , Cmd.none
+            )
 
         PressedSortBy sortBy ->
             ( { model | sortBy = sortBy }
@@ -459,13 +464,6 @@ view app _ model =
                 thingsDone1
                 worstTier
 
-        filterSet : Set String
-        filterSet =
-            List.map
-                (\tag -> Things.tagData tag |> .text)
-                (Array.toList model.filter)
-                |> Set.fromList
-
         thingsSorted : List ( String, ( Tier, Thing ) )
         thingsSorted =
             case model.sortBy of
@@ -491,19 +489,15 @@ view app _ model =
                         |> List.sortWith (\( _, ( _, a ) ) ( _, ( _, b ) ) -> Date.compare (thingDate b) (thingDate a))
 
         filterThings viewFunc ( name, ( tier, thing ) ) =
-            if Set.isEmpty filterSet then
+            if Set.isEmpty model.filter then
                 viewFunc name tier thing |> Just
 
             else if
-                Array.toList model.filter
+                Set.toList model.filter
                     |> List.all
                         (\tag ->
-                            let
-                                tagText =
-                                    Things.tagData tag |> .text
-                            in
                             List.any
-                                (\tag2 -> Things.tagData tag2 |> .text |> (==) tagText)
+                                (\tag2 -> Things.tagData tag2 |> .text |> (==) tag)
                                 thing.tags
                         )
             then
@@ -912,20 +906,14 @@ sortByView model =
 
 filterView : Model -> Ui.Element Msg
 filterView model =
-    Ui.row
+    Ui.column
         [ Ui.spacingWith { horizontal = 16, vertical = 8 }, Ui.wrap ]
         [ sortByView model
-        , if Array.isEmpty model.filter then
-            Ui.none
-
-          else
-            Ui.row
-                [ Ui.spacing 4, Ui.widthMin 300 ]
-                [ Ui.el [ Ui.Font.size 14, Ui.Font.bold, Ui.width Ui.shrink ] (Ui.text "Filter by")
-                , Array.toList model.filter
-                    |> List.map filterTagView
-                    |> Ui.row [ Ui.spacing 4 ]
-                ]
+        , Ui.row
+            [ Ui.spacing 4, Ui.widthMin 300, Ui.wrap ]
+            [ Ui.el [ Ui.Font.size 14, Ui.Font.bold, Ui.width Ui.shrink ] (Ui.text "Filter by")
+            , List.map (filterTagView model.filter) Things.allTags |> Ui.row [ Ui.spacing 4 ]
+            ]
         ]
 
 
@@ -1054,13 +1042,14 @@ thingsViewNotMobile name tier thing =
         ([ Ui.width (Ui.px Shared.tileWidth)
          , Ui.border 1
          , Ui.rounded 4
+         , Ui.padding 3
          , Ui.clip
          , Ui.alignTop
          , Ui.id name
          , Ui.el
             [ Ui.Font.bold
             , Ui.Font.size
-                (if String.length thing.name < 23 then
+                (if String.length thing.name < 22 then
                     16
 
                  else
@@ -1096,25 +1085,26 @@ thingsViewNotMobile name tier thing =
             , description = "Preview image for " ++ thing.name
             , onLoad = Nothing
             }
-        , Ui.row
-            [ Ui.wrap
-            , Ui.spacing 2
-            , Ui.contentTop
-            , Ui.paddingWith { left = 3, right = 3, top = 4, bottom = 0 }
-            , Ui.move { x = 0, y = -4, z = 0 }
-            , Ui.background
-                (case tier of
-                    MiddleTier ->
-                        containerBackgroundColor
 
-                    TopTier ->
-                        topTierBackground
-
-                    WorstTier ->
-                        worstTierBackground
-                )
-            ]
-            (List.map tagView thing.tags)
+        --, Ui.row
+        --    [ Ui.wrap
+        --    , Ui.spacing 2
+        --    , Ui.contentTop
+        --    , Ui.paddingWith { left = 3, right = 3, top = 4, bottom = 0 }
+        --    , Ui.move { x = 0, y = -4, z = 0 }
+        --    , Ui.background
+        --        (case tier of
+        --            MiddleTier ->
+        --                containerBackgroundColor
+        --
+        --            TopTier ->
+        --                topTierBackground
+        --
+        --            WorstTier ->
+        --                worstTierBackground
+        --        )
+        --    ]
+        --    (List.map tagView thing.tags)
         ]
 
 
@@ -1132,16 +1122,18 @@ tagView tag =
         , Ui.Font.color (Ui.rgb 255 255 255)
         , Ui.Font.noWrap
         , Ui.width Ui.shrink
-        , Ui.Input.button (PressedAddTag tag)
         ]
         (Ui.text text)
 
 
-filterTagView : Tag -> Ui.Element Msg
-filterTagView tag =
+filterTagView : Set String -> Tag -> Ui.Element Msg
+filterTagView selectedTags tag =
     let
         { text, color } =
             Things.tagData tag
+
+        { element, id } =
+            Ui.Input.label text [] (Ui.text text)
     in
     Ui.row
         [ Ui.background color
@@ -1151,7 +1143,14 @@ filterTagView tag =
         , Ui.Font.color (Ui.rgb 255 255 255)
         , Ui.Font.noWrap
         , Ui.width Ui.shrink
-        , Ui.Input.button (PressedRemoveTag tag)
-        , Ui.spacing 2
+        , Ui.spacing 8
         ]
-        [ Ui.text text, Ui.el [ Ui.Font.bold, Ui.move { x = 0, y = -1, z = 0 } ] (Ui.text "×") ]
+        [ Ui.Input.checkbox
+            []
+            { onChange = ToggledTag tag
+            , icon = Nothing
+            , checked = Set.member text selectedTags
+            , label = id
+            }
+        , element
+        ]
