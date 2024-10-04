@@ -906,15 +906,11 @@ filterView model =
     Ui.row
         [ Ui.spacingWith { horizontal = 16, vertical = 8 }, Ui.wrap ]
         [ sortByView model
-        , if True then
-            Ui.none
-
-          else
-            Ui.row
-                [ Ui.spacing 4, Ui.widthMin 300 ]
-                [ Ui.el [ Ui.Font.size 14, Ui.Font.bold, Ui.width Ui.shrink ] (Ui.text "Filter by")
-                , List.map (filterTagView model.filter) Things.allTags |> Ui.row [ Ui.spacing 4 ]
-                ]
+        , Ui.row
+            [ Ui.spacing 4, Ui.widthMin 300 ]
+            [ Ui.el [ Ui.Font.size 14, Ui.Font.bold, Ui.width Ui.shrink ] (Ui.text "Filter by")
+            , List.map (filterTagView model.filter) Things.allTags |> Ui.row [ Ui.spacing 4 ]
+            ]
         ]
 
 
