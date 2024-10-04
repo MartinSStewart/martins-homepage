@@ -250,7 +250,7 @@ title thing =
                 [ Ui.wrap, Ui.spacing 16, Ui.Font.size 14 ]
                 [ case thing.thingType of
                     OtherThing { releasedAt } ->
-                        "Released at " ++ Date.toIsoString releasedAt |> Ui.text
+                        "Released on " ++ Date.toIsoString releasedAt |> Ui.text
 
                     JobThing { startedAt, endedAt, elmPercentage } ->
                         Ui.Prose.paragraph
@@ -275,10 +275,10 @@ title thing =
                             )
 
                     PodcastThing { releasedAt } ->
-                        "Released at " ++ Date.toIsoString releasedAt |> Ui.text
+                        "Released on " ++ Date.toIsoString releasedAt |> Ui.text
 
                     GameMakerThing { releasedAt } ->
-                        Ui.text ("Released at " ++ Date.toIsoString releasedAt)
+                        Ui.text ("Released on " ++ Date.toIsoString releasedAt)
                 , case thing.thingType of
                     OtherThing other ->
                         case other.repo of

@@ -61,7 +61,7 @@ tagData tag =
             { text = "elm-pages", color = Ui.rgb 24 151 218, tooltip = "Anything created with Elm or related to the Elm community" }
 
         Javascript ->
-            { text = "JavaScript", color = Ui.rgb 217 197 70, tooltip = "Made using JavaScript" }
+            { text = "JS", color = Ui.rgb 217 197 70, tooltip = "Made using JavaScript" }
 
 
 gameMakerColor : Ui.Color
@@ -163,7 +163,25 @@ thingsIHaveDone =
       , { name = "ascii-collab"
         , website = Just "ascii-collab.app/"
         , tags = [ Elm, Game, Lamdera ]
-        , description = [ Paragraph [ Text "An infinite canvas that people can draw ascii art on together. I wrote an ", ExternalLink "announcement post" "discourse.elm-lang.org/t/ascii-collab-draw-ascii-art-together-on-an-infinite-canvas/6273", Text " and a ", ExternalLink "follow up post" "discourse.elm-lang.org/t/ascii-collab-progress-update/7019", Text " about it." ] ]
+        , description =
+            [ Paragraph [ Text "An infinite canvas that people can draw ascii art on together. I wrote an ", ExternalLink "announcement post" "discourse.elm-lang.org/t/ascii-collab-draw-ascii-art-together-on-an-infinite-canvas/6273", Text " and a ", ExternalLink "follow up post" "discourse.elm-lang.org/t/ascii-collab-progress-update/7019", Text " about it. I also showed it off on ", ExternalLink "Hacker News" "news.ycombinator.com/item?id=29572662", Text " and then had to spend an hour removing all of the vandalism left behind (but at least people liked it)." ]
+            , Section
+                "Backstory"
+                [ Paragraph [ Text "Back when I was active on the Game Maker Community forums, someone had the idea that we should hop onto ", ExternalLink "www.yourworldoftext.com" "yourworldoftext.com", Text " and draw some ascii art together. We had fun for a day or so but after that other people showed up and started vandalizing everything. Such is life on the internet." ]
+                , Image "/ascii-collab/gmc.png" [ Text "I anticipated there would be griefers so I took screenshots of most of what we drew" ]
+                , Paragraph [ Text "Years later I thought it would be fun to try drawing some ascii art again. I felt that I was reasonably good at it but I wanted to use something more sophisticated than yourworldoftext.com (which at least at the time, had no moderation tools and was missing basic features like undo/redo)." ]
+                , Paragraph [ Text "Naturally the thing to do then was write my own multiplayer ascii drawing webapp! And fortunately I was using Lamdera at this point so I had a convenient way to implement both the frontend and backend purely (heh) in Elm." ]
+                ]
+            , Section
+                "Ascii art (lots of it)"
+                [ Paragraph [ Text "There is ", Bold "a lot", Text " of quality ascii art has accumulated over the years this site has been running. The rest of this article is going to showcase some of the cool stuff other people and me have drawn/made." ]
+                , Paragraph [ Text "Real quick though, maybe some of you are thinking, ", Quote "Lots of quality ascii art? Easy! Copy-paste it from elsewhere!", Text " And yes, some ascii art is copied from elsewhere (I ask people to prefer drawing original stuff but I don't strictly enforce it)." ]
+                , Paragraph [ Text "I'd say 80% of it is original art however! How do I know that? Ascii-collab lets you color code changes people have made. Using it we can tell, this is copied due to the unnaturally placed space characters." ]
+                , Image "/ascii-collab/copied.png" [ Text "A chess knight" ]
+                , Paragraph [ Text "And this is ", AltText "original work." " There are cases that are ambiguous. If there's a solid colored rectangle, that could be original art that has then been moved with the box selection tool." ]
+                , Image "/ascii-collab/legit.png" [ Text "A large cat enjoying some ramen probably" ]
+                ]
+            ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/ascii-collab/preview.png"
@@ -1401,19 +1419,19 @@ type Tag
 
 allTags : List Tag
 allTags =
-    [ Elm
-    , ElmPackage
+    [ ElmPackage
     , ElmPages
-    , Game
-    , Lamdera
-    , Podcast
-    , GameMaker
-    , Presentation
-    , Job
-    , CSharp
+    , Elm
     , FSharp
+    , Game
+    , Presentation
     , Javascript
+    , Job
+    , Podcast
     , GameJam
+    , GameMaker
+    , CSharp
+    , Lamdera
     ]
 
 

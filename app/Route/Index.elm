@@ -537,7 +537,7 @@ view app _ model =
                     [ Ui.Font.size 32, Ui.Font.bold, Ui.Font.lineHeight 1.1 ]
                     (Ui.text "Stuff I've done that I don't want to forget")
                 , Ui.column
-                    [ Ui.spacing 8 ]
+                    [ Ui.spacing 16 ]
                     [ filterView model
                     , if model.sortBy == Chronological then
                         timelineView app.data.thingsIHaveDone
@@ -910,9 +910,9 @@ filterView model =
         [ Ui.spacingWith { horizontal = 16, vertical = 8 }, Ui.wrap ]
         [ sortByView model
         , Ui.row
-            [ Ui.spacing 4, Ui.widthMin 300, Ui.wrap ]
+            [ Ui.spacing 4 ]
             [ Ui.el [ Ui.Font.size 14, Ui.Font.bold, Ui.width Ui.shrink ] (Ui.text "Filter by")
-            , List.map (filterTagView model.filter) Things.allTags |> Ui.row [ Ui.spacing 4 ]
+            , List.map (filterTagView model.filter) Things.allTags |> Ui.row [ Ui.spacing 4, Ui.wrap ]
             ]
         ]
 
@@ -927,14 +927,14 @@ thingsViewMobile name tier thing =
          , Ui.alignTop
          , Ui.padding 4
          , Ui.spacing 4
+         , Html.Attributes.attribute "elm-pages:prefetch" "" |> Ui.htmlAttribute
+         , Ui.link (Route.toString (Route.Stuff__Slug_ { slug = name }))
          ]
             ++ borderAndBackground tier
         )
         [ Ui.image
             [ Ui.width (Ui.px 100)
             , Ui.height (Ui.px 100)
-            , Html.Attributes.attribute "elm-pages:prefetch" "" |> Ui.htmlAttribute
-            , Ui.link (Route.toString (Route.Stuff__Slug_ { slug = name }))
             ]
             { source = thing.previewImage
             , description = "Preview image for " ++ thing.name
@@ -946,8 +946,6 @@ thingsViewMobile name tier thing =
                 [ Ui.Font.bold
                 , Ui.Font.size 20
                 , Ui.Font.lineHeight 1
-                , Html.Attributes.attribute "elm-pages:prefetch" "" |> Ui.htmlAttribute
-                , Ui.link (Route.toString (Route.Stuff__Slug_ { slug = name }))
                 ]
                 (Ui.text thing.name)
             , Ui.row
@@ -1038,7 +1036,7 @@ borderAndBackground tier =
 
 thingsViewNotMobile : String -> Tier -> Thing -> Ui.Element Msg
 thingsViewNotMobile name tier thing =
-    Ui.column
+    Ui.el
         ([ Ui.width (Ui.px Shared.tileWidth)
          , Ui.border 1
          , Ui.rounded 4
@@ -1077,7 +1075,7 @@ thingsViewNotMobile name tier thing =
          ]
             ++ borderAndBackground tier
         )
-        [ Ui.image
+        (Ui.image
             [ Html.Attributes.attribute "elm-pages:prefetch" "" |> Ui.htmlAttribute
             , Ui.link (Route.toString (Route.Stuff__Slug_ { slug = name }))
             ]
@@ -1085,27 +1083,7 @@ thingsViewNotMobile name tier thing =
             , description = "Preview image for " ++ thing.name
             , onLoad = Nothing
             }
-
-        --, Ui.row
-        --    [ Ui.wrap
-        --    , Ui.spacing 2
-        --    , Ui.contentTop
-        --    , Ui.paddingWith { left = 3, right = 3, top = 4, bottom = 0 }
-        --    , Ui.move { x = 0, y = -4, z = 0 }
-        --    , Ui.background
-        --        (case tier of
-        --            MiddleTier ->
-        --                containerBackgroundColor
-        --
-        --            TopTier ->
-        --                topTierBackground
-        --
-        --            WorstTier ->
-        --                worstTierBackground
-        --        )
-        --    ]
-        --    (List.map tagView thing.tags)
-        ]
+        )
 
 
 tagView : Tag -> Ui.Element Msg
@@ -1116,7 +1094,7 @@ tagView tag =
     in
     Ui.el
         [ Ui.background color
-        , Ui.rounded 16
+        , Ui.rounded 8
         , Ui.paddingWith { left = 6, right = 6, top = 0, bottom = 2 }
         , Ui.Font.size 14
         , Ui.Font.color (Ui.rgb 255 255 255)
@@ -1126,6 +1104,17 @@ tagView tag =
         (Ui.text text)
 
 
+tagCircleView : Tag -> Ui.Element Msg
+tagCircleView tag =
+    let
+        { color } =
+            Things.tagData tag
+    in
+    Ui.el
+        [ Ui.background color, Ui.rounded 8, Ui.width (Ui.px 16), Ui.height (Ui.px 16) ]
+        Ui.none
+
+
 filterTagView : Set String -> Tag -> Ui.Element Msg
 filterTagView selectedTags tag =
     let
@@ -1133,17 +1122,17 @@ filterTagView selectedTags tag =
             Things.tagData tag
 
         { element, id } =
-            Ui.Input.label text [] (Ui.text text)
+            Ui.Input.label ("id_" ++ text) [] (Ui.text text)
     in
     Ui.row
         [ Ui.background color
-        , Ui.rounded 16
-        , Ui.paddingXY 8 2
+        , Ui.rounded 8
+        , Ui.paddingXY 6 2
         , Ui.Font.size 14
         , Ui.Font.color (Ui.rgb 255 255 255)
         , Ui.Font.noWrap
         , Ui.width Ui.shrink
-        , Ui.spacing 8
+        , Ui.spacing 4
         ]
         [ Ui.Input.checkbox
             []
