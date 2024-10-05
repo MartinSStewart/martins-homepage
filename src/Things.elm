@@ -88,8 +88,8 @@ type alias TagData =
     { text : String, color : Ui.Color, tooltip : String }
 
 
-elmPackage : String -> String -> List Formatting -> Date -> Date -> ( String, Thing )
-elmPackage user packageName description lastUpdated releasedAt =
+elmPackage : String -> String -> List Formatting -> Date -> Date -> String -> ( String, Thing )
+elmPackage user packageName description lastUpdated releasedAt previewText =
     ( packageName
     , { name = packageName
       , website =
@@ -104,6 +104,7 @@ elmPackage user packageName description lastUpdated releasedAt =
       , pageLastUpdated = lastUpdated
       , pageCreatedAt = lastUpdated
       , previewImage = "/elm-package-preview.png"
+      , previewText = previewText
       , thingType =
             OtherThing
                 { releasedAt = releasedAt
@@ -113,8 +114,8 @@ elmPackage user packageName description lastUpdated releasedAt =
     )
 
 
-lamderaPackage : String -> List Formatting -> Date -> Date -> ( String, Thing )
-lamderaPackage packageName description lastUpdated releasedAt =
+lamderaPackage : String -> List Formatting -> Date -> Date -> String -> ( String, Thing )
+lamderaPackage packageName description lastUpdated releasedAt previewText =
     ( "lamdera-" ++ packageName
     , { name = "lamdera/" ++ packageName
       , website = Nothing
@@ -123,6 +124,7 @@ lamderaPackage packageName description lastUpdated releasedAt =
       , pageLastUpdated = lastUpdated
       , pageCreatedAt = lastUpdated
       , previewImage = "/lamdera-preview.svg"
+      , previewText = previewText
       , thingType =
             OtherThing
                 { releasedAt = releasedAt
@@ -152,6 +154,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/town-collab/icon.webp"
+        , previewText = "A game I've been working on, inspired by an old children's game called Lego Loco"
         , thingType =
             OtherThing
                 { releasedAt = date 2023 Feb 11
@@ -163,6 +166,7 @@ thingsIHaveDone =
       , { name = "ascii-collab"
         , website = Just "ascii-collab.app/"
         , tags = [ Elm, Game, Lamdera ]
+        , previewText = "An infinite canvas that people can draw ascii art on together."
         , description =
             [ Paragraph [ Text "An infinite canvas that people can draw ascii art on together. I wrote an ", ExternalLink "announcement post" "discourse.elm-lang.org/t/ascii-collab-draw-ascii-art-together-on-an-infinite-canvas/6273", Text " and a ", ExternalLink "follow up post" "discourse.elm-lang.org/t/ascii-collab-progress-update/7019", Text " about it. I also showed it off on ", ExternalLink "Hacker News" "news.ycombinator.com/item?id=29572662", Text " and then had to spend an hour removing all of the vandalism left behind (but at least people liked it)." ]
             , Image "/ascii-collab/poster-irl.jpg"
@@ -249,6 +253,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/meetdown/logo.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2021 Jun 27
@@ -264,6 +269,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2019 Dec 17
@@ -279,6 +285,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/game-maker-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2016 Aug 1
@@ -286,7 +293,7 @@ thingsIHaveDone =
                 }
         }
       )
-    , elmPackage "MartinSStewart" "elm-audio" [] websiteReleasedAt (date 2020 Mar 11)
+    , elmPackage "MartinSStewart" "elm-audio" [] websiteReleasedAt (date 2020 Mar 11) ""
     , ( "elm-review-bot"
       , { name = "elm-review-bot"
         , website = Nothing
@@ -295,6 +302,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2021 Aug 24
@@ -310,6 +318,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/elm-package-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2022 May 1
@@ -325,6 +334,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2023 Sep 3
@@ -338,6 +348,7 @@ thingsIHaveDone =
         [ Paragraph [ ExternalLink "Discourse post" "discourse.elm-lang.org/t/elm-serialize-quickly-and-reliably-encode-and-decode-elm-values/6112/3" ] ]
         websiteReleasedAt
         (date 2020 Jul 30)
+        ""
     , ( "elm-review-elm-ui-upgrade"
       , { name = "elm-review-elm-ui-upgrade"
         , website = Nothing
@@ -346,6 +357,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2023 Aug 27
@@ -361,6 +373,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2023 Jul 20
@@ -376,6 +389,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2020 Mar 21
@@ -391,6 +405,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2020 Oct 29
@@ -398,17 +413,18 @@ thingsIHaveDone =
                 }
         }
       )
-    , elmPackage "MartinSStewart" "send-grid" [] websiteReleasedAt (date 2020 Feb 15)
-    , elmPackage "MartinSStewart" "elm-bayer-matrix" [ Paragraph [ Text "A package for generating ", ExternalLink "bayer matrices" "en.wikipedia.org/wiki/Ordered_dithering", Text ". These are useful for producing a dithering effect for partially transparent images. I used it for ", Link "surface-voyage" (Stuff__Slug_ { slug = "surface-voyage" }), Text " to fade out objects too close to the camera. That said, in hindsight it was silly to make a package for 50 lines of code though." ] ] websiteReleasedAt (date 2020 Feb 15)
-    , elmPackage "MartinSStewart" "elm-box-packing" [] websiteReleasedAt (date 2020 Apr 25)
+    , elmPackage "MartinSStewart" "send-grid" [] websiteReleasedAt (date 2020 Feb 15) ""
+    , elmPackage "MartinSStewart" "elm-bayer-matrix" [ Paragraph [ Text "A package for generating ", ExternalLink "bayer matrices" "en.wikipedia.org/wiki/Ordered_dithering", Text ". These are useful for producing a dithering effect for partially transparent images. I used it for ", Link "surface-voyage" (Stuff__Slug_ { slug = "surface-voyage" }), Text " to fade out objects too close to the camera. That said, in hindsight it was silly to make a package for 50 lines of code though." ] ] websiteReleasedAt (date 2020 Feb 15) ""
+    , elmPackage "MartinSStewart" "elm-box-packing" [] websiteReleasedAt (date 2020 Apr 25) ""
     , elmPackage
         "MartinSStewart"
         "elm-codec-bytes"
         [ Paragraph [ ExternalLink "Discourse post" "discourse.elm-lang.org/t/elm-codec-bytes-1-0-0-released/3989" ] ]
         websiteReleasedAt
         (date 2020 Feb 15)
-    , elmPackage "MartinSStewart" "elm-geometry-serialize" [] websiteReleasedAt (date 2020 Jul 31)
-    , elmPackage "MartinSStewart" "elm-nonempty-string" [] websiteReleasedAt (date 2020 Feb 15)
+        ""
+    , elmPackage "MartinSStewart" "elm-geometry-serialize" [] websiteReleasedAt (date 2020 Jul 31) ""
+    , elmPackage "MartinSStewart" "elm-nonempty-string" [] websiteReleasedAt (date 2020 Feb 15) ""
     , ( "postmark-email-client"
       , { name = "Postmark email client"
         , website = Just "postmark-email-client.lamdera.app/"
@@ -417,6 +433,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2023 Jul 5
@@ -432,6 +449,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/elm-camp-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2023 Jun 28
@@ -447,6 +465,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2023 Feb 27
@@ -465,6 +484,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/elm-map/preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2023 May 17
@@ -480,6 +500,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2023 May 21
@@ -499,6 +520,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/sheep-game-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2022 Jun 13
@@ -514,6 +536,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2022 Jun 14
@@ -529,6 +552,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/elm-town-preview.png"
+        , previewText = ""
         , thingType = PodcastThing { releasedAt = date 2020 Jan 11 }
         }
       )
@@ -540,6 +564,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/elm-town-preview.png"
+        , previewText = ""
         , thingType = PodcastThing { releasedAt = date 2023 Sep 5 }
         }
       )
@@ -551,6 +576,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/elm-radio-preview.svg"
+        , previewText = ""
         , thingType = PodcastThing { releasedAt = date 2022 May 23 }
         }
       )
@@ -562,6 +588,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/game-maker-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2022 May 23
@@ -577,6 +604,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/game-maker-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2014 Oct 28
@@ -592,6 +620,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/game-maker-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2011 Aug 2
@@ -607,6 +636,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/game-maker-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2012 Mar 3
@@ -614,8 +644,8 @@ thingsIHaveDone =
                 }
         }
       )
-    , lamderaPackage "websocket" [] websiteReleasedAt (date 2021 May 16)
-    , lamderaPackage "program-test" [] websiteReleasedAt (date 2021 Jul 7)
+    , lamderaPackage "websocket" [] websiteReleasedAt (date 2021 May 16) ""
+    , lamderaPackage "program-test" [] websiteReleasedAt (date 2021 Jul 7) ""
     , ( "making-a-game-with-elm-and-lamdera"
       , { name = "Making a game with Elm and Lamdera"
         , website = Just "www.youtube.com/watch?v=pZ_WqwRwwao"
@@ -624,6 +654,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2023 Sep 13
@@ -639,6 +670,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/elm-online-preview.svg"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2021 Jul 23
@@ -654,6 +686,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2022 Mar 16
@@ -669,6 +702,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2022 Mar 16
@@ -684,6 +718,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2021 Nov 11
@@ -699,6 +734,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/game-maker-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2016 Sep 22
@@ -714,6 +750,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/profile.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2016 Sep 22
@@ -729,6 +766,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/game-maker-preview.png"
+        , previewText = ""
         , thingType =
             JobThing
                 { startedAt = date 2014 Apr 1
@@ -746,6 +784,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/game-maker-preview.png"
+        , previewText = ""
         , thingType =
             JobThing
                 { startedAt = date 2013 Jun 4
@@ -763,6 +802,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             JobThing
                 { startedAt = date 2016 Oct 31
@@ -780,6 +820,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             JobThing
                 { startedAt = date 2020 Feb 3
@@ -797,6 +838,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/realia/logo.svg"
+        , previewText = ""
         , thingType =
             JobThing
                 { startedAt = date 2021 Aug 18
@@ -814,6 +856,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/ambue/ambue-logo.svg"
+        , previewText = ""
         , thingType =
             JobThing
                 { startedAt = date 2023 Aug 15
@@ -831,6 +874,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/game-maker-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2012 Oct 5
@@ -846,6 +890,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/profile.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = websiteReleasedAt
@@ -861,6 +906,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/game-maker-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2010 Mar 10
@@ -876,6 +922,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2014 Mar 1
@@ -891,6 +938,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/game-maker-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2014 Mar 1
@@ -906,6 +954,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2015 Mar 5
@@ -921,6 +970,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2020 Jan 14
@@ -936,6 +986,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/game-maker-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2012 Jul 30
@@ -951,6 +1002,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/game-maker-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2012 Jun 8
@@ -966,6 +1018,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/game-maker-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2012 Jun 25
@@ -981,6 +1034,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2014 Feb 5
@@ -996,6 +1050,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/game-maker-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2011 Jun 25
@@ -1018,6 +1073,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/break-the-facade/btfIconHighRes.png"
+        , previewText = "A puzzle game I made for the 5th Game Maker Community game jam"
         , thingType =
             GameMakerThing
                 { releasedAt = date 2012 Jan 30
@@ -1037,6 +1093,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/secret-santa-game/santaHatIconHighRes.png"
+        , previewText = ""
         , thingType =
             GameMakerThing
                 { releasedAt = date 2015 Mar 7
@@ -1052,6 +1109,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/game-maker-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2015 Mar 7
@@ -1067,6 +1125,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2020 Dec 31
@@ -1082,6 +1141,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2019 Dec 31
@@ -1100,6 +1160,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2019 Jun 14
@@ -1118,6 +1179,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2018 Dec 30
@@ -1133,6 +1195,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2019 Nov 1
@@ -1148,6 +1211,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2018 Dec 23
@@ -1163,6 +1227,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2012 Jul 30
@@ -1178,6 +1243,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/lamdera-preview.svg"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2020 Jan 27
@@ -1193,6 +1259,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2021 Oct 6
@@ -1208,6 +1275,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2022 Jul 27
@@ -1223,6 +1291,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2021 Oct 26
@@ -1238,6 +1307,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2021 Jul 14
@@ -1253,6 +1323,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2021 May 21
@@ -1268,6 +1339,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2021 Mar 24
@@ -1283,6 +1355,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2018 Jun 21
@@ -1298,6 +1371,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2017 Dec 7
@@ -1313,6 +1387,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/discord-bot-preview.png"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2018 Feb 12
@@ -1328,6 +1403,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/elm-online-preview.svg"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2022 Jul 7
@@ -1347,6 +1423,7 @@ thingsIHaveDone =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/lamdera-preview.svg"
+        , previewText = ""
         , thingType =
             OtherThing
                 { releasedAt = date 2024 Jun 30
@@ -1354,7 +1431,7 @@ thingsIHaveDone =
                 }
         }
       )
-    , lamderaPackage "containers" LamderaContainers.content (date 2024 Sep 22) (date 2024 Sep 22)
+    , lamderaPackage "containers" LamderaContainers.content (date 2024 Sep 22) (date 2024 Sep 22) ""
     ]
         |> Dict.fromList
 
@@ -1492,6 +1569,7 @@ type alias Thing =
     , pageLastUpdated : Date
     , pageCreatedAt : Date
     , previewImage : String
+    , previewText : String
     , thingType : ThingType
     }
 

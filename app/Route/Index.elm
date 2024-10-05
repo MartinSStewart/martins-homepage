@@ -65,6 +65,7 @@ type alias Thing =
     , tags : List Tag
     , previewImage : String
     , thingType : ThingType
+    , previewText : String
     }
 
 
@@ -258,6 +259,7 @@ data =
                             { name = thing.name
                             , tags = thing.tags
                             , previewImage = thing.previewImage
+                            , previewText = thing.previewText
                             , thingType = thing.thingType
                             }
                         )
@@ -948,6 +950,7 @@ thingsViewMobile name tier thing =
                 , Ui.Font.lineHeight 1
                 ]
                 (Ui.text thing.name)
+            , Ui.text thing.previewText
             , Ui.row
                 [ Ui.wrap
                 , Ui.spacing 4
@@ -1043,6 +1046,7 @@ thingsViewNotMobile name tier thing =
          , Ui.padding 3
          , Ui.clip
          , Ui.alignTop
+         , Ui.htmlAttribute (Html.Attributes.title thing.previewText)
          , Ui.id name
          , Ui.el
             [ Ui.Font.bold

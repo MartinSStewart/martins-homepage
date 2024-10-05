@@ -6,6 +6,7 @@ import Html.Events
 import Html.Lazy
 import Icons
 import Json.Decode
+import List.Extra
 import Parser exposing ((|.), (|=), Parser)
 import Result.Extra
 import Route exposing (Route)

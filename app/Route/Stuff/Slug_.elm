@@ -132,6 +132,7 @@ type alias Thing =
     , pageCreatedAt : Date
     , thingType : ThingType
     , previewImage : String
+    , previewText : String
     }
 
 
@@ -155,6 +156,7 @@ data routeParams =
                             , pageCreatedAt = thing.pageCreatedAt
                             , thingType = thing.thingType
                             , previewImage = thing.previewImage
+                            , previewText = thing.previewText
                             }
                         }
 
@@ -171,12 +173,12 @@ head app =
         { canonicalUrlOverride = Nothing
         , siteName = "Martin's homepage"
         , image =
-            { url = Pages.Url.external "TODO"
-            , alt = "elm-pages logo"
-            , dimensions = Nothing
+            { url = Pages.Url.fromPath (String.split "/" app.data.thing.previewImage)
+            , alt = ""
+            , dimensions = Just { width = Shared.tileWidth, height = Shared.tileWidth }
             , mimeType = Nothing
             }
-        , description = ""
+        , description = app.data.thing.previewText
         , locale = Nothing
         , title = app.data.thing.name
         }
