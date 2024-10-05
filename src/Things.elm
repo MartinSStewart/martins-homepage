@@ -211,7 +211,7 @@ thingsIHaveDone =
                 , Section "Miscellaneous things"
                     [ Paragraph [ Text "Here are some things people have made. The titles for them are made up by me." ]
                     , Image "/ascii-collab/touhou.png" [ ExternalLink "Touhou girls by yosicat" "ascii-collab.app/?x=-762&y=87" ]
-                    , Image "/ascii-collab/presentation2.png" [ ExternalLink "The second presetation I gave about how I designed ascii-collab (the first one is on the poster)." "ascii-collab.app/?x=3201&y=5943" ]
+                    , Image "/ascii-collab/presentation2.png" [ ExternalLink "The second presentation I gave about how I designed ascii-collab (the first one is on the poster)." "ascii-collab.app/?x=3201&y=5943" ]
                     , Image "/ascii-collab/instruments.png" [ ExternalLink "Music instruments drawn by Tilly, me, and two anonymous people" "ascii-collab.app/?x=-826&y=-151" ]
                     , PixelImage 492 156 "/ascii-collab/portraits.png" [ ExternalLink "Can you tell what these three portraits are?" "ascii-collab.app/?x=-184&y=169", AltText " Click here for answers" "American Gothic, The Scream, and Dos Equis's \"Most interesting man in the world\"" ]
                     , PixelImage 385 309 "/ascii-collab/sandwich.png" [ ExternalLink "A sandwich by me" "ascii-collab.app/?x=-722&y=-150" ]
