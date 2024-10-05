@@ -22,6 +22,10 @@ const config: ElmPagesInit = {
             }
         });
     });
+    app.ports.getDevicePixelRatio.subscribe((a) =>
+    {
+        app.ports.gotDevicePixelRatio.send(window.devicePixelRatio);
+    });
   },
   flags: function () {
     return "You can decode this in Shared.elm using Json.Decode.string!";

@@ -155,6 +155,8 @@ view app _ model =
                     , Formatting.view
                         { pressedAltText = \text -> PressedAltText text |> PagesMsg.fromMsg
                         , startedVideo = StartedVideo |> PagesMsg.fromMsg
+                        , windowWidth = 800
+                        , devicePixelRatio = 1
                         }
                         model
                         app.data.description

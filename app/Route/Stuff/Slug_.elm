@@ -1,6 +1,7 @@
 port module Route.Stuff.Slug_ exposing (ActionData, Data, Model, Msg, route)
 
 import BackendTask exposing (BackendTask)
+import Browser.Dom
 import Browser.Events
 import Date exposing (Date)
 import Dict
@@ -15,6 +16,7 @@ import PagesMsg exposing (PagesMsg)
 import RouteBuilder exposing (App, StatefulRoute)
 import Set exposing (Set)
 import Shared exposing (Breakpoints(..))
+import Task
 import Things exposing (Tag, ThingType(..))
 import Ui
 import Ui.Font
@@ -29,14 +31,22 @@ port skipForwardVideo : () -> Cmd msg
 port skipBackwardVideo : () -> Cmd msg
 
 
+port getDevicePixelRatio : () -> Cmd msg
+
+
+port gotDevicePixelRatio : (Float -> msg) -> Sub msg
+
+
 type alias Model =
-    { selectedAltText : Set String, videoIsPlaying : Bool }
+    { selectedAltText : Set String, videoIsPlaying : Bool, windowWidth : Int, devicePixelRatio : Float }
 
 
 type Msg
     = PressedAltText String
     | StartedVideo
     | PressedArrowKey ArrowKey
+    | WindowResized Int Int
+    | GotDevicePixelRatio Float
 
 
 type ArrowKey
@@ -48,8 +58,16 @@ type alias RouteParams =
     { slug : String }
 
 
+init : App data action routeParams -> Shared.Model -> ( Model, Cmd Msg )
 init _ _ =
-    ( { selectedAltText = Set.empty, videoIsPlaying = False }, Effect.none )
+    ( { selectedAltText = Set.empty, videoIsPlaying = False, windowWidth = 800, devicePixelRatio = 1 }
+    , Cmd.batch
+        [ Task.perform
+            (\{ viewport } -> WindowResized (round viewport.width) (round viewport.height))
+            Browser.Dom.getViewport
+        , getDevicePixelRatio ()
+        ]
+    )
 
 
 route : StatefulRoute RouteParams Data ActionData Model Msg
@@ -86,27 +104,37 @@ update _ _ msg model =
                     skipForwardVideo ()
             )
 
+        WindowResized width _ ->
+            ( { model | windowWidth = width }, getDevicePixelRatio () )
+
+        GotDevicePixelRatio devicePixelRatio ->
+            ( { model | devicePixelRatio = devicePixelRatio }, Effect.none )
+
 
 subscriptions : a -> b -> c -> Model -> Sub Msg
 subscriptions _ _ _ model =
-    if model.videoIsPlaying then
-        Browser.Events.onKeyDown
-            (Json.Decode.field "key" Json.Decode.string
-                |> Json.Decode.andThen
-                    (\key ->
-                        if key == "ArrowLeft" then
-                            Json.Decode.succeed (PressedArrowKey LeftArrowKey)
+    Sub.batch
+        [ Browser.Events.onResize WindowResized
+        , gotDevicePixelRatio GotDevicePixelRatio
+        , if model.videoIsPlaying then
+            Browser.Events.onKeyDown
+                (Json.Decode.field "key" Json.Decode.string
+                    |> Json.Decode.andThen
+                        (\key ->
+                            if key == "ArrowLeft" then
+                                Json.Decode.succeed (PressedArrowKey LeftArrowKey)
 
-                        else if key == "ArrowRight" then
-                            Json.Decode.succeed (PressedArrowKey RightArrowKey)
+                            else if key == "ArrowRight" then
+                                Json.Decode.succeed (PressedArrowKey RightArrowKey)
 
-                        else
-                            Json.Decode.fail ""
-                    )
-            )
+                            else
+                                Json.Decode.fail ""
+                        )
+                )
 
-    else
-        Sub.none
+          else
+            Sub.none
+        ]
 
 
 pages : BackendTask FatalError (List RouteParams)
@@ -202,9 +230,11 @@ view app _ model =
                             }
 
                         NotMobile ->
-                            { x = Ui.Responsive.value 16, y = Ui.Responsive.value 16 }
+                            { x = Ui.Responsive.value Formatting.sidePaddingNotMobile
+                            , y = Ui.Responsive.value 16
+                            }
                 )
-            , Ui.widthMax 800
+            , Ui.widthMax Formatting.contentWidthMax
             , Ui.centerX
             , Ui.spacing 8
             ]
@@ -216,6 +246,8 @@ view app _ model =
                 Formatting.view
                     { pressedAltText = \text -> PressedAltText text |> PagesMsg.fromMsg
                     , startedVideo = StartedVideo |> PagesMsg.fromMsg
+                    , windowWidth = model.windowWidth
+                    , devicePixelRatio = model.devicePixelRatio
                     }
                     model
                     thing.description

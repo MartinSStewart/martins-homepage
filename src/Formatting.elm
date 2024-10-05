@@ -1,4 +1,4 @@
-module Formatting exposing (Formatting(..), Inline(..), Model, checkFormatting, downloadLink, externalLink, sidePaddingMobile, view)
+module Formatting exposing (Formatting(..), Inline(..), Model, checkFormatting, contentWidthMax, downloadLink, externalLink, sidePaddingMobile, sidePaddingNotMobile, view)
 
 import Html exposing (Html)
 import Html.Attributes
@@ -24,7 +24,7 @@ type Formatting
     | Group (List Formatting)
     | Section String (List Formatting)
     | Image String (List Inline)
-    | PixelImage String (List Inline)
+    | PixelImage Int Int String (List Inline)
     | Video String
 
 
@@ -44,28 +44,21 @@ type alias Model a =
     { a | selectedAltText : Set String }
 
 
-type alias MsgConfig msg =
+type alias Config msg =
     { pressedAltText : String -> msg
     , startedVideo : msg
+    , windowWidth : Int
+    , devicePixelRatio : Float
     }
 
 
-view : MsgConfig msg -> Model a -> List Formatting -> Ui.Element msg
-view msgConfig model list =
+view : Config msg -> Model a -> List Formatting -> Ui.Element msg
+view config model list =
     Html.div
         [ Html.Attributes.style "line-height" "1.5" ]
-        (Html.node "style" [] [ Html.text """pre { white-space: pre-wrap; }
-
-@media (resolution: 1.5x) {
-  .pixel-img {
-    scale: 0.666666;
-  }
-}
-
-
-        """ ]
+        (Html.node "style" [] [ Html.text "pre { white-space: pre-wrap; }" ]
             :: SyntaxHighlight.useTheme SyntaxHighlight.gitHub
-            :: List.map (viewHelper msgConfig 0 model) list
+            :: List.map (viewHelper config 0 model) list
         )
         |> Ui.html
 
@@ -151,7 +144,7 @@ checkFormattingHelper formatting =
             else
                 Ok ()
 
-        PixelImage url _ ->
+        PixelImage _ _ url _ ->
             if String.contains ")" url || String.contains "://" url then
                 Err (url ++ " is an invalid url")
 
@@ -314,11 +307,16 @@ parseString =
         |. Parser.chompIf (\char -> char == '"')
 
 
-viewHelper : MsgConfig msg -> Int -> Model a -> Formatting -> Html msg
-viewHelper msgConfig depth model item =
+contentWidthMax : number
+contentWidthMax =
+    800
+
+
+viewHelper : Config msg -> Int -> Model a -> Formatting -> Html msg
+viewHelper config depth model item =
     case item of
         Paragraph items ->
-            Html.p [] (List.map (inlineView msgConfig model) items)
+            Html.p [] (List.map (inlineView config model) items)
 
         CodeBlock text ->
             case SyntaxHighlight.elm text of
@@ -344,11 +342,11 @@ viewHelper msgConfig depth model item =
         BulletList leading formattings ->
             Html.div
                 []
-                [ Html.p [] (List.map (inlineView msgConfig model) leading)
+                [ Html.p [] (List.map (inlineView config model) leading)
                 , Html.ul
                     [ Html.Attributes.style "padding-left" "20px" ]
                     (List.map
-                        (\item2 -> Html.li [] [ Html.Lazy.lazy4 viewHelper msgConfig depth model item2 ])
+                        (\item2 -> Html.li [] [ Html.Lazy.lazy4 viewHelper config depth model item2 ])
                         formattings
                     )
                 ]
@@ -356,11 +354,11 @@ viewHelper msgConfig depth model item =
         NumberList leading formattings ->
             Html.div
                 []
-                [ Html.p [] (List.map (inlineView msgConfig model) leading)
+                [ Html.p [] (List.map (inlineView config model) leading)
                 , Html.ol
                     [ Html.Attributes.style "padding-left" "20px" ]
                     (List.map
-                        (\item2 -> Html.li [] [ Html.Lazy.lazy4 viewHelper msgConfig depth model item2 ])
+                        (\item2 -> Html.li [] [ Html.Lazy.lazy4 viewHelper config depth model item2 ])
                         formattings
                     )
                 ]
@@ -368,22 +366,22 @@ viewHelper msgConfig depth model item =
         LetterList leading formattings ->
             Html.div
                 []
-                [ Html.p [] (List.map (inlineView msgConfig model) leading)
+                [ Html.p [] (List.map (inlineView config model) leading)
                 , Html.ol
                     [ Html.Attributes.type_ "A", Html.Attributes.style "padding-left" "20px" ]
                     (List.map
-                        (\item2 -> Html.li [] [ Html.Lazy.lazy4 viewHelper msgConfig depth model item2 ])
+                        (\item2 -> Html.li [] [ Html.Lazy.lazy4 viewHelper config depth model item2 ])
                         formattings
                     )
                 ]
 
         Group formattings ->
-            Html.div [] (List.map (Html.Lazy.lazy4 viewHelper msgConfig depth model) formattings)
+            Html.div [] (List.map (Html.Lazy.lazy4 viewHelper config depth model) formattings)
 
         Section title formattings ->
             let
                 content =
-                    List.map (Html.Lazy.lazy4 viewHelper msgConfig (depth + 1) model) formattings
+                    List.map (Html.Lazy.lazy4 viewHelper config (depth + 1) model) formattings
             in
             case depth of
                 0 ->
@@ -415,27 +413,42 @@ viewHelper msgConfig depth model item =
                     [ Html.Attributes.style "font-size" "14px"
                     , Html.Attributes.style "padding" "0 8px 0 8px "
                     ]
-                    (List.map (inlineView msgConfig model) altText)
+                    (List.map (inlineView config model) altText)
                 ]
 
-        PixelImage url altText ->
+        PixelImage imageWidth _ url altText ->
+            let
+                containerWidth : Int
+                containerWidth =
+                    min config.windowWidth contentWidthMax - sidePaddingNotMobile * 2
+
+                cssWidth : Float
+                cssWidth =
+                    toFloat (floor config.devicePixelRatio) * toFloat imageWidth / config.devicePixelRatio
+
+                attributes : List (Html.Attribute msg)
+                attributes =
+                    if cssWidth > toFloat containerWidth then
+                        [ Html.Attributes.style "width" "100%"
+                        ]
+
+                    else
+                        [ Html.Attributes.style "width" (String.fromFloat cssWidth ++ "px")
+                        , Html.Attributes.style "image-rendering" "pixelated"
+                        ]
+            in
             Html.figure
                 [ Html.Attributes.style "padding-bottom" "16px"
                 , Html.Attributes.style "margin" "0"
                 ]
                 [ Html.img
-                    [ Html.Attributes.src url
-                    , Html.Attributes.style "max-width" "100%"
-                    , Html.Attributes.style "max-height" "500px"
-                    , Html.Attributes.class "pixel-img"
-                    , Html.Attributes.style "image-rendering" "pixelated"
-                    ]
+                    (Html.Attributes.src url :: attributes)
                     []
                 , Html.figcaption
                     [ Html.Attributes.style "font-size" "14px"
                     , Html.Attributes.style "padding" "0 8px 0 8px "
                     ]
-                    (List.map (inlineView msgConfig model) altText)
+                    (List.map (inlineView config model) altText)
                 ]
 
         Video url ->
@@ -448,7 +461,7 @@ viewHelper msgConfig depth model item =
                     "margin-left"
                     ("calc(var(--ui-bp-0) * -" ++ String.fromInt sidePaddingMobile ++ "px)")
                 , Html.Attributes.controls True
-                , Html.Events.on "play" (Json.Decode.succeed msgConfig.startedVideo)
+                , Html.Events.on "play" (Json.Decode.succeed config.startedVideo)
                 ]
                 []
 
@@ -458,8 +471,13 @@ sidePaddingMobile =
     8
 
 
-inlineView : MsgConfig msg -> Model a -> Inline -> Html msg
-inlineView msgConfig model inline =
+sidePaddingNotMobile : number
+sidePaddingNotMobile =
+    16
+
+
+inlineView : Config msg -> Model a -> Inline -> Html msg
+inlineView config model inline =
     case inline of
         Bold text ->
             Html.b [] [ Html.text text ]
@@ -505,7 +523,7 @@ inlineView msgConfig model inline =
 
                  else
                     [ Html.Attributes.title altText
-                    , Html.Events.onClick (msgConfig.pressedAltText altText)
+                    , Html.Events.onClick (config.pressedAltText altText)
                     , Html.Attributes.style "cursor" "pointer"
                     ]
                 )
