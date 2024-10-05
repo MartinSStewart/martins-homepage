@@ -1,4 +1,4 @@
-module Shared exposing
+port module Shared exposing
     ( Breakpoints(..)
     , Data
     , Model
@@ -14,10 +14,12 @@ module Shared exposing
     )
 
 import BackendTask exposing (BackendTask)
+import Browser.Events
 import Effect exposing (Effect)
 import FatalError exposing (FatalError)
 import Html exposing (Html)
 import Html.Attributes
+import Json.Decode
 import Pages.Flags
 import Pages.PageUrl exposing (PageUrl)
 import Route exposing (Route)
@@ -28,6 +30,12 @@ import Ui.Font
 import Ui.Responsive
 import UrlPath exposing (UrlPath)
 import View exposing (View)
+
+
+port getDevicePixelRatio : () -> Cmd msg
+
+
+port gotDevicePixelRatio : (Float -> msg) -> Sub msg
 
 
 template : SharedTemplate Msg Model Data msg
@@ -43,6 +51,8 @@ template =
 
 type Msg
     = UiAnimMsg Ui.Anim.Msg
+    | GotDevicePixelRatio Float
+    | WindowResized Int Int
 
 
 type alias Data =
@@ -52,6 +62,8 @@ type alias Data =
 type alias Model =
     { showMenu : Bool
     , uiAnimModel : Ui.Anim.State
+    , devicePixelRatio : Float
+    , windowWidth : Int
     }
 
 
@@ -68,8 +80,34 @@ init :
             , pageUrl : Maybe PageUrl
             }
     -> ( Model, Effect Msg )
-init _ _ =
-    ( { showMenu = False, uiAnimModel = Ui.Anim.init }
+init flags _ =
+    let
+        ( dpr, windowWidth ) =
+            case flags of
+                Pages.Flags.PreRenderFlags ->
+                    ( 1, 800 )
+
+                Pages.Flags.BrowserFlags value ->
+                    case
+                        Json.Decode.decodeValue
+                            (Json.Decode.map2
+                                Tuple.pair
+                                (Json.Decode.field "dpr" Json.Decode.float)
+                                (Json.Decode.field "windowWidth" Json.Decode.int)
+                            )
+                            value
+                    of
+                        Ok ok ->
+                            ok
+
+                        Err _ ->
+                            ( 1, 800 )
+    in
+    ( { showMenu = False
+      , uiAnimModel = Ui.Anim.init
+      , devicePixelRatio = dpr
+      , windowWidth = windowWidth
+      }
     , Effect.none
     )
 
@@ -80,10 +118,19 @@ update msg model =
         UiAnimMsg uiAnimMsg ->
             ( { model | uiAnimModel = Ui.Anim.update UiAnimMsg uiAnimMsg model.uiAnimModel }, Effect.none )
 
+        GotDevicePixelRatio devicePixelRatio ->
+            ( { model | devicePixelRatio = devicePixelRatio }, Effect.none )
+
+        WindowResized width _ ->
+            ( { model | windowWidth = width }, getDevicePixelRatio () )
+
 
 subscriptions : UrlPath -> Model -> Sub Msg
 subscriptions _ _ =
-    Sub.none
+    Sub.batch
+        [ Browser.Events.onResize WindowResized
+        , gotDevicePixelRatio GotDevicePixelRatio
+        ]
 
 
 data : BackendTask FatalError Data

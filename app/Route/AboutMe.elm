@@ -119,7 +119,7 @@ view :
     -> Shared.Model
     -> Model
     -> View.View (PagesMsg.PagesMsg Msg)
-view app _ model =
+view app shared model =
     { title = "About me"
     , body =
         Ui.row
@@ -155,8 +155,8 @@ view app _ model =
                     , Formatting.view
                         { pressedAltText = \text -> PressedAltText text |> PagesMsg.fromMsg
                         , startedVideo = StartedVideo |> PagesMsg.fromMsg
-                        , windowWidth = 800
-                        , devicePixelRatio = 1
+                        , windowWidth = shared.windowWidth
+                        , devicePixelRatio = shared.devicePixelRatio
                         }
                         model
                         app.data.description

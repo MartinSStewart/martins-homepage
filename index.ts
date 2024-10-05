@@ -28,7 +28,7 @@ const config: ElmPagesInit = {
     });
   },
   flags: function () {
-    return "You can decode this in Shared.elm using Json.Decode.string!";
+    return { dpr: window.devicePixelRatio, windowWidth: window.innerWidth };
   },
 };
 

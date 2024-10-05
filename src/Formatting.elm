@@ -437,18 +437,21 @@ viewHelper config depth model item =
 
         PixelImage imageWidth _ url altText ->
             let
+                dpr2 =
+                    max 1 config.devicePixelRatio
+
+                cssWidth : Float
+                cssWidth =
+                    toFloat (round (dpr2 - 0.2)) * toFloat imageWidth / dpr2
+
                 containerWidth : Int
                 containerWidth =
                     min config.windowWidth contentWidthMax - sidePaddingNotMobile * 2
 
-                cssWidth : Float
-                cssWidth =
-                    toFloat (round (config.devicePixelRatio - 0.2)) * toFloat imageWidth / config.devicePixelRatio
-
                 attributes : List (Html.Attribute msg)
                 attributes =
                     if cssWidth > toFloat containerWidth then
-                        [ Html.Attributes.style "width" "100%"
+                        [ Html.Attributes.style "max-width" "100%"
                         ]
 
                     else
