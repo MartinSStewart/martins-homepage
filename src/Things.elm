@@ -962,6 +962,60 @@ thingsIHaveDone =
                 }
         }
       )
+    , ( "elm-review-todo-it-for-me"
+      , { name = "elm-review-todo-it-for-me"
+        , website = Nothing
+        , tags = [ Elm, ElmPackage ]
+        , description =
+            [ Paragraph [ Text "An elm-review rule designed to take code that looks like this" ]
+            , CodeBlock """import Codec
+
+type MyType = { fieldA : Int, fieldB : Int }
+
+myTypeCodec : Codec MyType
+myTypeCodec = Debug.todo ""
+"""
+            , Paragraph [ Text "and replace it with this" ]
+            , CodeBlock """import Codec
+
+type MyType = { fieldA : Int, fieldB : Int }
+
+myTypeCodec : Codec MyType
+myTypeCodec = 
+    Codec.object MyType
+        |> Codec.field "fieldA" .fieldA Codec.int
+        |> Codec.field "fieldB" .fieldB Codec.string
+        |> Codec.buildObject
+"""
+            , Paragraph
+                [ Text "And not just codecs, but generate code for a variety of different types and allow the user to easily set up their own code gen."
+                ]
+            , Paragraph
+                [ Text "I called it elm-review-todo-it-for-me because I write Debug."
+                , Italic "todo"
+                , Text " and then it does "
+                , Italic "it for me"
+                , Text ". Very clever. Also a terrible awful name."
+                ]
+            , Paragraph
+                [ Text "After I demoed a proof of concept, "
+                , ExternalLink "gampleman" "github.com/gampleman"
+                , Text " started helping me work on it. After I while I lost interest but he kept at it. Eventually I just transferred control of the repo to him and he gave it a much better name: "
+                , ExternalLink "elm-review-derive" "github.com/gampleman/elm-review-derive"
+                , Text "."
+                ]
+            ]
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/elm-package-preview.png"
+        , previewText = ""
+        , thingType =
+            OtherThing
+                { releasedAt = date 2021 Jul 23
+                , repo = Nothing
+                }
+        }
+      )
     , ( "surface-voyage"
       , { name = "Surface voyage"
         , website = Nothing
@@ -1487,6 +1541,7 @@ qualityOrder =
     , "elm-review-remove-duplicate-code"
     , "elm-audio-presentation"
     , "the-best-color"
+    , "elm-review-todo-it-for-me"
     , "demon-clutched-walkaround"
     , "tetherball-extreme-zombie-edition"
     , "elm-review-elm-ui-upgrade"
