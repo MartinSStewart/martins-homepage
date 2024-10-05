@@ -165,6 +165,10 @@ thingsIHaveDone =
         , tags = [ Elm, Game, Lamdera ]
         , description =
             [ Paragraph [ Text "An infinite canvas that people can draw ascii art on together. I wrote an ", ExternalLink "announcement post" "discourse.elm-lang.org/t/ascii-collab-draw-ascii-art-together-on-an-infinite-canvas/6273", Text " and a ", ExternalLink "follow up post" "discourse.elm-lang.org/t/ascii-collab-progress-update/7019", Text " about it. I also showed it off on ", ExternalLink "Hacker News" "news.ycombinator.com/item?id=29572662", Text " and then had to spend an hour removing all of the vandalism left behind (but at least people liked it)." ]
+            , Image "/ascii-collab/poster-irl.jpg"
+                [ Text "Part of the canvas that I made into a poster. I ordered two copies of it from a local print shop for me and my sister. This is the one I have, stuck to the wall above my couch-bed. "
+                , ExternalLink "High-res version" "ascii-collab.app/poster-irl.jpg"
+                ]
             , Section
                 "Backstory"
                 [ Paragraph [ Text "Back when I was active on the Game Maker Community forums, someone had the idea that we should hop onto ", ExternalLink "www.yourworldoftext.com" "yourworldoftext.com", Text " and draw some ascii art together. We had fun for a day or so but after that other people showed up and started vandalizing everything." ]
@@ -176,10 +180,40 @@ thingsIHaveDone =
                 "Ascii art (lots of it)"
                 [ Paragraph [ Text "There is ", Bold "a lot", Text " of quality ascii art that has accumulated over the years this site has been running. The rest of this article is going to showcase some of the cool stuff other people and me have drawn/made." ]
                 , Paragraph [ Text "Real quick though, maybe some of you are thinking, ", Quote "Lots of quality ascii art? Easy! Copy-paste it from elsewhere!", Text " And yes, some ascii art is copied from elsewhere (I ask people to prefer drawing original stuff but I don't strictly enforce it)." ]
-                , Paragraph [ Text "I'd say 80% of it is original art however! How do I know that? Ascii-collab lets you color code changes people have made. Using it we can tell, this is copied due to the unnaturally placed space characters." ]
-                , Image "/ascii-collab/copied.png" [ Text "A chess knight" ]
-                , Paragraph [ Text "And this is ", AltText "original work." " There are cases that are ambiguous. If there's a solid colored rectangle, that could be original art that has then been moved with the box selection tool." ]
-                , Image "/ascii-collab/legit.png" [ Text "A large cat enjoying some ramen probably" ]
+                , Paragraph [ Text "I'd say 80% of it is original art however! How do I know that? Ascii-collab lets you color code changes people have made. Using it we can tell, this is probably copied due to the unnaturally placed space characters." ]
+                , PixelImage "/ascii-collab/copied.png" [ ExternalLink "A chess knight" "ascii-collab.app/?x=-184&y=291" ]
+                , Paragraph [ Text "And this is an ", AltText "original work." " There are cases that are ambiguous. If there's a solid colored rectangle, that could be original art that has then been moved with the box selection tool." ]
+                , PixelImage "/ascii-collab/legit.png" [ ExternalLink "A large cat enjoying some ramen, drawn by Tilly" "ascii-collab.app/?x=-856&y=-354" ]
+                , Paragraph [ Text "Anyway, lets see some ascii art!" ]
+                , Section "Posters"
+                    [ Paragraph [ Text "You saw the ascii poster already at the start of this article. Here's the original image for it." ]
+                    , Image "/ascii-collab/poster.png" [ Text "The poster region of the ascii-collab canvas" ]
+                    , Paragraph
+                        [ Text "And here is the color coded version. The green text represents changes "
+                        , AltText "I've made." " Note that as admin for the site, I do also clean up vandalism and move around art sometimes, which makes it look like I drew a thing when it was someone else. 99% of the time it's my own art though."
+                        ]
+                    , Image "/ascii-collab/poster-color.png" [ Text "The poster region of the ascii-collab canvas but color coded by user" ]
+                    , Paragraph [ Text "There's no sign-up so once someone's session cookie expires (which happens after a few weeks) they get a new color. So there are slightly fewer contributors than there are colors." ]
+                    , Paragraph [ Text "There's lots of little details in this poster (can you find ", ExternalLink "Waldo?" "en.wikipedia.org/wiki/Where%27s_Wally%3F", Text ") but it's only a fraction of everything drawn so lets continue!" ]
+                    ]
+                , Section "Coffee mugs"
+                    [ Paragraph [ Text "I ordered two coffee mugs (one for me, one for my sister) with an ascii art design printed on them!" ]
+                    , Image "/ascii-collab/mug-front.jpg" [ Text "Front side of the coffee mug" ]
+                    , Image "/ascii-collab/mug-back.jpg" [ Text "Back side of the coffee mug" ]
+                    , Paragraph [ Text "And here's the original art in case you too want an ascii coffee mug." ]
+                    , Image "/ascii-collab/mug-art.png" [ ExternalLink "Coffee mug design" "ascii-collab.app/?x=348&y=-189" ]
+                    ]
+                , Section "T-shirts"
+                    [ Paragraph [ Text "I ordered three t-shirts with an ascii art design printed on them! One was for me with black text on a white background. One was for my sister with a purple background. And the last one was for my girlfriend at the time with orange as the background (her favorite color). Unfortunately women's clothes sizes are really unpredictable and their t-shirts ended up being too small." ]
+                    , Image "/ascii-collab/tshirt-front.jpg" [ Text "The front side of my ascii t-shirt" ]
+                    , Image "/ascii-collab/tshirt-back.jpg" [ Text "The back side of my ascii t-shirt. Can you spot Waldo this time?" ]
+                    ]
+                , Section "Miscellaneous drawings"
+                    [ Paragraph [ Text "Original drawings people have made (not even close to an exhaustive list)." ]
+                    , Image "/ascii-collab/touhou.png" [ ExternalLink "Touhou girls by yosicat" "ascii-collab.app/?x=-762&y=87" ]
+                    , Image "/ascii-collab/presentation2.png" [ ExternalLink "The second presetation I gave about how I designed ascii-collab (the first one is on the poster)." "ascii-collab.app/?x=3201&y=5943" ]
+                    , Image "/ascii-collab/instruments.png" [ ExternalLink "Music instruments drawn by Tilly, me, and two anonymous people" "ascii-collab.app/?x=-826&y=-151" ]
+                    ]
                 ]
             ]
         , pageLastUpdated = websiteReleasedAt

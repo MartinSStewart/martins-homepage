@@ -24,6 +24,7 @@ type Formatting
     | Group (List Formatting)
     | Section String (List Formatting)
     | Image String (List Inline)
+    | PixelImage String (List Inline)
     | Video String
 
 
@@ -53,7 +54,16 @@ view : MsgConfig msg -> Model a -> List Formatting -> Ui.Element msg
 view msgConfig model list =
     Html.div
         [ Html.Attributes.style "line-height" "1.5" ]
-        (Html.node "style" [] [ Html.text "pre { white-space: pre-wrap; }" ]
+        (Html.node "style" [] [ Html.text """pre { white-space: pre-wrap; }
+
+@media (resolution: 1.5x) {
+  .pixel-img {
+    scale: 0.666666;
+  }
+}
+
+
+        """ ]
             :: SyntaxHighlight.useTheme SyntaxHighlight.gitHub
             :: List.map (viewHelper msgConfig 0 model) list
         )
@@ -135,6 +145,13 @@ checkFormattingHelper formatting =
             checkFormatting content
 
         Image url altText ->
+            if String.contains ")" url || String.contains "://" url then
+                Err (url ++ " is an invalid url")
+
+            else
+                Ok ()
+
+        PixelImage url _ ->
             if String.contains ")" url || String.contains "://" url then
                 Err (url ++ " is an invalid url")
 
@@ -392,6 +409,26 @@ viewHelper msgConfig depth model item =
                     , Html.Attributes.style "max-width" "100%"
                     , Html.Attributes.style "max-height" "500px"
                     , Html.Attributes.style "border-radius" "4px"
+                    ]
+                    []
+                , Html.figcaption
+                    [ Html.Attributes.style "font-size" "14px"
+                    , Html.Attributes.style "padding" "0 8px 0 8px "
+                    ]
+                    (List.map (inlineView msgConfig model) altText)
+                ]
+
+        PixelImage url altText ->
+            Html.figure
+                [ Html.Attributes.style "padding-bottom" "16px"
+                , Html.Attributes.style "margin" "0"
+                ]
+                [ Html.img
+                    [ Html.Attributes.src url
+                    , Html.Attributes.style "max-width" "100%"
+                    , Html.Attributes.style "max-height" "500px"
+                    , Html.Attributes.class "pixel-img"
+                    , Html.Attributes.style "image-rendering" "pixelated"
                     ]
                     []
                 , Html.figcaption
