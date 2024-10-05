@@ -173,7 +173,7 @@ thingsIHaveDone =
                 "Backstory"
                 [ Paragraph [ Text "Back when I was active on the Game Maker Community forums, someone had the idea that we should hop onto ", ExternalLink "www.yourworldoftext.com" "yourworldoftext.com", Text " and draw some ascii art together. We had fun for a day or so but after that other people showed up and started vandalizing everything." ]
                 , Image "/ascii-collab/gmc.png" [ Text "I anticipated there would be griefers so I took screenshots of most of what we had drawn" ]
-                , Paragraph [ Text "Years later I thought it would be fun to try drawing some ascii art again. I felt that I was reasonably good at it but I wanted to use something more sophisticated than yourworldoftext.com (which at least at the time, had no moderation tools and was missing basic features like undo/redo)." ]
+                , Paragraph [ Text "Years later I thought it would be fun to try drawing some ascii art again but I wanted to use something more sophisticated than yourworldoftext.com (which at least at the time, had no moderation tools and was missing basic features like undo/redo)." ]
                 , Paragraph [ Text "Naturally the thing to do then was write my own multiplayer ascii drawing webapp! And fortunately I was using Lamdera at this point so I had a convenient way to implement both the frontend and backend purely (heh) in Elm." ]
                 ]
             , Section
@@ -208,11 +208,20 @@ thingsIHaveDone =
                     , Image "/ascii-collab/tshirt-front.jpg" [ Text "The front side of my ascii t-shirt" ]
                     , Image "/ascii-collab/tshirt-back.jpg" [ Text "The back side of my ascii t-shirt. Can you spot Waldo this time?" ]
                     ]
-                , Section "Miscellaneous drawings"
-                    [ Paragraph [ Text "Original drawings people have made (not even close to an exhaustive list)." ]
+                , Section "Miscellaneous things"
+                    [ Paragraph [ Text "Here are some things people have made. The titles for them are made up by me." ]
                     , Image "/ascii-collab/touhou.png" [ ExternalLink "Touhou girls by yosicat" "ascii-collab.app/?x=-762&y=87" ]
                     , Image "/ascii-collab/presentation2.png" [ ExternalLink "The second presetation I gave about how I designed ascii-collab (the first one is on the poster)." "ascii-collab.app/?x=3201&y=5943" ]
                     , Image "/ascii-collab/instruments.png" [ ExternalLink "Music instruments drawn by Tilly, me, and two anonymous people" "ascii-collab.app/?x=-826&y=-151" ]
+                    , PixelImage "/ascii-collab/portraits.png" [ ExternalLink "Can you tell what these three portraits are?" "ascii-collab.app/?x=-184&y=169", AltText " Click here for answers" "American Gothic, The Scream, and Dos Equis's \"Most interesting man in the world\"" ]
+                    , PixelImage "/ascii-collab/sandwich.png" [ ExternalLink "A sandwich by me" "ascii-collab.app/?x=-722&y=-150" ]
+                    , PixelImage "/ascii-collab/moon.png" [ ExternalLink "(A) man on the moon by me" "ascii-collab.app/?x=92&y=-244" ]
+                    , PixelImage "/ascii-collab/sleeping.png" [ ExternalLink "Sleeping creature by Mushex" "ascii-collab.app/?x=1178&y=-48" ]
+                    , PixelImage "/ascii-collab/donuts.png" [ ExternalLink "Donut shop by Emo" "ascii-collab.app/?x=-251&y=-193" ]
+                    , Image "/ascii-collab/moyai.png" [ ExternalLink "🗿 by Emo" "ascii-collab.app/?x=120&y=95" ]
+                    , PixelImage "/ascii-collab/mei.png" [ ExternalLink "mei_the_flower by Mei" "ascii-collab.app/?x=960&y=-824" ]
+                    , Image "/ascii-collab/factory.png" [ ExternalLink "A Fæctory by Tilly and me" "ascii-collab.app/?x=-955&y=-355" ]
+                    , Paragraph [ Text "There's lots more to see, but you'll have to explore ascii-collab if you want to see the rest (or if you want to contribute). I highly recommend using a mouse and keyboard, the site does not work well with touch screens." ]
                     ]
                 ]
             ]
