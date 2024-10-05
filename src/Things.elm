@@ -178,33 +178,33 @@ thingsIHaveDone =
                 ]
             , Section
                 "Ascii art (lots of it)"
-                [ Paragraph [ Text "There is ", Bold "a lot", Text " of quality ascii art that has accumulated over the years this site has been running. The rest of this article is going to showcase some of the cool stuff other people and me have drawn/made." ]
-                , Paragraph [ Text "Real quick though, maybe some of you are thinking, ", Quote "Lots of quality ascii art? Easy! Copy-paste it from elsewhere!", Text " And yes, some ascii art is copied from elsewhere. I ask people to prefer drawing original stuff but I don't enforce it." ]
-                , Paragraph [ Text "I'd say 80% of it is original art however! How do I know that? Ascii-collab lets you color code changes people have made. Using it we can tell that this is probably copied due to the unnaturally placed space characters." ]
+                [ Paragraph [ Text "There is ", Bold "a lot", Text " of quality ascii art that has accumulated over the years. The rest of this article is going to showcase some of the cool stuff other people and me have drawn/made." ]
+                , Paragraph [ Text "Real quick though, some of you might be thinking, ", Quote "Lots of quality ascii art? Easy! Copy-paste it from elsewhere!", Text " And yes, some ascii art is copied from elsewhere. I ask people to prefer drawing original stuff but I don't enforce it." ]
+                , Paragraph [ Text "I'd say 80% of it is original art however! How do I know that? Ascii-collab lets you color code changes people have made. Using this tool we can tell that this is probably copied due to the unnaturally placed space characters." ]
                 , PixelImage 200 306 "/ascii-collab/copied.png" [ ExternalLink "A chess knight" "ascii-collab.app/?x=-184&y=291" ]
                 , Paragraph [ Text "And this, on the other hand, is an ", AltText "original drawing." " There are cases that are ambiguous. If there's a solid colored rectangle, that could be original art that has then been moved with the box selection tool." ]
                 , PixelImage 290 162 "/ascii-collab/legit.png" [ ExternalLink "A large cat enjoying some ramen, drawn by Tilly" "ascii-collab.app/?x=-856&y=-354" ]
                 , Paragraph [ Text "Anyway, lets see some ascii art!" ]
                 , Section "Posters"
-                    [ Paragraph [ Text "You saw the ascii poster already at the start of this article. Here's the original image for it." ]
+                    [ Paragraph [ Text "You saw the ascii poster already at the start of this article. Here's the raw image for it." ]
                     , Image "/ascii-collab/poster.png" [ Text "The poster region of the ascii-collab canvas" ]
                     , Paragraph
                         [ Text "And here is the color coded version. The green text represents changes "
                         , AltText "I've made." " Note that as admin for the site, I do also clean up vandalism and move around art sometimes, which makes it look like I drew a thing when it was someone else. 99% of the time it's my own art though."
                         ]
                     , Image "/ascii-collab/poster-color.png" [ Text "The poster region of the ascii-collab canvas but color coded by user" ]
-                    , Paragraph [ Text "There's no sign-up so once someone's session cookie expires (which happens after a few weeks) they get a new color. So there are slightly fewer contributors than there are colors." ]
+                    , Paragraph [ Text "There's no sign-up so once someone's session cookie expires (which happens after a few weeks) they get a new color. So there are fewer unique contributors than there are colors." ]
                     , Paragraph [ Text "There's lots of little details in this poster (can you find ", ExternalLink "Waldo?" "en.wikipedia.org/wiki/Where%27s_Wally%3F", Text ") but it's only a fraction of everything drawn so lets continue!" ]
                     ]
                 , Section "Coffee mugs"
                     [ Paragraph [ Text "I ordered two coffee mugs (one for me, one for my sister) with an ascii art design printed on them!" ]
                     , Image "/ascii-collab/mug-front.jpg" [ Text "Front side of the coffee mug" ]
                     , Image "/ascii-collab/mug-back.jpg" [ Text "Back side of the coffee mug" ]
-                    , Paragraph [ Text "And here's the original art in case you too want an ascii coffee mug." ]
+                    , Paragraph [ Text "And here's the raw image in case you too want an ascii coffee mug." ]
                     , Image "/ascii-collab/mug-art.png" [ ExternalLink "Coffee mug design" "ascii-collab.app/?x=348&y=-189" ]
                     ]
                 , Section "T-shirts"
-                    [ Paragraph [ Text "I ordered three t-shirts with an ascii art design printed on them! One was for me with black text on a white background. One was for my sister with a purple background. And the last one was for my girlfriend at the time with orange as the background (her favorite color). Unfortunately women's clothes sizes are really unpredictable and their t-shirts ended up being too small." ]
+                    [ Paragraph [ Text "I ordered three t-shirts with an ascii art design printed on them! One was for me with black text on a white background. One was for my sister with a purple background. And the last one was for my girlfriend with orange as the background (her favorite color). Unfortunately women's clothes sizes are really unpredictable and their t-shirts ended up being too small." ]
                     , Image "/ascii-collab/tshirt-front.jpg" [ Text "The front side of my ascii t-shirt" ]
                     , Image "/ascii-collab/tshirt-back.jpg" [ Text "The back side of my ascii t-shirt. Can you spot Waldo this time?" ]
                     ]
@@ -215,14 +215,18 @@ thingsIHaveDone =
                     , Image "/ascii-collab/instruments.png" [ ExternalLink "Music instruments drawn by Tilly, me, and two anonymous people" "ascii-collab.app/?x=-826&y=-151" ]
                     , PixelImage 492 156 "/ascii-collab/portraits.png" [ ExternalLink "Can you tell what these three portraits are?" "ascii-collab.app/?x=-184&y=169", AltText " Click here for answers" "American Gothic, The Scream, and Dos Equis's \"Most interesting man in the world\"" ]
                     , PixelImage 385 309 "/ascii-collab/sandwich.png" [ ExternalLink "A sandwich by me" "ascii-collab.app/?x=-722&y=-150" ]
-                    , PixelImage 765 414 "/ascii-collab/moon.png" [ ExternalLink "(A) man on the moon by me" "ascii-collab.app/?x=92&y=-244" ]
+                    , PixelImage 765 414 "/ascii-collab/moon.png" [ ExternalLink "[A] man on the moon by me" "ascii-collab.app/?x=92&y=-244" ]
                     , PixelImage 356 144 "/ascii-collab/sleeping.png" [ ExternalLink "Sleeping creature by Mushex" "ascii-collab.app/?x=1178&y=-48" ]
-                    , PixelImage 214 216 "/ascii-collab/sister.png" [ ExternalLink "My sister by my sister" "ascii-collab.app/?x=-923&y=203" ]
+                    , PixelImage 214 216 "/ascii-collab/sister.png" [ ExternalLink "My sister by my sister" "ascii-collab.app/?x=923&y=203" ]
                     , PixelImage 384 309 "/ascii-collab/donuts.png" [ ExternalLink "Donut shop by Emo" "ascii-collab.app/?x=-251&y=-193" ]
                     , Image "/ascii-collab/moyai.png" [ ExternalLink "🗿 by Emo" "ascii-collab.app/?x=120&y=95" ]
                     , PixelImage 340 378 "/ascii-collab/mei.png" [ ExternalLink "mei_the_flower by Mei" "ascii-collab.app/?x=960&y=-824" ]
                     , Image "/ascii-collab/factory.png" [ ExternalLink "A Fæctory by Tilly and me" "ascii-collab.app/?x=-955&y=-355" ]
-                    , Paragraph [ Text "There's lots more to see, but you'll have to explore ascii-collab if you want to see the rest (or if you want to contribute). I highly recommend using a mouse and keyboard, the site does not work well with touch screens." ]
+                    , Paragraph
+                        [ Text "There's lots more to see, but you'll have to explore ascii-collab if you want to see the rest. You're welcome to contribute as well, "
+                        , ExternalLink "but make sure to read the rules first" "ascii-collab.app"
+                        , Text ". Also I highly recommend using a mouse and keyboard, the site does not work well with touch screens."
+                        ]
                     , PixelImage 122 173 "/ascii-collab/waldo.png" [ ExternalLink "Oh and here's Waldo" "ascii-collab.app/?x=360&y=51" ]
                     ]
                 ]
