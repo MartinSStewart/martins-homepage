@@ -13,6 +13,7 @@ import Set exposing (Set)
 import SyntaxHighlight
 import Ui
 import Ui.Font
+import Url
 
 
 type Formatting
@@ -382,22 +383,40 @@ viewHelper config depth model item =
             let
                 content =
                     List.map (Html.Lazy.lazy4 viewHelper config (depth + 1) model) formattings
+
+                id =
+                    Url.percentEncode title
             in
             case depth of
                 0 ->
                     Html.div
                         [ Html.Attributes.style "padding-top" "16px" ]
-                        (Html.h2 [] [ Html.text title ] :: content)
-
-                1 ->
-                    Html.div
-                        []
-                        (Html.h3 [] [ Html.text title ] :: content)
+                        (Html.h2
+                            [ Html.Attributes.id id ]
+                            [ Html.a
+                                [ Html.Attributes.href ("#" ++ id)
+                                , Html.Attributes.style "text-decoration" "none"
+                                , Html.Attributes.style "color" "black"
+                                ]
+                                [ Html.text title ]
+                            ]
+                            :: content
+                        )
 
                 _ ->
                     Html.div
-                        []
-                        (Html.h4 [] [ Html.text title ] :: content)
+                        [ Html.Attributes.style "padding-top" "8px" ]
+                        (Html.h3
+                            [ Html.Attributes.id (Url.percentEncode title) ]
+                            [ Html.a
+                                [ Html.Attributes.href ("#" ++ id)
+                                , Html.Attributes.style "text-decoration" "none"
+                                , Html.Attributes.style "color" "black"
+                                ]
+                                [ Html.text title ]
+                            ]
+                            :: content
+                        )
 
         Image url altText ->
             Html.figure
@@ -424,7 +443,7 @@ viewHelper config depth model item =
 
                 cssWidth : Float
                 cssWidth =
-                    toFloat (floor config.devicePixelRatio) * toFloat imageWidth / config.devicePixelRatio
+                    toFloat (round (config.devicePixelRatio - 0.2)) * toFloat imageWidth / config.devicePixelRatio
 
                 attributes : List (Html.Attribute msg)
                 attributes =

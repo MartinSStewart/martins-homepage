@@ -179,10 +179,10 @@ thingsIHaveDone =
             , Section
                 "Ascii art (lots of it)"
                 [ Paragraph [ Text "There is ", Bold "a lot", Text " of quality ascii art that has accumulated over the years this site has been running. The rest of this article is going to showcase some of the cool stuff other people and me have drawn/made." ]
-                , Paragraph [ Text "Real quick though, maybe some of you are thinking, ", Quote "Lots of quality ascii art? Easy! Copy-paste it from elsewhere!", Text " And yes, some ascii art is copied from elsewhere (I ask people to prefer drawing original stuff but I don't strictly enforce it)." ]
-                , Paragraph [ Text "I'd say 80% of it is original art however! How do I know that? Ascii-collab lets you color code changes people have made. Using it we can tell, this is probably copied due to the unnaturally placed space characters." ]
+                , Paragraph [ Text "Real quick though, maybe some of you are thinking, ", Quote "Lots of quality ascii art? Easy! Copy-paste it from elsewhere!", Text " And yes, some ascii art is copied from elsewhere. I ask people to prefer drawing original stuff but I don't enforce it." ]
+                , Paragraph [ Text "I'd say 80% of it is original art however! How do I know that? Ascii-collab lets you color code changes people have made. Using it we can tell that this is probably copied due to the unnaturally placed space characters." ]
                 , PixelImage 200 306 "/ascii-collab/copied.png" [ ExternalLink "A chess knight" "ascii-collab.app/?x=-184&y=291" ]
-                , Paragraph [ Text "And this is an ", AltText "original work." " There are cases that are ambiguous. If there's a solid colored rectangle, that could be original art that has then been moved with the box selection tool." ]
+                , Paragraph [ Text "And this, on the other hand, is an ", AltText "original drawing." " There are cases that are ambiguous. If there's a solid colored rectangle, that could be original art that has then been moved with the box selection tool." ]
                 , PixelImage 290 162 "/ascii-collab/legit.png" [ ExternalLink "A large cat enjoying some ramen, drawn by Tilly" "ascii-collab.app/?x=-856&y=-354" ]
                 , Paragraph [ Text "Anyway, lets see some ascii art!" ]
                 , Section "Posters"
