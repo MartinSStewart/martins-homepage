@@ -911,11 +911,15 @@ filterView model =
     Ui.column
         [ Ui.spacingWith { horizontal = 16, vertical = 8 }, Ui.wrap ]
         [ sortByView model
-        , Ui.row
-            [ Ui.spacing 4 ]
-            [ Ui.el [ Ui.Font.size 14, Ui.Font.bold, Ui.width Ui.shrink ] (Ui.text "Filter by")
-            , List.map (filterTagView model.filter) Things.allTags |> Ui.row [ Ui.spacing 4, Ui.wrap ]
-            ]
+        , if model.sortBy == Chronological then
+            Ui.none
+
+          else
+            Ui.row
+                [ Ui.spacing 4 ]
+                [ Ui.el [ Ui.Font.size 14, Ui.Font.bold, Ui.width Ui.shrink ] (Ui.text "Filter by")
+                , List.map (filterTagView model.filter) Things.allTags |> Ui.row [ Ui.spacing 4, Ui.wrap ]
+                ]
         ]
 
 
