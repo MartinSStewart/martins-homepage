@@ -1045,6 +1045,7 @@ thingsViewNotMobile : String -> Tier -> Thing -> Ui.Element Msg
 thingsViewNotMobile name tier thing =
     Ui.el
         ([ Ui.width (Ui.px Shared.tileWidth)
+         , Ui.heightMin Shared.tileWidth
          , Ui.border 1
          , Ui.rounded 4
          , Ui.padding 3

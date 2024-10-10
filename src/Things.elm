@@ -268,7 +268,7 @@ thingsIHaveDone =
         , description = [ Paragraph [ Text "I made a ", ExternalLink "blog post" "dev.to/martinsstewart/what-is-elm-and-a-game-i-m-making-with-it-3di1", Text " describing how Elm made it easier to create along with an ", ExternalLink "announcement post" "discourse.elm-lang.org/t/ive-created-a-game-in-elm/4844", Text "." ] ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/circuit-breaker/preview.png"
         , previewText = ""
         , thingType =
             OtherThing
@@ -653,7 +653,7 @@ thingsIHaveDone =
         , description = []
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/func-prog-sweden.png"
         , previewText = ""
         , thingType =
             OtherThing
@@ -685,7 +685,7 @@ thingsIHaveDone =
         , description = []
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/func-prog-sweden.png"
         , previewText = ""
         , thingType =
             OtherThing
@@ -701,7 +701,7 @@ thingsIHaveDone =
         , description = []
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/goto-aarhus/preview.png"
         , previewText = ""
         , thingType =
             OtherThing
@@ -801,7 +801,7 @@ thingsIHaveDone =
         , description = []
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/tretton37/preview.png"
         , previewText = ""
         , thingType =
             JobThing
@@ -819,7 +819,7 @@ thingsIHaveDone =
         , description = []
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/insurello/preview.png"
         , previewText = ""
         , thingType =
             JobThing
@@ -1071,7 +1071,7 @@ myTypeCodec =
         , description = []
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/game-maker-preview.png"
+        , previewImage = "/zig-zag/preview.png"
         , previewText = ""
         , thingType =
             OtherThing
@@ -1280,7 +1280,7 @@ myTypeCodec =
         , description = []
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
-        , previewImage = "/discord-bot-preview.png"
+        , previewImage = "/tretton37/preview.png"
         , previewText = ""
         , thingType =
             OtherThing
