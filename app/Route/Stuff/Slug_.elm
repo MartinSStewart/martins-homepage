@@ -10,6 +10,7 @@ import FatalError exposing (FatalError)
 import Formatting exposing (Formatting)
 import Head
 import Head.Seo as Seo
+import Html.Attributes
 import Json.Decode
 import Pages.Url
 import PagesMsg exposing (PagesMsg)

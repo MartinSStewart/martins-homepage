@@ -57,18 +57,20 @@ type alias Config msg =
     }
 
 
-type ShotPath
-    = Leaf Bool
-    | Node (List ShotPath)
-
-
 view : Config msg -> Model a -> List Formatting -> Ui.Element msg
 view config model list =
     Html.div
-        [ Html.Attributes.style "line-height" "1.5" ]
+        (Html.Attributes.style "line-height" "1.5"
+            :: (if config.shootEmUpMode then
+                    [ Html.Attributes.style "user-select" "none", Html.Attributes.style "cursor" "crosshair" ]
+
+                else
+                    []
+               )
+        )
         (Html.node "style" [] [ Html.text "pre { white-space: pre-wrap; }" ]
             :: SyntaxHighlight.useTheme SyntaxHighlight.gitHub
-            :: List.map (viewHelper config [] [] model) list
+            :: List.map (viewHelper config 0 model) list
         )
         |> Ui.html
 
@@ -325,11 +327,11 @@ contentWidthMax =
     800
 
 
-viewHelper : Config msg -> List ShotPath -> List Int -> Model a -> Formatting -> Html msg
-viewHelper config shotPaths path model item =
+viewHelper : Config msg -> Int -> Model a -> Formatting -> Html msg
+viewHelper config depth model item =
     case item of
         Paragraph items ->
-            Html.p [] (mapOverInlineItems config 0 shotPaths path model items)
+            Html.p [] (List.map (inlineView config model) items)
 
         CodeBlock text ->
             case SyntaxHighlight.elm text of
@@ -353,104 +355,59 @@ viewHelper config shotPaths path model item =
                     Html.text text
 
         BulletList leading formattings ->
-            let
-                indexOffset =
-                    List.length leading
-            in
             Html.div
                 []
                 [ Html.p
                     []
-                    (mapOverInlineItems config 0 shotPaths path model leading)
+                    (List.map (inlineView config model) leading)
                 , Html.ul
                     [ Html.Attributes.style "padding-left" "20px" ]
-                    (List.indexedMap
-                        (\index item2 ->
-                            Html.li
-                                []
-                                [ Html.Lazy.lazy5
-                                    viewHelper
-                                    config
-                                    shotPaths
-                                    (indexOffset + index :: path)
-                                    model
-                                    item2
-                                ]
-                        )
+                    (List.map
+                        (\item2 -> Html.li [] [ Html.Lazy.lazy4 viewHelper config depth model item2 ])
                         formattings
                     )
                 ]
 
         NumberList leading formattings ->
-            let
-                indexOffset =
-                    List.length leading
-            in
             Html.div
                 []
                 [ Html.p
                     []
-                    (mapOverInlineItems config 0 shotPaths path model leading)
+                    (List.map (inlineView config model) leading)
                 , Html.ol
                     [ Html.Attributes.style "padding-left" "20px" ]
-                    (List.indexedMap
-                        (\index item2 ->
-                            Html.li
-                                []
-                                [ Html.Lazy.lazy5
-                                    viewHelper
-                                    config
-                                    shotPaths
-                                    (indexOffset + index :: path)
-                                    model
-                                    item2
-                                ]
-                        )
+                    (List.map
+                        (\item2 -> Html.li [] [ Html.Lazy.lazy4 viewHelper config depth model item2 ])
                         formattings
                     )
                 ]
 
         LetterList leading formattings ->
-            let
-                indexOffset =
-                    List.length leading
-            in
             Html.div
                 []
                 [ Html.p
                     []
-                    (mapOverInlineItems config 0 shotPaths path model leading)
+                    (List.map (inlineView config model) leading)
                 , Html.ul
                     [ Html.Attributes.type_ "A", Html.Attributes.style "padding-left" "20px" ]
-                    (List.indexedMap
-                        (\index item2 ->
-                            Html.li
-                                []
-                                [ Html.Lazy.lazy5
-                                    viewHelper
-                                    config
-                                    shotPaths
-                                    (indexOffset + index :: path)
-                                    model
-                                    item2
-                                ]
-                        )
+                    (List.map
+                        (\item2 -> Html.li [] [ Html.Lazy.lazy4 viewHelper config depth model item2 ])
                         formattings
                     )
                 ]
 
         Group formattings ->
-            Html.div [] (mapOverItems config 0 shotPaths path model formattings)
+            Html.div [] (List.map (viewHelper config depth model) formattings)
 
         Section title formattings ->
             let
                 content =
-                    mapOverItems config 0 shotPaths path model formattings
+                    List.map (viewHelper config (depth + 1) model) formattings
 
                 id =
                     Url.percentEncode title
             in
-            case List.length path of
+            case depth of
                 0 ->
                     Html.div
                         [ Html.Attributes.style "padding-top" "16px" ]
@@ -495,24 +452,33 @@ viewHelper config shotPaths path model item =
                     [ Html.Attributes.style "font-size" "14px"
                     , Html.Attributes.style "padding" "0 8px 0 8px "
                     ]
-                    (mapOverInlineItems config 0 shotPaths path model altText)
+                    (List.map (inlineView config model) altText)
                 ]
 
         PixelImage imageWidth _ url altText ->
-            pixelImage False config imageWidth url altText shotPaths path model
+            pixelImage False config imageWidth url altText model
 
         Video url ->
             Html.video
-                [ Html.Attributes.src ("https://" ++ url)
-                , Html.Attributes.style
+                ([ Html.Attributes.src ("https://" ++ url)
+                 , Html.Attributes.style
                     "max-width"
                     ("calc(100% + var(--ui-bp-0) * " ++ String.fromInt (sidePaddingMobile * 2) ++ "px)")
-                , Html.Attributes.style
+                 , Html.Attributes.style
                     "margin-left"
                     ("calc(var(--ui-bp-0) * -" ++ String.fromInt sidePaddingMobile ++ "px)")
-                , Html.Attributes.controls True
-                , Html.Events.on "play" (Json.Decode.succeed config.startedVideo)
-                ]
+                 , Html.Events.on "play" (Json.Decode.succeed config.startedVideo)
+                 ]
+                    ++ (if config.shootEmUpMode then
+                            [ Html.Attributes.style "opacity" "0.2"
+                            , Html.Attributes.attribute "disablePictureInPicture" ""
+                            , Html.Attributes.style "pointer-events" "none"
+                            ]
+
+                        else
+                            []
+                       )
+                )
                 []
 
         DogsGif ->
@@ -522,13 +488,11 @@ viewHelper config shotPaths path model item =
                 384
                 "/secret-santa-game/omfgdogs.gif"
                 [ Text "A very distracting pixel art animation of dogs" ]
-                shotPaths
-                path
                 model
 
 
-pixelImage : Bool -> Config msg -> Int -> String -> List Inline -> List ShotPath -> List Int -> Model a -> Html msg
-pixelImage isDogs config imageWidth url altText shotPaths path model =
+pixelImage : Bool -> Config msg -> Int -> String -> List Inline -> Model a -> Html msg
+pixelImage isDogs config imageWidth url altText model =
     let
         dpr2 =
             max 1 config.devicePixelRatio
@@ -571,68 +535,8 @@ pixelImage isDogs config imageWidth url altText shotPaths path model =
             [ Html.Attributes.style "font-size" "14px"
             , Html.Attributes.style "padding" "0 8px 0 8px "
             ]
-            (mapOverInlineItems config 0 shotPaths path model altText)
+            (List.map (inlineView config model) altText)
         ]
-
-
-mapOverItems :
-    Config msg
-    -> Int
-    -> List ShotPath
-    -> List Int
-    -> Model m
-    -> List Formatting
-    -> List (Html msg)
-mapOverItems config indexOffset shotPaths path model items =
-    List.foldl
-        (\item state ->
-            case state.shots of
-                (Node head) :: rest ->
-                    { html = viewHelper config head (state.index :: path) model item :: state.html
-                    , index = state.index + 1
-                    , shots = rest
-                    }
-
-                _ ->
-                    { html = viewHelper config [] (state.index :: path) model item :: state.html
-                    , index = state.index + 1
-                    , shots = []
-                    }
-        )
-        { shots = shotPaths, index = indexOffset, html = [] }
-        items
-        |> .html
-        |> List.reverse
-
-
-mapOverInlineItems :
-    Config msg
-    -> Int
-    -> List ShotPath
-    -> List Int
-    -> Model m
-    -> List Inline
-    -> List (Html msg)
-mapOverInlineItems config indexOffset shotPaths path model items =
-    List.foldl
-        (\item state ->
-            case state.shots of
-                (Node head) :: rest ->
-                    { html = inlineView config head (state.index :: path) model item :: state.html
-                    , index = state.index + 1
-                    , shots = rest
-                    }
-
-                _ ->
-                    { html = inlineView config [] (state.index :: path) model item :: state.html
-                    , index = state.index + 1
-                    , shots = []
-                    }
-        )
-        { shots = shotPaths, index = indexOffset, html = [] }
-        items
-        |> .html
-        |> List.reverse
 
 
 sidePaddingMobile : number
@@ -645,17 +549,65 @@ sidePaddingNotMobile =
     16
 
 
-inlineView : Config msg -> List ShotPath -> List Int -> Model a -> Inline -> Html msg
-inlineView config shotPaths path model inline =
+inlineView : Config msg -> Model a -> Inline -> Html msg
+inlineView config model inline =
     case inline of
         Bold text ->
-            Html.b [] [ Html.text text ]
+            Html.b []
+                [ if config.shootEmUpMode then
+                    List.map
+                        (\word ->
+                            Html.span
+                                [ Html.Attributes.class "shootable"
+                                ]
+                                [ Html.text word ]
+                        )
+                        (String.split " " text)
+                        |> List.intersperse (Html.text " ")
+                        |> Html.span []
+
+                  else
+                    Html.text text
+                ]
 
         Italic text ->
-            Html.i [] [ Html.text text ]
+            Html.i []
+                [ if config.shootEmUpMode then
+                    List.map
+                        (\word ->
+                            Html.span
+                                [ Html.Attributes.class "shootable"
+                                ]
+                                [ Html.text word ]
+                        )
+                        (String.split " " text)
+                        |> List.intersperse (Html.text " ")
+                        |> Html.span []
+
+                  else
+                    Html.text text
+                ]
 
         Link text url ->
-            Html.a [ Html.Attributes.href (Route.toString url) ] [ Html.text text ]
+            if config.shootEmUpMode then
+                List.map
+                    (\word ->
+                        Html.span
+                            [ Html.Attributes.class "shootable"
+                            ]
+                            [ Html.text word ]
+                    )
+                    (String.split " " text)
+                    |> List.intersperse (Html.text " ")
+                    |> Html.span
+                        [ Html.Attributes.style "text-decoration" "underline"
+                        , Html.Attributes.style "color" "#0000EE"
+                        ]
+
+            else
+                Html.a
+                    [ Html.Attributes.href (Route.toString url) ]
+                    [ Html.text text ]
 
         Code text ->
             Html.code
@@ -673,7 +625,21 @@ inlineView config shotPaths path model inline =
                 , Html.Attributes.style "border-radius" "4px"
                 , Html.Attributes.style "font-size" "16px"
                 ]
-                [ Html.text text ]
+                [ if config.shootEmUpMode then
+                    List.map
+                        (\word ->
+                            Html.span
+                                [ Html.Attributes.class "shootable"
+                                ]
+                                [ Html.text word ]
+                        )
+                        (String.split " " text)
+                        |> List.intersperse (Html.text " ")
+                        |> Html.span []
+
+                  else
+                    Html.text text
+                ]
 
         Text text ->
             if config.shootEmUpMode then
@@ -692,7 +658,23 @@ inlineView config shotPaths path model inline =
                 Html.text text
 
         ExternalLink text url ->
-            externalLinkHtml text url
+            if config.shootEmUpMode then
+                List.map
+                    (\word ->
+                        Html.span
+                            [ Html.Attributes.class "shootable"
+                            ]
+                            [ Html.text word ]
+                    )
+                    (String.split " " text)
+                    |> List.intersperse (Html.text " ")
+                    |> Html.span
+                        [ Html.Attributes.style "text-decoration" "underline"
+                        , Html.Attributes.style "color" "#0000EE"
+                        ]
+
+            else
+                externalLinkHtml text url
 
         AltText text altText ->
             let

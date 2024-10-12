@@ -29,30 +29,39 @@ const config: ElmPagesInit = {
     app.ports.shoot.subscribe((a) => {
 
         const elem = document.elementFromPoint(a.x, a.y);
-        console.log(elem);
         if (elem) {
             if (elem.classList[0] === 'shootable') {
-                const newElem = document.createElement("span");
-                document.body.appendChild(newElem);
-                const newspaperSpinning = [
-                  { transform: "translateY(0px) rotate(0)" },
-                  { transform: "translateY(-100px) rotate(100deg)" },
-                  { transform: "translateY(100px) rotate(200deg)" },
-                  { transform: "translateY(300px) rotate(300deg)" },
-                  { transform: "translateY(600px) rotate(400deg)" },
-                ];
+                let keyframes = [];
 
-                const newspaperTiming = {
-                  duration: 2000,
-                  iterations: 1,
-                };
-                elem.style.color = 'transparent';
+                const scale = elem.innerText.length + 3;
+                const bodyHeight = document.documentElement.scrollHeight
+                const height = bodyHeight - elem.getBoundingClientRect().y;
+
+                const xSpeed = (Math.random() - 0.5) * 5 / scale;
+                const ySpeed = Math.abs(xSpeed * 2);
+                const spinSpeed = (Math.random() - 0.5) * 10 / scale;
+                const gravity = -0.001;
+
+                const apexTime = -ySpeed / (2 * gravity);
+                const apexHeight = gravity * Math.pow(apexTime, 2) + ySpeed * apexTime + height;
+
+                const timeFactor = 0.03;
+                const duration = apexTime + Math.sqrt(-apexHeight / gravity);
+                const iterations = 20;
+
+                for (let i = 0; i <= iterations; i++) {
+                    const t = duration * i / iterations;
+                    const y = -gravity * Math.pow(t, 2) + t * -ySpeed;
+                    const x = t * xSpeed;
+                    keyframes.push({ color: "inherit", transform: "translateX(" + x + "px) translateY(" + y + "px) rotate(" + (t * spinSpeed) + "deg)" });
+                }
+
+
                 elem.classList = "";
-                newElem.innerText = elem.innerText;
-                const rect = elem.getBoundingClientRect();
-                newElem.style = "display:inline-block; color:red; position:relative; top:" + rect.top + "left:" + rect.left;
 
-                newElem.animate(newspaperSpinning, newspaperTiming);
+                elem.style = "display:inline-block; color:transparent";
+
+                elem.animate(keyframes, { duration: duration, iterations: 1 });
             }
         }
     });
