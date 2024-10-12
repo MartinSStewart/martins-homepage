@@ -168,7 +168,8 @@ thingsIHaveDone =
         , tags = [ Elm, Game, Lamdera ]
         , previewText = "An infinite canvas that people can draw ascii art on together."
         , description =
-            [ Paragraph [ Text "An infinite canvas that people can draw ascii art on together. I wrote an ", ExternalLink "announcement post" "discourse.elm-lang.org/t/ascii-collab-draw-ascii-art-together-on-an-infinite-canvas/6273", Text " and a ", ExternalLink "follow up post" "discourse.elm-lang.org/t/ascii-collab-progress-update/7019", Text " about it. I also showed it off on ", ExternalLink "Hacker News" "news.ycombinator.com/item?id=29572662", Text " and then had to spend an hour removing all of the vandalism left behind (but at least people liked it)." ]
+            [ Image "/ascii-collab/screenshot.png" []
+            , Paragraph [ Text "An infinite canvas that people can draw ascii art on together. I wrote an ", ExternalLink "announcement post" "discourse.elm-lang.org/t/ascii-collab-draw-ascii-art-together-on-an-infinite-canvas/6273", Text " and a ", ExternalLink "follow up post" "discourse.elm-lang.org/t/ascii-collab-progress-update/7019", Text " about it. I also showed it off on ", ExternalLink "Hacker News" "news.ycombinator.com/item?id=29572662", Text " and then had to spend an hour removing all of the vandalism left behind (but at least people liked it)." ]
             , Image "/ascii-collab/poster-irl.jpg"
                 [ Text "Part of the canvas that I made into a poster. I ordered two copies of it from a local print shop for me and my sister. This is the one I have, stuck to the wall above my couch-bed. "
                 , ExternalLink "High-res version" "ascii-collab.app/poster-irl.jpg"
@@ -1142,7 +1143,21 @@ myTypeCodec =
         , description =
             [ Paragraph [ Text "I participated in a secret santa event where everyone made a little game for another randomly chosen participant. This is the game I made. In my opinion it has by far the highest fun-to-effort ratio of anything I've ever made." ]
             , Video "res.cloudinary.com/dqqkfcvf6/video/upload/f_auto:video,q_auto/v1/martins-homepage/xdxibprfxfthcrtmjtiu"
-            , Paragraph [ Text "The song that plays in the game is Norwegian Pirate by Two Steps From Hell" ]
+            , Paragraph
+                [ Text "The song that plays in the game is Norwegian Pirate by Two Steps From Hell. The dogs gif that you defend is by "
+                , ExternalLink "Paul Robertson" "www.inprnt.com/gallery/paulrobertson/"
+                , Text " (he draws lots of high-quality pixel art)"
+                ]
+            , PixelImage 384 80 "/secret-santa-game/omfgdogs.gif" [ Text "A very distracting pixel art animation of dogs" ]
+            , Paragraph
+                [ Text "Since the game didn't take very long to make and I bet you are unlikely to download and run a random exe file you found on the internet, I've made it so you can also play it on this page."
+                ]
+            , BulletList
+                [ Bold "How to play:" ]
+                [ Paragraph [ Text "1, 2, 3, and 4 keys swap between weapons (you're going to want to use a mouse and keyboard)" ]
+                , Paragraph [ Text "Shoot the incoming cursors and prevent them from dragging the dogs gif off the screen" ]
+                , Paragraph [ Text "Double click on the dogs gif to start!" ]
+                ]
             ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt

@@ -51,7 +51,13 @@ type alias Config msg =
     , startedVideo : msg
     , windowWidth : Int
     , devicePixelRatio : Float
+    , shootEmUpMode : Maybe (List Int -> msg)
     }
+
+
+type ShotPath
+    = Leaf Bool
+    | Node (List ShotPath)
 
 
 view : Config msg -> Model a -> List Formatting -> Ui.Element msg
@@ -60,7 +66,7 @@ view config model list =
         [ Html.Attributes.style "line-height" "1.5" ]
         (Html.node "style" [] [ Html.text "pre { white-space: pre-wrap; }" ]
             :: SyntaxHighlight.useTheme SyntaxHighlight.gitHub
-            :: List.map (viewHelper config 0 model) list
+            :: List.map (viewHelper config (Leaf False) [] model) list
         )
         |> Ui.html
 
@@ -314,11 +320,11 @@ contentWidthMax =
     800
 
 
-viewHelper : Config msg -> Int -> Model a -> Formatting -> Html msg
-viewHelper config depth model item =
+viewHelper : Config msg -> ShotPath -> List Int -> Model a -> Formatting -> Html msg
+viewHelper config shotPaths path model item =
     case item of
         Paragraph items ->
-            Html.p [] (List.map (inlineView config model) items)
+            Html.p [] (List.indexedMap (\index a -> inlineView config shotPaths (index :: path) model a) items)
 
         CodeBlock text ->
             case SyntaxHighlight.elm text of
@@ -342,53 +348,113 @@ viewHelper config depth model item =
                     Html.text text
 
         BulletList leading formattings ->
+            let
+                indexOffset =
+                    List.length leading
+            in
             Html.div
                 []
-                [ Html.p [] (List.map (inlineView config model) leading)
+                [ Html.p
+                    []
+                    (List.indexedMap (\index a -> inlineView config shotPaths (index :: path) model a) leading)
                 , Html.ul
                     [ Html.Attributes.style "padding-left" "20px" ]
-                    (List.map
-                        (\item2 -> Html.li [] [ Html.Lazy.lazy4 viewHelper config depth model item2 ])
+                    (List.indexedMap
+                        (\index item2 ->
+                            Html.li
+                                []
+                                [ Html.Lazy.lazy5
+                                    viewHelper
+                                    config
+                                    shotPaths
+                                    (indexOffset + index :: path)
+                                    model
+                                    item2
+                                ]
+                        )
                         formattings
                     )
                 ]
 
         NumberList leading formattings ->
+            let
+                indexOffset =
+                    List.length leading
+            in
             Html.div
                 []
-                [ Html.p [] (List.map (inlineView config model) leading)
+                [ Html.p
+                    []
+                    (List.indexedMap (\index a -> inlineView config shotPaths (index :: path) model a) leading)
                 , Html.ol
                     [ Html.Attributes.style "padding-left" "20px" ]
-                    (List.map
-                        (\item2 -> Html.li [] [ Html.Lazy.lazy4 viewHelper config depth model item2 ])
+                    (List.indexedMap
+                        (\index item2 ->
+                            Html.li
+                                []
+                                [ Html.Lazy.lazy5
+                                    viewHelper
+                                    config
+                                    shotPaths
+                                    (indexOffset + index :: path)
+                                    model
+                                    item2
+                                ]
+                        )
                         formattings
                     )
                 ]
 
         LetterList leading formattings ->
+            let
+                indexOffset =
+                    List.length leading
+            in
             Html.div
                 []
-                [ Html.p [] (List.map (inlineView config model) leading)
-                , Html.ol
+                [ Html.p
+                    []
+                    (List.indexedMap (\index a -> inlineView config shotPaths (index :: path) model a) leading)
+                , Html.ul
                     [ Html.Attributes.type_ "A", Html.Attributes.style "padding-left" "20px" ]
-                    (List.map
-                        (\item2 -> Html.li [] [ Html.Lazy.lazy4 viewHelper config depth model item2 ])
+                    (List.indexedMap
+                        (\index item2 ->
+                            Html.li
+                                []
+                                [ Html.Lazy.lazy5
+                                    viewHelper
+                                    config
+                                    shotPaths
+                                    (indexOffset + index :: path)
+                                    model
+                                    item2
+                                ]
+                        )
                         formattings
                     )
                 ]
 
         Group formattings ->
-            Html.div [] (List.map (Html.Lazy.lazy4 viewHelper config depth model) formattings)
+            Html.div
+                []
+                (List.indexedMap
+                    (\index item2 -> Html.Lazy.lazy5 viewHelper config shotPaths (index :: path) model item2)
+                    formattings
+                )
 
         Section title formattings ->
             let
                 content =
-                    List.map (Html.Lazy.lazy4 viewHelper config (depth + 1) model) formattings
+                    List.indexedMap
+                        (\index item2 ->
+                            Html.Lazy.lazy5 viewHelper config shotPaths (index + 1 :: path) model item2
+                        )
+                        formattings
 
                 id =
                     Url.percentEncode title
             in
-            case depth of
+            case List.length path of
                 0 ->
                     Html.div
                         [ Html.Attributes.style "padding-top" "16px" ]
@@ -433,7 +499,7 @@ viewHelper config depth model item =
                     [ Html.Attributes.style "font-size" "14px"
                     , Html.Attributes.style "padding" "0 8px 0 8px "
                     ]
-                    (List.map (inlineView config model) altText)
+                    (List.indexedMap (\index a -> inlineView config shotPaths (index :: path) model a) altText)
                 ]
 
         PixelImage imageWidth _ url altText ->
@@ -471,7 +537,7 @@ viewHelper config depth model item =
                     [ Html.Attributes.style "font-size" "14px"
                     , Html.Attributes.style "padding" "0 8px 0 8px "
                     ]
-                    (List.map (inlineView config model) altText)
+                    (List.indexedMap (\index a -> inlineView config shotPaths (index :: path) model a) altText)
                 ]
 
         Video url ->
@@ -489,6 +555,35 @@ viewHelper config depth model item =
                 []
 
 
+mapOversItems :
+    (Config msg -> ShotPath -> List Int -> Model m -> a -> Html msg)
+    -> Config msg
+    -> Int
+    -> List ShotPath
+    -> List Int
+    -> Model m
+    -> List a
+    -> { html : List (Html msg), index : Int, shots : List ShotPath }
+mapOversItems viewFunc config indexOffset shotPaths path model items =
+    List.foldl
+        (\item state ->
+            case state.shots of
+                head :: rest ->
+                    { html = viewFunc config head (state.index :: path) model item :: state.html
+                    , index = state.index + 1
+                    , shots = rest
+                    }
+
+                [] ->
+                    { html = viewFunc config (Leaf False) (state.index :: path) model item :: state.html
+                    , index = state.index + 1
+                    , shots = []
+                    }
+        )
+        { shots = shotPaths, index = indexOffset, html = [] }
+        items
+
+
 sidePaddingMobile : number
 sidePaddingMobile =
     8
@@ -499,8 +594,8 @@ sidePaddingNotMobile =
     16
 
 
-inlineView : Config msg -> Model a -> Inline -> Html msg
-inlineView config model inline =
+inlineView : Config msg -> ShotPath -> List Int -> Model a -> Inline -> Html msg
+inlineView config shotPaths path model inline =
     case inline of
         Bold text ->
             Html.b [] [ Html.text text ]
@@ -530,7 +625,20 @@ inlineView config model inline =
                 [ Html.text text ]
 
         Text text ->
-            Html.text text
+            case config.shootEmUpMode of
+                Just msg ->
+                    List.map
+                        (\word ->
+                            Html.span
+                                [ Html.Events.onMouseDown (msg path) ]
+                                [ Html.text word ]
+                        )
+                        (String.split " " text)
+                        |> List.intersperse (Html.text " ")
+                        |> Html.span []
+
+                Nothing ->
+                    Html.text text
 
         ExternalLink text url ->
             externalLinkHtml text url

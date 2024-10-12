@@ -227,6 +227,7 @@ view app shared model =
                     , startedVideo = StartedVideo |> PagesMsg.fromMsg
                     , windowWidth = shared.windowWidth
                     , devicePixelRatio = shared.devicePixelRatio
+                    , shootEmUpMode = Nothing
                     }
                     model
                     thing.description
