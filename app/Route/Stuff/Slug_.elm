@@ -31,6 +31,9 @@ port skipForwardVideo : () -> Cmd msg
 port skipBackwardVideo : () -> Cmd msg
 
 
+port shoot : { x : Float, y : Float } -> Cmd msg
+
+
 type alias Model =
     { selectedAltText : Set String, videoIsPlaying : Bool }
 
@@ -39,6 +42,8 @@ type Msg
     = PressedAltText String
     | StartedVideo
     | PressedArrowKey ArrowKey
+    | PressedStartShootEmUp
+    | MouseDown Float Float
 
 
 type ArrowKey
@@ -91,27 +96,45 @@ update _ _ msg model =
                     skipForwardVideo ()
             )
 
+        PressedStartShootEmUp ->
+            ( model, Effect.none )
+
+        MouseDown x y ->
+            let
+                _ =
+                    Debug.log "a" ( x, y )
+            in
+            ( model, shoot { x = x, y = y } )
+
 
 subscriptions : a -> b -> c -> Model -> Sub Msg
 subscriptions _ _ _ model =
-    if model.videoIsPlaying then
-        Browser.Events.onKeyDown
-            (Json.Decode.field "key" Json.Decode.string
-                |> Json.Decode.andThen
-                    (\key ->
-                        if key == "ArrowLeft" then
-                            Json.Decode.succeed (PressedArrowKey LeftArrowKey)
-
-                        else if key == "ArrowRight" then
-                            Json.Decode.succeed (PressedArrowKey RightArrowKey)
-
-                        else
-                            Json.Decode.fail ""
-                    )
+    Sub.batch
+        [ Browser.Events.onMouseDown
+            (Json.Decode.map2
+                MouseDown
+                (Json.Decode.field "clientX" Json.Decode.float)
+                (Json.Decode.field "clientY" Json.Decode.float)
             )
+        , if model.videoIsPlaying then
+            Browser.Events.onKeyDown
+                (Json.Decode.field "key" Json.Decode.string
+                    |> Json.Decode.andThen
+                        (\key ->
+                            if key == "ArrowLeft" then
+                                Json.Decode.succeed (PressedArrowKey LeftArrowKey)
 
-    else
-        Sub.none
+                            else if key == "ArrowRight" then
+                                Json.Decode.succeed (PressedArrowKey RightArrowKey)
+
+                            else
+                                Json.Decode.fail ""
+                        )
+                )
+
+          else
+            Sub.none
+        ]
 
 
 pages : BackendTask FatalError (List RouteParams)
@@ -227,7 +250,8 @@ view app shared model =
                     , startedVideo = StartedVideo |> PagesMsg.fromMsg
                     , windowWidth = shared.windowWidth
                     , devicePixelRatio = shared.devicePixelRatio
-                    , shootEmUpMode = Nothing
+                    , shootEmUpMode = True
+                    , pressedStartShootEmUp = PagesMsg.fromMsg PressedStartShootEmUp
                     }
                     model
                     thing.description

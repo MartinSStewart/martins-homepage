@@ -28,6 +28,7 @@ type Formatting
     | Image String (List Inline)
     | PixelImage Int Int String (List Inline)
     | Video String
+    | DogsGif
 
 
 type Inline
@@ -51,7 +52,8 @@ type alias Config msg =
     , startedVideo : msg
     , windowWidth : Int
     , devicePixelRatio : Float
-    , shootEmUpMode : Maybe (List Int -> msg)
+    , shootEmUpMode : Bool
+    , pressedStartShootEmUp : msg
     }
 
 
@@ -66,7 +68,7 @@ view config model list =
         [ Html.Attributes.style "line-height" "1.5" ]
         (Html.node "style" [] [ Html.text "pre { white-space: pre-wrap; }" ]
             :: SyntaxHighlight.useTheme SyntaxHighlight.gitHub
-            :: List.map (viewHelper config (Leaf False) [] model) list
+            :: List.map (viewHelper config [] [] model) list
         )
         |> Ui.html
 
@@ -165,6 +167,9 @@ checkFormattingHelper formatting =
 
             else
                 Ok ()
+
+        DogsGif ->
+            Ok ()
 
 
 checkInlineFormatting : Inline -> Result String ()
@@ -320,11 +325,11 @@ contentWidthMax =
     800
 
 
-viewHelper : Config msg -> ShotPath -> List Int -> Model a -> Formatting -> Html msg
+viewHelper : Config msg -> List ShotPath -> List Int -> Model a -> Formatting -> Html msg
 viewHelper config shotPaths path model item =
     case item of
         Paragraph items ->
-            Html.p [] (List.indexedMap (\index a -> inlineView config shotPaths (index :: path) model a) items)
+            Html.p [] (mapOverInlineItems config 0 shotPaths path model items)
 
         CodeBlock text ->
             case SyntaxHighlight.elm text of
@@ -356,7 +361,7 @@ viewHelper config shotPaths path model item =
                 []
                 [ Html.p
                     []
-                    (List.indexedMap (\index a -> inlineView config shotPaths (index :: path) model a) leading)
+                    (mapOverInlineItems config 0 shotPaths path model leading)
                 , Html.ul
                     [ Html.Attributes.style "padding-left" "20px" ]
                     (List.indexedMap
@@ -385,7 +390,7 @@ viewHelper config shotPaths path model item =
                 []
                 [ Html.p
                     []
-                    (List.indexedMap (\index a -> inlineView config shotPaths (index :: path) model a) leading)
+                    (mapOverInlineItems config 0 shotPaths path model leading)
                 , Html.ol
                     [ Html.Attributes.style "padding-left" "20px" ]
                     (List.indexedMap
@@ -414,7 +419,7 @@ viewHelper config shotPaths path model item =
                 []
                 [ Html.p
                     []
-                    (List.indexedMap (\index a -> inlineView config shotPaths (index :: path) model a) leading)
+                    (mapOverInlineItems config 0 shotPaths path model leading)
                 , Html.ul
                     [ Html.Attributes.type_ "A", Html.Attributes.style "padding-left" "20px" ]
                     (List.indexedMap
@@ -435,21 +440,12 @@ viewHelper config shotPaths path model item =
                 ]
 
         Group formattings ->
-            Html.div
-                []
-                (List.indexedMap
-                    (\index item2 -> Html.Lazy.lazy5 viewHelper config shotPaths (index :: path) model item2)
-                    formattings
-                )
+            Html.div [] (mapOverItems config 0 shotPaths path model formattings)
 
         Section title formattings ->
             let
                 content =
-                    List.indexedMap
-                        (\index item2 ->
-                            Html.Lazy.lazy5 viewHelper config shotPaths (index + 1 :: path) model item2
-                        )
-                        formattings
+                    mapOverItems config 0 shotPaths path model formattings
 
                 id =
                     Url.percentEncode title
@@ -499,46 +495,11 @@ viewHelper config shotPaths path model item =
                     [ Html.Attributes.style "font-size" "14px"
                     , Html.Attributes.style "padding" "0 8px 0 8px "
                     ]
-                    (List.indexedMap (\index a -> inlineView config shotPaths (index :: path) model a) altText)
+                    (mapOverInlineItems config 0 shotPaths path model altText)
                 ]
 
         PixelImage imageWidth _ url altText ->
-            let
-                dpr2 =
-                    max 1 config.devicePixelRatio
-
-                cssWidth : Float
-                cssWidth =
-                    toFloat (round (dpr2 - 0.2)) * toFloat imageWidth / dpr2
-
-                containerWidth : Int
-                containerWidth =
-                    min config.windowWidth contentWidthMax - sidePaddingNotMobile * 2
-
-                attributes : List (Html.Attribute msg)
-                attributes =
-                    if cssWidth > toFloat containerWidth then
-                        [ Html.Attributes.style "max-width" "100%"
-                        ]
-
-                    else
-                        [ Html.Attributes.style "width" (String.fromFloat cssWidth ++ "px")
-                        , Html.Attributes.style "image-rendering" "pixelated"
-                        ]
-            in
-            Html.figure
-                [ Html.Attributes.style "padding-bottom" "16px"
-                , Html.Attributes.style "margin" "0"
-                ]
-                [ Html.img
-                    (Html.Attributes.src url :: attributes)
-                    []
-                , Html.figcaption
-                    [ Html.Attributes.style "font-size" "14px"
-                    , Html.Attributes.style "padding" "0 8px 0 8px "
-                    ]
-                    (List.indexedMap (\index a -> inlineView config shotPaths (index :: path) model a) altText)
-                ]
+            pixelImage False config imageWidth url altText shotPaths path model
 
         Video url ->
             Html.video
@@ -554,34 +515,124 @@ viewHelper config shotPaths path model item =
                 ]
                 []
 
+        DogsGif ->
+            pixelImage
+                True
+                config
+                384
+                "/secret-santa-game/omfgdogs.gif"
+                [ Text "A very distracting pixel art animation of dogs" ]
+                shotPaths
+                path
+                model
 
-mapOversItems :
-    (Config msg -> ShotPath -> List Int -> Model m -> a -> Html msg)
-    -> Config msg
+
+pixelImage : Bool -> Config msg -> Int -> String -> List Inline -> List ShotPath -> List Int -> Model a -> Html msg
+pixelImage isDogs config imageWidth url altText shotPaths path model =
+    let
+        dpr2 =
+            max 1 config.devicePixelRatio
+
+        cssWidth : Float
+        cssWidth =
+            toFloat (round (dpr2 - 0.2)) * toFloat imageWidth / dpr2
+
+        containerWidth : Int
+        containerWidth =
+            min config.windowWidth contentWidthMax - sidePaddingNotMobile * 2
+
+        attributes : List (Html.Attribute msg)
+        attributes =
+            if cssWidth > toFloat containerWidth then
+                [ Html.Attributes.style "max-width" "100%"
+                ]
+
+            else
+                [ Html.Attributes.style "width" (String.fromFloat cssWidth ++ "px")
+                , Html.Attributes.style "image-rendering" "pixelated"
+                ]
+    in
+    Html.figure
+        [ Html.Attributes.style "padding-bottom" "16px"
+        , Html.Attributes.style "margin" "0"
+        ]
+        [ Html.img
+            (Html.Attributes.src url
+                :: attributes
+                ++ (if isDogs then
+                        [ Html.Events.onDoubleClick config.pressedStartShootEmUp ]
+
+                    else
+                        []
+                   )
+            )
+            []
+        , Html.figcaption
+            [ Html.Attributes.style "font-size" "14px"
+            , Html.Attributes.style "padding" "0 8px 0 8px "
+            ]
+            (mapOverInlineItems config 0 shotPaths path model altText)
+        ]
+
+
+mapOverItems :
+    Config msg
     -> Int
     -> List ShotPath
     -> List Int
     -> Model m
-    -> List a
-    -> { html : List (Html msg), index : Int, shots : List ShotPath }
-mapOversItems viewFunc config indexOffset shotPaths path model items =
+    -> List Formatting
+    -> List (Html msg)
+mapOverItems config indexOffset shotPaths path model items =
     List.foldl
         (\item state ->
             case state.shots of
-                head :: rest ->
-                    { html = viewFunc config head (state.index :: path) model item :: state.html
+                (Node head) :: rest ->
+                    { html = viewHelper config head (state.index :: path) model item :: state.html
                     , index = state.index + 1
                     , shots = rest
                     }
 
-                [] ->
-                    { html = viewFunc config (Leaf False) (state.index :: path) model item :: state.html
+                _ ->
+                    { html = viewHelper config [] (state.index :: path) model item :: state.html
                     , index = state.index + 1
                     , shots = []
                     }
         )
         { shots = shotPaths, index = indexOffset, html = [] }
         items
+        |> .html
+        |> List.reverse
+
+
+mapOverInlineItems :
+    Config msg
+    -> Int
+    -> List ShotPath
+    -> List Int
+    -> Model m
+    -> List Inline
+    -> List (Html msg)
+mapOverInlineItems config indexOffset shotPaths path model items =
+    List.foldl
+        (\item state ->
+            case state.shots of
+                (Node head) :: rest ->
+                    { html = inlineView config head (state.index :: path) model item :: state.html
+                    , index = state.index + 1
+                    , shots = rest
+                    }
+
+                _ ->
+                    { html = inlineView config [] (state.index :: path) model item :: state.html
+                    , index = state.index + 1
+                    , shots = []
+                    }
+        )
+        { shots = shotPaths, index = indexOffset, html = [] }
+        items
+        |> .html
+        |> List.reverse
 
 
 sidePaddingMobile : number
@@ -594,7 +645,7 @@ sidePaddingNotMobile =
     16
 
 
-inlineView : Config msg -> ShotPath -> List Int -> Model a -> Inline -> Html msg
+inlineView : Config msg -> List ShotPath -> List Int -> Model a -> Inline -> Html msg
 inlineView config shotPaths path model inline =
     case inline of
         Bold text ->
@@ -625,20 +676,20 @@ inlineView config shotPaths path model inline =
                 [ Html.text text ]
 
         Text text ->
-            case config.shootEmUpMode of
-                Just msg ->
-                    List.map
-                        (\word ->
-                            Html.span
-                                [ Html.Events.onMouseDown (msg path) ]
-                                [ Html.text word ]
-                        )
-                        (String.split " " text)
-                        |> List.intersperse (Html.text " ")
-                        |> Html.span []
+            if config.shootEmUpMode then
+                List.map
+                    (\word ->
+                        Html.span
+                            [ Html.Attributes.class "shootable"
+                            ]
+                            [ Html.text word ]
+                    )
+                    (String.split " " text)
+                    |> List.intersperse (Html.text " ")
+                    |> Html.span []
 
-                Nothing ->
-                    Html.text text
+            else
+                Html.text text
 
         ExternalLink text url ->
             externalLinkHtml text url

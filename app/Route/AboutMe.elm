@@ -30,6 +30,7 @@ type alias Model =
 type Msg
     = PressedAltText String
     | StartedVideo
+    | PressedStartShootEmUp
 
 
 type alias RouteParams =
@@ -68,6 +69,9 @@ update _ _ msg model =
             ( { model | selectedAltText = Set.insert altText model.selectedAltText }, Effect.none )
 
         StartedVideo ->
+            ( model, Effect.none )
+
+        PressedStartShootEmUp ->
             ( model, Effect.none )
 
 
@@ -157,7 +161,8 @@ view app shared model =
                         , startedVideo = StartedVideo |> PagesMsg.fromMsg
                         , windowWidth = shared.windowWidth
                         , devicePixelRatio = shared.devicePixelRatio
-                        , shootEmUpMode = Nothing
+                        , shootEmUpMode = False
+                        , pressedStartShootEmUp = PagesMsg.fromMsg PressedStartShootEmUp
                         }
                         model
                         app.data.description

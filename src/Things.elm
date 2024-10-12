@@ -1146,11 +1146,11 @@ myTypeCodec =
             , Paragraph
                 [ Text "The song that plays in the game is Norwegian Pirate by Two Steps From Hell. The dogs gif that you defend is by "
                 , ExternalLink "Paul Robertson" "www.inprnt.com/gallery/paulrobertson/"
-                , Text " (he draws lots of high-quality pixel art)"
+                , Text " (he draws lots of high-quality pixel art)."
                 ]
-            , PixelImage 384 80 "/secret-santa-game/omfgdogs.gif" [ Text "A very distracting pixel art animation of dogs" ]
+            , DogsGif
             , Paragraph
-                [ Text "Since the game didn't take very long to make and I bet you are unlikely to download and run a random exe file you found on the internet, I've made it so you can also play it on this page."
+                [ Text "Since the game didn't take very long to make and I bet you are unlikely to run a random exe file you found on the internet, I've made it so you can also play it on this page."
                 ]
             , BulletList
                 [ Bold "How to play:" ]
@@ -1158,6 +1158,7 @@ myTypeCodec =
                 , Paragraph [ Text "Shoot the incoming cursors and prevent them from dragging the dogs gif off the screen" ]
                 , Paragraph [ Text "Double click on the dogs gif to start!" ]
                 ]
+            , Paragraph [ Text "Tip: If you are struggling to shoot the cursors, try increasing the browser zoom so they are easier to hit!" ]
             ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
