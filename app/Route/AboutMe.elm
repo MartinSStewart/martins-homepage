@@ -18,6 +18,7 @@ import Set exposing (Set)
 import Shared exposing (Breakpoints(..))
 import Ui
 import Ui.Font
+import Ui.Lazy
 import Ui.Responsive
 import UrlPath
 import View
@@ -156,14 +157,11 @@ view app shared model =
                     , Ui.spacing 16
                     ]
                     [ Ui.el [ Ui.Font.size 32, Ui.Font.bold, Ui.Font.lineHeight 1.1 ] (Ui.text "About me")
-                    , Formatting.view
-                        { pressedAltText = \text -> PressedAltText text |> PagesMsg.fromMsg
-                        , startedVideo = StartedVideo |> PagesMsg.fromMsg
-                        , windowWidth = shared.windowWidth
-                        , devicePixelRatio = shared.devicePixelRatio
-                        , shootEmUpMode = False
-                        , pressedStartShootEmUp = PagesMsg.fromMsg PressedStartShootEmUp
-                        }
+                    , Ui.Lazy.lazy5
+                        Formatting.view
+                        False
+                        shared
+                        msgConfig
                         model
                         app.data.description
                     ]
@@ -177,4 +175,11 @@ view app shared model =
                     }
                 ]
             ]
+    }
+
+
+msgConfig =
+    { pressedAltText = \text -> PressedAltText text |> PagesMsg.fromMsg
+    , startedVideo = StartedVideo |> PagesMsg.fromMsg
+    , pressedStartShootEmUp = PagesMsg.fromMsg PressedStartShootEmUp
     }

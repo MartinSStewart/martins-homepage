@@ -34,8 +34,7 @@ const config: ElmPagesInit = {
                 let keyframes = [];
 
                 const scale = elem.innerText.length + 3;
-                const bodyHeight = document.documentElement.scrollHeight
-                const height = bodyHeight - elem.getBoundingClientRect().y;
+                const height = document.documentElement.scrollHeight - elem.getBoundingClientRect().y;
 
                 const xSpeed = (Math.random() - 0.5) * 5 / scale;
                 const ySpeed = Math.abs(xSpeed * 2);
@@ -57,9 +56,9 @@ const config: ElmPagesInit = {
                 }
 
 
-                elem.classList = "";
 
-                elem.style = "display:inline-block; color:transparent";
+
+                elem.style = "display:inline-block; color:transparent; pointer-events:none";
 
                 elem.animate(keyframes, { duration: duration, iterations: 1 });
             }

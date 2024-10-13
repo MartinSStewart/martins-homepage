@@ -235,6 +235,12 @@ thingsIHaveDone =
                     , PixelImage 122 173 "/ascii-collab/waldo.png" [ ExternalLink "Oh and here's Waldo" "ascii-collab.app/?x=360&y=51" ]
                     ]
                 ]
+            , Section "More stuff"
+                [ Paragraph
+                    [ Text "The article would have ended already but then I remembered I was asked to create a separate instance of ascii-collab that me and my Insurello colleagues could use as a get-well-soon card for a colleague."
+                    ]
+                , Paragraph [ Text "And then a while after that, I was asked to create another ascii-collab instance for when me and one (maybe two I forget) colleagues were leaving Insurello on the same day." ]
+                ]
             ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
@@ -1150,7 +1156,7 @@ myTypeCodec =
                 ]
             , DogsGif
             , Paragraph
-                [ Text "Since the game didn't take very long to make and I bet you are unlikely to run a random exe file you found on the internet, I've made it so you can also play it on this page."
+                [ Text "Since the game didn't take very long to make and I bet you are unlikely to run a random exe file you found on the internet, I've recreated it so it's playable on this page."
                 ]
             , BulletList
                 [ Bold "How to play:" ]

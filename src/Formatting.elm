@@ -50,18 +50,19 @@ type alias Model a =
 type alias Config msg =
     { pressedAltText : String -> msg
     , startedVideo : msg
-    , windowWidth : Int
-    , devicePixelRatio : Float
-    , shootEmUpMode : Bool
     , pressedStartShootEmUp : msg
     }
 
 
-view : Config msg -> Model a -> List Formatting -> Ui.Element msg
-view config model list =
+type alias Shared a =
+    { a | windowWidth : Int, devicePixelRatio : Float }
+
+
+view : Bool -> Shared b -> Config msg -> Model a -> List Formatting -> Ui.Element msg
+view shootMode shared config model list =
     Html.div
         (Html.Attributes.style "line-height" "1.5"
-            :: (if config.shootEmUpMode then
+            :: (if shootMode then
                     [ Html.Attributes.style "user-select" "none", Html.Attributes.style "cursor" "crosshair" ]
 
                 else
@@ -70,7 +71,7 @@ view config model list =
         )
         (Html.node "style" [] [ Html.text "pre { white-space: pre-wrap; }" ]
             :: SyntaxHighlight.useTheme SyntaxHighlight.gitHub
-            :: List.map (viewHelper config 0 model) list
+            :: List.map (viewHelper shootMode shared config 0 model) list
         )
         |> Ui.html
 
@@ -327,11 +328,11 @@ contentWidthMax =
     800
 
 
-viewHelper : Config msg -> Int -> Model a -> Formatting -> Html msg
-viewHelper config depth model item =
+viewHelper : Bool -> Shared b -> Config msg -> Int -> Model a -> Formatting -> Html msg
+viewHelper shootMode shared config depth model item =
     case item of
         Paragraph items ->
-            Html.p [] (List.map (inlineView config model) items)
+            Html.p [] (List.map (inlineView shootMode shared config model) items)
 
         CodeBlock text ->
             case SyntaxHighlight.elm text of
@@ -359,11 +360,11 @@ viewHelper config depth model item =
                 []
                 [ Html.p
                     []
-                    (List.map (inlineView config model) leading)
+                    (List.map (inlineView shootMode shared config model) leading)
                 , Html.ul
                     [ Html.Attributes.style "padding-left" "20px" ]
                     (List.map
-                        (\item2 -> Html.li [] [ Html.Lazy.lazy4 viewHelper config depth model item2 ])
+                        (\item2 -> Html.li [] [ Html.Lazy.lazy6 viewHelper shootMode shared config depth model item2 ])
                         formattings
                     )
                 ]
@@ -373,11 +374,11 @@ viewHelper config depth model item =
                 []
                 [ Html.p
                     []
-                    (List.map (inlineView config model) leading)
+                    (List.map (inlineView shootMode shared config model) leading)
                 , Html.ol
                     [ Html.Attributes.style "padding-left" "20px" ]
                     (List.map
-                        (\item2 -> Html.li [] [ Html.Lazy.lazy4 viewHelper config depth model item2 ])
+                        (\item2 -> Html.li [] [ Html.Lazy.lazy6 viewHelper shootMode shared config depth model item2 ])
                         formattings
                     )
                 ]
@@ -387,22 +388,22 @@ viewHelper config depth model item =
                 []
                 [ Html.p
                     []
-                    (List.map (inlineView config model) leading)
+                    (List.map (inlineView shootMode shared config model) leading)
                 , Html.ul
                     [ Html.Attributes.type_ "A", Html.Attributes.style "padding-left" "20px" ]
                     (List.map
-                        (\item2 -> Html.li [] [ Html.Lazy.lazy4 viewHelper config depth model item2 ])
+                        (\item2 -> Html.li [] [ Html.Lazy.lazy6 viewHelper shootMode shared config depth model item2 ])
                         formattings
                     )
                 ]
 
         Group formattings ->
-            Html.div [] (List.map (viewHelper config depth model) formattings)
+            Html.div [] (List.map (viewHelper shootMode shared config depth model) formattings)
 
         Section title formattings ->
             let
                 content =
-                    List.map (viewHelper config (depth + 1) model) formattings
+                    List.map (viewHelper shootMode shared config (depth + 1) model) formattings
 
                 id =
                     Url.percentEncode title
@@ -452,11 +453,11 @@ viewHelper config depth model item =
                     [ Html.Attributes.style "font-size" "14px"
                     , Html.Attributes.style "padding" "0 8px 0 8px "
                     ]
-                    (List.map (inlineView config model) altText)
+                    (List.map (inlineView shootMode shared config model) altText)
                 ]
 
         PixelImage imageWidth _ url altText ->
-            pixelImage False config imageWidth url altText model
+            pixelImage shootMode shared False config imageWidth url altText model
 
         Video url ->
             Html.video
@@ -469,7 +470,7 @@ viewHelper config depth model item =
                     ("calc(var(--ui-bp-0) * -" ++ String.fromInt sidePaddingMobile ++ "px)")
                  , Html.Events.on "play" (Json.Decode.succeed config.startedVideo)
                  ]
-                    ++ (if config.shootEmUpMode then
+                    ++ (if shootMode then
                             [ Html.Attributes.style "opacity" "0.2"
                             , Html.Attributes.attribute "disablePictureInPicture" ""
                             , Html.Attributes.style "pointer-events" "none"
@@ -483,6 +484,8 @@ viewHelper config depth model item =
 
         DogsGif ->
             pixelImage
+                shootMode
+                shared
                 True
                 config
                 384
@@ -491,11 +494,11 @@ viewHelper config depth model item =
                 model
 
 
-pixelImage : Bool -> Config msg -> Int -> String -> List Inline -> Model a -> Html msg
-pixelImage isDogs config imageWidth url altText model =
+pixelImage : Bool -> Shared b -> Bool -> Config msg -> Int -> String -> List Inline -> Model a -> Html msg
+pixelImage shootMode shared isDogs config imageWidth url altText model =
     let
         dpr2 =
-            max 1 config.devicePixelRatio
+            max 1 shared.devicePixelRatio
 
         cssWidth : Float
         cssWidth =
@@ -503,7 +506,7 @@ pixelImage isDogs config imageWidth url altText model =
 
         containerWidth : Int
         containerWidth =
-            min config.windowWidth contentWidthMax - sidePaddingNotMobile * 2
+            min shared.windowWidth contentWidthMax - sidePaddingNotMobile * 2
 
         attributes : List (Html.Attribute msg)
         attributes =
@@ -535,7 +538,7 @@ pixelImage isDogs config imageWidth url altText model =
             [ Html.Attributes.style "font-size" "14px"
             , Html.Attributes.style "padding" "0 8px 0 8px "
             ]
-            (List.map (inlineView config model) altText)
+            (List.map (inlineView shootMode shared config model) altText)
         ]
 
 
@@ -549,12 +552,12 @@ sidePaddingNotMobile =
     16
 
 
-inlineView : Config msg -> Model a -> Inline -> Html msg
-inlineView config model inline =
+inlineView : Bool -> Shared b -> Config msg -> Model a -> Inline -> Html msg
+inlineView shootMode shared config model inline =
     case inline of
         Bold text ->
             Html.b []
-                [ if config.shootEmUpMode then
+                [ if shootMode then
                     List.map
                         (\word ->
                             Html.span
@@ -572,7 +575,7 @@ inlineView config model inline =
 
         Italic text ->
             Html.i []
-                [ if config.shootEmUpMode then
+                [ if shootMode then
                     List.map
                         (\word ->
                             Html.span
@@ -589,7 +592,7 @@ inlineView config model inline =
                 ]
 
         Link text url ->
-            if config.shootEmUpMode then
+            if shootMode then
                 List.map
                     (\word ->
                         Html.span
@@ -625,7 +628,7 @@ inlineView config model inline =
                 , Html.Attributes.style "border-radius" "4px"
                 , Html.Attributes.style "font-size" "16px"
                 ]
-                [ if config.shootEmUpMode then
+                [ if shootMode then
                     List.map
                         (\word ->
                             Html.span
@@ -642,7 +645,7 @@ inlineView config model inline =
                 ]
 
         Text text ->
-            if config.shootEmUpMode then
+            if shootMode then
                 List.map
                     (\word ->
                         Html.span
@@ -658,7 +661,7 @@ inlineView config model inline =
                 Html.text text
 
         ExternalLink text url ->
-            if config.shootEmUpMode then
+            if shootMode then
                 List.map
                     (\word ->
                         Html.span

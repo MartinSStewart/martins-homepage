@@ -10,6 +10,7 @@ import FatalError exposing (FatalError)
 import Formatting exposing (Formatting)
 import Head
 import Head.Seo as Seo
+import Html
 import Html.Attributes
 import Json.Decode
 import Pages.Url
@@ -21,6 +22,7 @@ import Task
 import Things exposing (Tag, ThingType(..))
 import Ui
 import Ui.Font
+import Ui.Lazy
 import Ui.Prose
 import Ui.Responsive
 import View exposing (View)
@@ -35,8 +37,18 @@ port skipBackwardVideo : () -> Cmd msg
 port shoot : { x : Float, y : Float } -> Cmd msg
 
 
+type GunType
+    = Handgun
+    | MachineGun
+    | Shotgun
+    | Bomb
+
+
 type alias Model =
-    { selectedAltText : Set String, videoIsPlaying : Bool }
+    { selectedAltText : Set String
+    , videoIsPlaying : Bool
+    , bulletHoles : List { x : Float, y : Float, gunType : GunType }
+    }
 
 
 type Msg
@@ -44,7 +56,11 @@ type Msg
     | StartedVideo
     | PressedArrowKey ArrowKey
     | PressedStartShootEmUp
-    | MouseDown Float Float
+    | MouseDown MouseDownData
+
+
+type alias MouseDownData =
+    { clientX : Float, clientY : Float, pageX : Float, pageY : Float }
 
 
 type ArrowKey
@@ -58,7 +74,7 @@ type alias RouteParams =
 
 init : App data action routeParams -> Shared.Model -> ( Model, Cmd Msg )
 init _ _ =
-    ( { selectedAltText = Set.empty, videoIsPlaying = False }
+    ( { selectedAltText = Set.empty, videoIsPlaying = False, bulletHoles = [] }
     , Cmd.none
     )
 
@@ -100,22 +116,23 @@ update _ _ msg model =
         PressedStartShootEmUp ->
             ( model, Effect.none )
 
-        MouseDown x y ->
-            let
-                _ =
-                    Debug.log "a" ( x, y )
-            in
-            ( model, shoot { x = x, y = y } )
+        MouseDown { clientX, clientY, pageX, pageY } ->
+            ( { model | bulletHoles = { x = pageX, y = pageY, gunType = Handgun } :: model.bulletHoles }
+            , shoot { x = clientX, y = clientY }
+            )
 
 
 subscriptions : a -> b -> c -> Model -> Sub Msg
 subscriptions _ _ _ model =
     Sub.batch
         [ Browser.Events.onMouseDown
-            (Json.Decode.map2
-                MouseDown
+            (Json.Decode.map4
+                MouseDownData
                 (Json.Decode.field "clientX" Json.Decode.float)
                 (Json.Decode.field "clientY" Json.Decode.float)
+                (Json.Decode.field "pageX" Json.Decode.float)
+                (Json.Decode.field "pageY" Json.Decode.float)
+                |> Json.Decode.map MouseDown
             )
         , if model.videoIsPlaying then
             Browser.Events.onKeyDown
@@ -222,42 +239,67 @@ view app shared model =
     in
     { title = thing.name
     , body =
-        Ui.column
-            [ Ui.Responsive.paddingXY
-                Shared.breakpoints
-                (\label ->
-                    case label of
-                        Mobile ->
-                            { x = Ui.Responsive.value Formatting.sidePaddingMobile
-                            , y = Ui.Responsive.value 16
-                            }
-
-                        NotMobile ->
-                            { x = Ui.Responsive.value Formatting.sidePaddingNotMobile
-                            , y = Ui.Responsive.value 16
-                            }
+        Ui.el
+            [ List.map
+                (\{ x, y, gunType } ->
+                    Html.div
+                        [ Html.Attributes.style "position" "absolute"
+                        , Html.Attributes.style "left" (String.fromFloat (x - 4) ++ "px")
+                        , Html.Attributes.style "top" (String.fromFloat (y - Shared.headerHeight - 4) ++ "px")
+                        , Html.Attributes.style "background-color" "black"
+                        , Html.Attributes.style "border-radius" "8px"
+                        , Html.Attributes.style "width" "8px"
+                        , Html.Attributes.style "height" "8px"
+                        ]
+                        []
                 )
-            , Ui.widthMax Formatting.contentWidthMax
-            , Ui.centerX
-            , Ui.spacing 8
+                model.bulletHoles
+                |> List.reverse
+                |> Html.div []
+                |> Ui.html
+                |> Ui.inFront
             ]
-            [ title thing
-            , if List.isEmpty thing.description then
-                Ui.text "TODO"
+            (Ui.column
+                [ Ui.Responsive.paddingXY
+                    Shared.breakpoints
+                    (\label ->
+                        case label of
+                            Mobile ->
+                                { x = Ui.Responsive.value Formatting.sidePaddingMobile
+                                , y = Ui.Responsive.value 16
+                                }
 
-              else
-                Formatting.view
-                    { pressedAltText = \text -> PressedAltText text |> PagesMsg.fromMsg
-                    , startedVideo = StartedVideo |> PagesMsg.fromMsg
-                    , windowWidth = shared.windowWidth
-                    , devicePixelRatio = shared.devicePixelRatio
-                    , shootEmUpMode = True
-                    , pressedStartShootEmUp = PagesMsg.fromMsg PressedStartShootEmUp
-                    }
-                    model
-                    thing.description
-            , Ui.el [ Ui.height (Ui.px 100) ] Ui.none
-            ]
+                            NotMobile ->
+                                { x = Ui.Responsive.value Formatting.sidePaddingNotMobile
+                                , y = Ui.Responsive.value 16
+                                }
+                    )
+                , Ui.widthMax Formatting.contentWidthMax
+                , Ui.centerX
+                , Ui.spacing 8
+                ]
+                [ title thing
+                , if List.isEmpty thing.description then
+                    Ui.text "TODO"
+
+                  else
+                    Ui.Lazy.lazy5
+                        Formatting.view
+                        True
+                        shared
+                        msgConfig
+                        model
+                        thing.description
+                , Ui.el [ Ui.height (Ui.px 100) ] Ui.none
+                ]
+            )
+    }
+
+
+msgConfig =
+    { pressedAltText = \text -> PressedAltText text |> PagesMsg.fromMsg
+    , startedVideo = StartedVideo |> PagesMsg.fromMsg
+    , pressedStartShootEmUp = PagesMsg.fromMsg PressedStartShootEmUp
     }
 
 
