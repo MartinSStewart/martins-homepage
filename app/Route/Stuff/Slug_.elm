@@ -242,14 +242,13 @@ view app shared model =
         Ui.el
             [ List.map
                 (\{ x, y, gunType } ->
-                    Html.div
+                    Html.img
                         [ Html.Attributes.style "position" "absolute"
-                        , Html.Attributes.style "left" (String.fromFloat (x - 4) ++ "px")
-                        , Html.Attributes.style "top" (String.fromFloat (y - Shared.headerHeight - 4) ++ "px")
-                        , Html.Attributes.style "background-color" "black"
-                        , Html.Attributes.style "border-radius" "8px"
-                        , Html.Attributes.style "width" "8px"
-                        , Html.Attributes.style "height" "8px"
+                        , Html.Attributes.style "left" (String.fromFloat (x - 14) ++ "px")
+                        , Html.Attributes.style "top" (String.fromFloat (y - Shared.headerHeight - 14) ++ "px")
+                        , Html.Attributes.src "/secret-santa-game/bullet-hole.png"
+                        , Html.Attributes.style "pointer-events" "none"
+                        , Html.Attributes.style "transform" ("rotate(" ++ String.fromInt (modBy 360 (round x * 1000)) ++ "deg)")
                         ]
                         []
                 )

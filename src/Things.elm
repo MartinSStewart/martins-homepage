@@ -651,6 +651,22 @@ thingsIHaveDone =
                 }
         }
       )
+    , ( "tettetris"
+      , { name = "Tettetris"
+        , website = Nothing
+        , tags = [ Elm, Javascript, Game ]
+        , description = [ Paragraph [ Text "Also called Quadtris, it's a game I had and didn't finish where tetris blocks fall from all cardinal directions. I originally worked on it in JS before giving up. A while later I started working on it in Elm before gaving up again." ] ]
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/elm-package-preview.png"
+        , previewText = ""
+        , thingType =
+            OtherThing
+                { releasedAt = date 2018 Aug 7
+                , repo = Just "github.com/MartinSStewart/tettetris"
+                }
+        }
+      )
     , lamderaPackage "websocket" [] websiteReleasedAt (date 2021 May 16) ""
     , lamderaPackage "program-test" [] websiteReleasedAt (date 2021 Jul 7) ""
     , ( "making-a-game-with-elm-and-lamdera"
@@ -1306,7 +1322,7 @@ myTypeCodec =
         , previewText = ""
         , thingType =
             OtherThing
-                { releasedAt = date 2012 Jul 30
+                { releasedAt = date 2018 Sep 23
                 , repo = Just "github.com/MartinSStewart/tretton37-game-jam"
                 }
         }
@@ -1601,6 +1617,7 @@ qualityOrder =
     , "gmc-jam-7-animation"
     , "ssrpg"
     , "minmacro"
+    , "tettetris"
     ]
 
 
