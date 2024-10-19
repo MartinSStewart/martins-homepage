@@ -1,4 +1,4 @@
-module Formatting exposing (Formatting(..), Inline(..), Model, checkFormatting, contentWidthMax, downloadLink, externalLink, sidePaddingMobile, sidePaddingNotMobile, view)
+module Formatting exposing (Config, Formatting(..), Inline(..), Model, checkFormatting, contentWidthMax, downloadLink, externalLink, sidePaddingMobile, sidePaddingNotMobile, view)
 
 import Html exposing (Html)
 import Html.Attributes
@@ -12,6 +12,7 @@ import Result.Extra
 import Route exposing (Route)
 import Set exposing (Set)
 import SyntaxHighlight
+import Time
 import Ui
 import Ui.Font
 import Url
@@ -50,7 +51,7 @@ type alias Model a =
 type alias Config msg =
     { pressedAltText : String -> msg
     , startedVideo : msg
-    , pressedStartShootEmUp : msg
+    , pressedStartShootEmUp : Time.Posix -> msg
     }
 
 
@@ -527,7 +528,16 @@ pixelImage shootMode shared isDogs config imageWidth url altText model =
             (Html.Attributes.src url
                 :: attributes
                 ++ (if isDogs then
-                        [ Html.Events.onDoubleClick config.pressedStartShootEmUp ]
+                        [ Html.Events.on
+                            "dblclick"
+                            (Json.Decode.field "timeStamp" Json.Decode.int
+                                |> Json.Decode.map
+                                    (\int ->
+                                        Time.millisToPosix int
+                                            |> config.pressedStartShootEmUp
+                                    )
+                            )
+                        ]
 
                     else
                         []

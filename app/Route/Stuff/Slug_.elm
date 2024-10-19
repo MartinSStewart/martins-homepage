@@ -14,10 +14,12 @@ import Html.Attributes
 import Json.Decode
 import Pages.Url
 import PagesMsg exposing (PagesMsg)
+import Random
 import RouteBuilder exposing (App, StatefulRoute)
 import Set exposing (Set)
 import Shared exposing (Breakpoints(..))
 import Things exposing (Tag, ThingType(..))
+import Time
 import Ui
 import Ui.Font
 import Ui.Lazy
@@ -52,7 +54,18 @@ type alias Model =
     { selectedAltText : Set String
     , videoIsPlaying : Bool
     , bulletHoles : List { x : Float, y : Float, gunType : GunType }
-    , currentGun : Maybe GunType
+    , gameState : Maybe GameState
+    }
+
+
+type alias GameState =
+    { gun : GunType
+    , machineGunAmmo : Int
+    , shotgunAmmo : Int
+    , bombAmmo : Int
+    , startTime : Time.Posix
+    , cursors : List Cursor
+    , dogsGif : { x : Float, y : Float, width : Float, height : Float }
     }
 
 
@@ -60,9 +73,10 @@ type Msg
     = PressedAltText String
     | StartedVideo
     | PressedArrowKey ArrowKey
-    | PressedStartShootEmUp
+    | PressedStartShootEmUp Time.Posix
     | MouseDown MouseDownData
     | PressedGunKey GunType
+    | AnimationFrame Time.Posix
 
 
 type alias MouseDownData =
@@ -80,7 +94,7 @@ type alias RouteParams =
 
 init : App Data action routeParams -> Shared.Model -> ( Model, Cmd Msg )
 init _ _ =
-    ( { selectedAltText = Set.empty, videoIsPlaying = False, bulletHoles = [], currentGun = Nothing }
+    ( { selectedAltText = Set.empty, videoIsPlaying = False, bulletHoles = [], gameState = Nothing }
     , Cmd.none
     )
 
@@ -119,16 +133,28 @@ update _ _ msg model =
                     skipForwardVideo ()
             )
 
-        PressedStartShootEmUp ->
-            ( { model | currentGun = Just Handgun }, loadSounds () )
+        PressedStartShootEmUp time ->
+            ( { model
+                | gameState =
+                    Just
+                        { gun = Handgun
+                        , machineGunAmmo = 0
+                        , shotgunAmmo = 0
+                        , bombAmmo = 0
+                        , startTime = time
+                        , cursors = []
+                        }
+              }
+            , loadSounds ()
+            )
 
         MouseDown { clientX, clientY, pageX, pageY } ->
-            case model.currentGun of
-                Just gunType ->
+            case model.gameState of
+                Just { gun } ->
                     ( { model | bulletHoles = { x = pageX, y = pageY, gunType = Handgun } :: model.bulletHoles }
                     , Cmd.batch
                         [ shoot { x = clientX, y = clientY }
-                        , (case gunType of
+                        , (case gun of
                             Handgun ->
                                 "sn_handgun"
 
@@ -149,9 +175,9 @@ update _ _ msg model =
                     ( model, Cmd.none )
 
         PressedGunKey gunType ->
-            case model.currentGun of
-                Just _ ->
-                    ( { model | currentGun = Just gunType }
+            case model.gameState of
+                Just gameState ->
+                    ( { model | gameState = Just { gameState | gun = gunType } }
                     , (case gunType of
                         Handgun ->
                             "sn_handgun_voice"
@@ -171,21 +197,39 @@ update _ _ msg model =
                 Nothing ->
                     ( model, Cmd.none )
 
+        AnimationFrame time ->
+            case model.gameState of
+                Just gameState ->
+                    let
+                        startTime =
+                            Time.posixToMillis gameState.startTime
+
+                        time2 =
+                            Time.posixToMillis time
+                    in
+                    0
+
+                Nothing ->
+                    ( model, Cmd.none )
+
 
 subscriptions : a -> b -> c -> Model -> Sub Msg
 subscriptions _ _ _ model =
     Sub.batch
-        [ case model.currentGun of
+        [ case model.gameState of
             Just _ ->
-                Browser.Events.onMouseDown
-                    (Json.Decode.map4
-                        MouseDownData
-                        (Json.Decode.field "clientX" Json.Decode.float)
-                        (Json.Decode.field "clientY" Json.Decode.float)
-                        (Json.Decode.field "pageX" Json.Decode.float)
-                        (Json.Decode.field "pageY" Json.Decode.float)
-                        |> Json.Decode.map MouseDown
-                    )
+                Sub.batch
+                    [ Browser.Events.onMouseDown
+                        (Json.Decode.map4
+                            MouseDownData
+                            (Json.Decode.field "clientX" Json.Decode.float)
+                            (Json.Decode.field "clientY" Json.Decode.float)
+                            (Json.Decode.field "pageX" Json.Decode.float)
+                            (Json.Decode.field "pageY" Json.Decode.float)
+                            |> Json.Decode.map MouseDown
+                        )
+                    , Browser.Events.onAnimationFrame AnimationFrame
+                    ]
 
             Nothing ->
                 Sub.none
@@ -293,6 +337,69 @@ head app =
         |> Seo.website
 
 
+type alias Cursor =
+    { x : Int, y : Int, isBonus : Bool }
+
+
+shouldSpawn : Float -> Random.Generator Bool
+shouldSpawn timeElapsed =
+    Random.float 0 1
+        |> Random.map
+            (\t ->
+                t > 0.99 - (timeElapsed / 100000)
+            )
+
+
+getAmmo : Random.Generator GunType
+getAmmo =
+    Random.weighted
+        ( 0.5, MachineGun )
+        [ ( 0.35, Shotgun )
+        , ( 0.15, Bomb )
+        ]
+
+
+spawnCursors : Int -> Int -> Random.Generator (Random.Generator (List Cursor))
+spawnCursors windowWidth windowHeight =
+    Random.map3
+        (\t side count ->
+            let
+                x : Int
+                x =
+                    if side == 0 || side == 2 then
+                        round (toFloat windowWidth * t)
+
+                    else if side == 1 then
+                        windowWidth
+
+                    else
+                        0
+
+                y : Int
+                y =
+                    if side == 1 || side == 3 then
+                        round (toFloat windowHeight * t)
+
+                    else if side == 2 then
+                        windowHeight
+
+                    else
+                        0
+            in
+            Random.list
+                count
+                (Random.map3
+                    (\x2 y2 isBonus -> { x = x2, y = y2, isBonus = isBonus })
+                    (Random.int (x - 50) (x + 50))
+                    (Random.int (y - 50) (y + 50))
+                    (Random.weighted ( 0.8, False ) [ ( 0.2, True ) ])
+                )
+        )
+        (Random.float 0 1)
+        (Random.int 0 3)
+        (Random.int 1 5)
+
+
 view :
     App Data ActionData RouteParams
     -> Shared.Model
@@ -324,6 +431,13 @@ view app shared model =
                 |> Html.div []
                 |> Ui.html
                 |> Ui.inFront
+            , Html.audio
+                [ Html.Attributes.src "/secret-santa-game/audio/norwegian_pirate.mp3"
+                , Html.Attributes.autoplay True
+                ]
+                []
+                |> Ui.html
+                |> Ui.inFront
             ]
             (Ui.column
                 [ Ui.Responsive.paddingXY
@@ -351,7 +465,7 @@ view app shared model =
                   else
                     Ui.Lazy.lazy5
                         Formatting.view
-                        (model.currentGun /= Nothing)
+                        (model.gameState /= Nothing)
                         shared
                         msgConfig
                         model
@@ -362,10 +476,11 @@ view app shared model =
     }
 
 
+msgConfig : Formatting.Config (PagesMsg Msg)
 msgConfig =
     { pressedAltText = \text -> PressedAltText text |> PagesMsg.fromMsg
     , startedVideo = StartedVideo |> PagesMsg.fromMsg
-    , pressedStartShootEmUp = PagesMsg.fromMsg PressedStartShootEmUp
+    , pressedStartShootEmUp = \time -> PressedStartShootEmUp time |> PagesMsg.fromMsg
     }
 
 

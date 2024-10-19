@@ -16,6 +16,7 @@ import Route exposing (Route(..))
 import RouteBuilder
 import Set exposing (Set)
 import Shared exposing (Breakpoints(..))
+import Time
 import Ui
 import Ui.Font
 import Ui.Lazy
@@ -31,7 +32,7 @@ type alias Model =
 type Msg
     = PressedAltText String
     | StartedVideo
-    | PressedStartShootEmUp
+    | PressedStartShootEmUp Time.Posix
 
 
 type alias RouteParams =
@@ -72,7 +73,7 @@ update _ _ msg model =
         StartedVideo ->
             ( model, Effect.none )
 
-        PressedStartShootEmUp ->
+        PressedStartShootEmUp _ ->
             ( model, Effect.none )
 
 
@@ -181,5 +182,5 @@ view app shared model =
 msgConfig =
     { pressedAltText = \text -> PressedAltText text |> PagesMsg.fromMsg
     , startedVideo = StartedVideo |> PagesMsg.fromMsg
-    , pressedStartShootEmUp = PagesMsg.fromMsg PressedStartShootEmUp
+    , pressedStartShootEmUp = \time -> PressedStartShootEmUp time |> PagesMsg.fromMsg
     }
