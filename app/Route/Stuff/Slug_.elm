@@ -1,7 +1,6 @@
 port module Route.Stuff.Slug_ exposing (ActionData, Data, Model, Msg, route)
 
 import BackendTask exposing (BackendTask)
-import Browser.Dom
 import Browser.Events
 import Date exposing (Date)
 import Dict
@@ -18,7 +17,6 @@ import PagesMsg exposing (PagesMsg)
 import RouteBuilder exposing (App, StatefulRoute)
 import Set exposing (Set)
 import Shared exposing (Breakpoints(..))
-import Task
 import Things exposing (Tag, ThingType(..))
 import Ui
 import Ui.Font
@@ -37,6 +35,12 @@ port skipBackwardVideo : () -> Cmd msg
 port shoot : { x : Float, y : Float } -> Cmd msg
 
 
+port playSound : String -> Cmd msg
+
+
+port loadSounds : () -> Cmd msg
+
+
 type GunType
     = Handgun
     | MachineGun
@@ -48,6 +52,7 @@ type alias Model =
     { selectedAltText : Set String
     , videoIsPlaying : Bool
     , bulletHoles : List { x : Float, y : Float, gunType : GunType }
+    , currentGun : Maybe GunType
     }
 
 
@@ -57,6 +62,7 @@ type Msg
     | PressedArrowKey ArrowKey
     | PressedStartShootEmUp
     | MouseDown MouseDownData
+    | PressedGunKey GunType
 
 
 type alias MouseDownData =
@@ -72,9 +78,9 @@ type alias RouteParams =
     { slug : String }
 
 
-init : App data action routeParams -> Shared.Model -> ( Model, Cmd Msg )
+init : App Data action routeParams -> Shared.Model -> ( Model, Cmd Msg )
 init _ _ =
-    ( { selectedAltText = Set.empty, videoIsPlaying = False, bulletHoles = [] }
+    ( { selectedAltText = Set.empty, videoIsPlaying = False, bulletHoles = [], currentGun = Nothing }
     , Cmd.none
     )
 
@@ -114,26 +120,75 @@ update _ _ msg model =
             )
 
         PressedStartShootEmUp ->
-            ( model, Effect.none )
+            ( { model | currentGun = Just Handgun }, loadSounds () )
 
         MouseDown { clientX, clientY, pageX, pageY } ->
-            ( { model | bulletHoles = { x = pageX, y = pageY, gunType = Handgun } :: model.bulletHoles }
-            , shoot { x = clientX, y = clientY }
-            )
+            case model.currentGun of
+                Just gunType ->
+                    ( { model | bulletHoles = { x = pageX, y = pageY, gunType = Handgun } :: model.bulletHoles }
+                    , Cmd.batch
+                        [ shoot { x = clientX, y = clientY }
+                        , (case gunType of
+                            Handgun ->
+                                "sn_handgun"
+
+                            MachineGun ->
+                                "sn_machinegun"
+
+                            Shotgun ->
+                                "sn_shotgun"
+
+                            Bomb ->
+                                "sn_explosion"
+                          )
+                            |> playSound
+                        ]
+                    )
+
+                Nothing ->
+                    ( model, Cmd.none )
+
+        PressedGunKey gunType ->
+            case model.currentGun of
+                Just _ ->
+                    ( { model | currentGun = Just gunType }
+                    , (case gunType of
+                        Handgun ->
+                            "sn_handgun_voice"
+
+                        MachineGun ->
+                            "sn_machinegun_voice"
+
+                        Shotgun ->
+                            "sn_shotgun_voice"
+
+                        Bomb ->
+                            "sn_bomb_voice"
+                      )
+                        |> playSound
+                    )
+
+                Nothing ->
+                    ( model, Cmd.none )
 
 
 subscriptions : a -> b -> c -> Model -> Sub Msg
 subscriptions _ _ _ model =
     Sub.batch
-        [ Browser.Events.onMouseDown
-            (Json.Decode.map4
-                MouseDownData
-                (Json.Decode.field "clientX" Json.Decode.float)
-                (Json.Decode.field "clientY" Json.Decode.float)
-                (Json.Decode.field "pageX" Json.Decode.float)
-                (Json.Decode.field "pageY" Json.Decode.float)
-                |> Json.Decode.map MouseDown
-            )
+        [ case model.currentGun of
+            Just _ ->
+                Browser.Events.onMouseDown
+                    (Json.Decode.map4
+                        MouseDownData
+                        (Json.Decode.field "clientX" Json.Decode.float)
+                        (Json.Decode.field "clientY" Json.Decode.float)
+                        (Json.Decode.field "pageX" Json.Decode.float)
+                        (Json.Decode.field "pageY" Json.Decode.float)
+                        |> Json.Decode.map MouseDown
+                    )
+
+            Nothing ->
+                Sub.none
         , if model.videoIsPlaying then
             Browser.Events.onKeyDown
                 (Json.Decode.field "key" Json.Decode.string
@@ -144,6 +199,18 @@ subscriptions _ _ _ model =
 
                             else if key == "ArrowRight" then
                                 Json.Decode.succeed (PressedArrowKey RightArrowKey)
+
+                            else if key == "1" then
+                                Json.Decode.succeed (PressedGunKey Handgun)
+
+                            else if key == "2" then
+                                Json.Decode.succeed (PressedGunKey MachineGun)
+
+                            else if key == "3" then
+                                Json.Decode.succeed (PressedGunKey Shotgun)
+
+                            else if key == "4" then
+                                Json.Decode.succeed (PressedGunKey Bomb)
 
                             else
                                 Json.Decode.fail ""
@@ -284,7 +351,7 @@ view app shared model =
                   else
                     Ui.Lazy.lazy5
                         Formatting.view
-                        True
+                        (model.currentGun /= Nothing)
                         shared
                         msgConfig
                         model

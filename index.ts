@@ -3,6 +3,18 @@ type ElmPagesInit = {
   flags: unknown;
 };
 
+async function loadAudio(url, context, sounds) {
+    try {
+        const response = await fetch("/secret-santa-game/audio/" + url + ".wav");
+        const responseBuffer = await response.arrayBuffer();
+        sounds[url] = await context.decodeAudioData(responseBuffer);
+    } catch (error) {
+        console.log(error);
+        sounds[url] = null;
+    }
+}
+
+
 const config: ElmPagesInit = {
   load: async function (elmLoaded) {
     const app = await elmLoaded;
@@ -25,6 +37,25 @@ const config: ElmPagesInit = {
     app.ports.getDevicePixelRatio.subscribe((a) =>
     {
         app.ports.gotDevicePixelRatio.send(window.devicePixelRatio);
+    });
+    let context = null;
+    let sounds = {};
+    app.ports.loadSounds.subscribe((a) => {
+        console.log("test");
+        context = new AudioContext();
+        loadAudio("sn_handgun_voice", context, sounds);
+        loadAudio("sn_handgun", context, sounds);
+    });
+    app.ports.playSound.subscribe((a) => {
+        console.log(a);
+        console.log(sounds);
+        const source = context.createBufferSource();
+        if (sounds[a]) {
+            source.buffer = sounds[a];
+            source.connect(context.destination);
+            source.start(0);
+            console.log(source);
+        }
     });
     app.ports.shoot.subscribe((a) => {
 
