@@ -9,7 +9,7 @@ import FatalError exposing (FatalError)
 import Formatting exposing (Formatting)
 import Head
 import Head.Seo as Seo
-import Html
+import Html exposing (Html)
 import Html.Attributes
 import Json.Decode
 import Pages.Url
@@ -208,11 +208,18 @@ update _ shared msg model =
                         time2 =
                             Time.posixToMillis time
 
+                        elapsed =
+                            time2 - startTime
+
                         cursorSpeed =
                             5
 
-                        cursors =
-                            spawnCursors shared.windowWidth
+                        newCursors : List Cursor
+                        newCursors =
+                            Random.step
+                                (spawnCursors shared.windowWidth shared.windowHeight elapsed)
+                                (Random.initialSeed time2)
+                                |> Tuple.first
                     in
                     { model
                         | gameState =
@@ -222,9 +229,10 @@ update _ shared msg model =
                             , bombAmmo = gameState.bombAmmo
                             , startTime = gameState.startTime
                             , cursors =
-                                List.map
-                                    (\cursor -> { x = cursor.x + 1, y = 0, isBonus = cursor.isBonus })
-                                    gameState.cursors
+                                newCursors
+                                    ++ List.map
+                                        (\cursor -> { x = cursor.x + 1, y = 0, isBonus = cursor.isBonus })
+                                        gameState.cursors
                             , dogsGif = gameState.dogsGif
                             }
                                 |> Just
@@ -364,15 +372,6 @@ type alias Cursor =
     { x : Int, y : Int, isBonus : Bool }
 
 
-shouldSpawn : Float -> Random.Generator Bool
-shouldSpawn timeElapsed =
-    Random.float 0 1
-        |> Random.map
-            (\t ->
-                t > 0.99 - (timeElapsed / 100000)
-            )
-
-
 getAmmo : Random.Generator GunType
 getAmmo =
     Random.weighted
@@ -382,45 +381,67 @@ getAmmo =
         ]
 
 
-spawnCursors : Int -> Int -> Random.Generator (Random.Generator (List Cursor))
-spawnCursors windowWidth windowHeight =
-    Random.map3
-        (\t side count ->
-            let
-                x : Int
-                x =
-                    if side == 0 || side == 2 then
-                        round (toFloat windowWidth * t)
+spawnCursors : Int -> Int -> Int -> Random.Generator (List Cursor)
+spawnCursors windowWidth windowHeight timeElapsed =
+    Random.andThen
+        (\t2 ->
+            if t2 > 0.99 - (toFloat timeElapsed / 100000) then
+                Random.map3
+                    (\t side count ->
+                        let
+                            x : Int
+                            x =
+                                if side == 0 || side == 2 then
+                                    round (toFloat windowWidth * t)
 
-                    else if side == 1 then
-                        windowWidth
+                                else if side == 1 then
+                                    windowWidth
 
-                    else
-                        0
+                                else
+                                    0
 
-                y : Int
-                y =
-                    if side == 1 || side == 3 then
-                        round (toFloat windowHeight * t)
+                            y : Int
+                            y =
+                                if side == 1 || side == 3 then
+                                    round (toFloat windowHeight * t)
 
-                    else if side == 2 then
-                        windowHeight
+                                else if side == 2 then
+                                    windowHeight
 
-                    else
-                        0
-            in
-            Random.list
-                count
-                (Random.map3
-                    (\x2 y2 isBonus -> { x = x2, y = y2, isBonus = isBonus })
-                    (Random.int (x - 50) (x + 50))
-                    (Random.int (y - 50) (y + 50))
-                    (Random.weighted ( 0.8, False ) [ ( 0.2, True ) ])
-                )
+                                else
+                                    0
+                        in
+                        Random.list
+                            count
+                            (Random.map3
+                                (\x2 y2 isBonus -> { x = x2, y = y2, isBonus = isBonus })
+                                (Random.int (x - 50) (x + 50))
+                                (Random.int (y - 50) (y + 50))
+                                (Random.weighted ( 0.8, False ) [ ( 0.2, True ) ])
+                            )
+                    )
+                    (Random.float 0 1)
+                    (Random.int 0 3)
+                    (Random.int 1 5)
+                    |> Random.andThen identity
+
+            else
+                Random.constant []
         )
         (Random.float 0 1)
-        (Random.int 0 3)
-        (Random.int 1 5)
+
+
+drawSprite : String -> Float -> Float -> Int -> Html msg
+drawSprite sprite x y rotation =
+    Html.img
+        [ Html.Attributes.style "position" "absolute"
+        , Html.Attributes.style "left" (String.fromFloat (x - 14) ++ "px")
+        , Html.Attributes.style "top" (String.fromFloat (y - Shared.headerHeight - 14) ++ "px")
+        , Html.Attributes.style "pointer-events" "none"
+        , Html.Attributes.src ("/secret-santa-game/" ++ sprite)
+        , Html.Attributes.style "transform" ("rotate(" ++ String.fromInt (modBy 360 rotation) ++ "deg)")
+        ]
+        []
 
 
 view :
@@ -438,29 +459,26 @@ view app shared model =
     , body =
         Ui.el
             [ List.map
-                (\{ x, y, gunType } ->
-                    Html.img
-                        [ Html.Attributes.style "position" "absolute"
-                        , Html.Attributes.style "left" (String.fromFloat (x - 14) ++ "px")
-                        , Html.Attributes.style "top" (String.fromFloat (y - Shared.headerHeight - 14) ++ "px")
-                        , Html.Attributes.src "/secret-santa-game/bullet-hole.png"
-                        , Html.Attributes.style "pointer-events" "none"
-                        , Html.Attributes.style "transform" ("rotate(" ++ String.fromInt (modBy 360 (round x * 1000)) ++ "deg)")
-                        ]
-                        []
-                )
+                (\{ x, y, gunType } -> drawSprite "bullet-hole.png" x y (round x * 1000))
                 model.bulletHoles
                 |> List.reverse
                 |> Html.div []
                 |> Ui.html
                 |> Ui.inFront
             , case model.gameState of
-                Just _ ->
-                    Html.audio
-                        [ Html.Attributes.src "/secret-santa-game/audio/norwegian_pirate.mp3"
-                        , Html.Attributes.autoplay True
-                        ]
+                Just gameState ->
+                    Html.div
                         []
+                        [ Html.audio
+                            [ Html.Attributes.src "/secret-santa-game/audio/norwegian_pirate.mp3"
+                            , Html.Attributes.autoplay True
+                            ]
+                            []
+                        , List.map
+                            (\cursor -> drawSprite "cursor.png" (toFloat cursor.x) (toFloat cursor.y) 0)
+                            gameState.cursors
+                            |> Html.div []
+                        ]
                         |> Ui.html
                         |> Ui.inFront
 
