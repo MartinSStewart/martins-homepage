@@ -115,7 +115,7 @@ route =
 
 
 update : App data action routeParams -> Shared.Model -> Msg -> Model -> ( Model, Effect msg )
-update _ _ msg model =
+update _ shared msg model =
     case msg of
         PressedAltText altText ->
             ( { model | selectedAltText = Set.insert altText model.selectedAltText }, Effect.none )
@@ -143,6 +143,7 @@ update _ _ msg model =
                         , bombAmmo = 0
                         , startTime = time
                         , cursors = []
+                        , dogsGif = { x = 0, y = 0, width = 0, height = 0 }
                         }
               }
             , loadSounds ()
@@ -198,7 +199,7 @@ update _ _ msg model =
                     ( model, Cmd.none )
 
         AnimationFrame time ->
-            case model.gameState of
+            ( case model.gameState of
                 Just gameState ->
                     let
                         startTime =
@@ -206,11 +207,33 @@ update _ _ msg model =
 
                         time2 =
                             Time.posixToMillis time
+
+                        cursorSpeed =
+                            5
+
+                        cursors =
+                            spawnCursors shared.windowWidth
                     in
-                    0
+                    { model
+                        | gameState =
+                            { gun = gameState.gun
+                            , machineGunAmmo = gameState.machineGunAmmo
+                            , shotgunAmmo = gameState.shotgunAmmo
+                            , bombAmmo = gameState.bombAmmo
+                            , startTime = gameState.startTime
+                            , cursors =
+                                List.map
+                                    (\cursor -> { x = cursor.x + 1, y = 0, isBonus = cursor.isBonus })
+                                    gameState.cursors
+                            , dogsGif = gameState.dogsGif
+                            }
+                                |> Just
+                    }
 
                 Nothing ->
-                    ( model, Cmd.none )
+                    model
+            , Cmd.none
+            )
 
 
 subscriptions : a -> b -> c -> Model -> Sub Msg
@@ -431,13 +454,18 @@ view app shared model =
                 |> Html.div []
                 |> Ui.html
                 |> Ui.inFront
-            , Html.audio
-                [ Html.Attributes.src "/secret-santa-game/audio/norwegian_pirate.mp3"
-                , Html.Attributes.autoplay True
-                ]
-                []
-                |> Ui.html
-                |> Ui.inFront
+            , case model.gameState of
+                Just _ ->
+                    Html.audio
+                        [ Html.Attributes.src "/secret-santa-game/audio/norwegian_pirate.mp3"
+                        , Html.Attributes.autoplay True
+                        ]
+                        []
+                        |> Ui.html
+                        |> Ui.inFront
+
+                Nothing ->
+                    Ui.noAttr
             ]
             (Ui.column
                 [ Ui.Responsive.paddingXY

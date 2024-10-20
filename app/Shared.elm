@@ -64,6 +64,7 @@ type alias Model =
     , uiAnimModel : Ui.Anim.State
     , devicePixelRatio : Float
     , windowWidth : Int
+    , windowHeight : Int
     }
 
 
@@ -82,18 +83,19 @@ init :
     -> ( Model, Effect Msg )
 init flags _ =
     let
-        ( dpr, windowWidth ) =
+        ( dpr, windowWidth, windowHeight ) =
             case flags of
                 Pages.Flags.PreRenderFlags ->
-                    ( 1, 800 )
+                    ( 1, 800, 800 )
 
                 Pages.Flags.BrowserFlags value ->
                     case
                         Json.Decode.decodeValue
-                            (Json.Decode.map2
-                                Tuple.pair
+                            (Json.Decode.map3
+                                (\a b c -> ( a, b, c ))
                                 (Json.Decode.field "dpr" Json.Decode.float)
                                 (Json.Decode.field "windowWidth" Json.Decode.int)
+                                (Json.Decode.field "windowHeight" Json.Decode.int)
                             )
                             value
                     of
@@ -101,12 +103,13 @@ init flags _ =
                             ok
 
                         Err _ ->
-                            ( 1, 800 )
+                            ( 1, 800, 800 )
     in
     ( { showMenu = False
       , uiAnimModel = Ui.Anim.init
       , devicePixelRatio = dpr
       , windowWidth = windowWidth
+      , windowHeight = windowHeight
       }
     , Effect.none
     )
@@ -121,8 +124,8 @@ update msg model =
         GotDevicePixelRatio devicePixelRatio ->
             ( { model | devicePixelRatio = devicePixelRatio }, Effect.none )
 
-        WindowResized width _ ->
-            ( { model | windowWidth = width }, getDevicePixelRatio () )
+        WindowResized width height ->
+            ( { model | windowWidth = width, windowHeight = height }, getDevicePixelRatio () )
 
 
 subscriptions : UrlPath -> Model -> Sub Msg
