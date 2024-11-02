@@ -1,6 +1,5 @@
 module Route.Index exposing (ActionData, Data, Model, Msg, route)
 
-import Array exposing (Array)
 import BackendTask exposing (BackendTask)
 import Browser.Dom
 import Browser.Events
@@ -565,6 +564,7 @@ view app _ model =
                 ]
                 |> Ui.map PagesMsg.fromMsg
             )
+            |> Shared.defaultView
     }
 
 

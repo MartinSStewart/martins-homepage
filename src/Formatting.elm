@@ -1,4 +1,4 @@
-module Formatting exposing (Config, Formatting(..), Inline(..), Model, checkFormatting, contentWidthMax, downloadLink, externalLink, sidePaddingMobile, sidePaddingNotMobile, view)
+module Formatting exposing (Config, Formatting(..), Inline(..), Model, checkFormatting, contentWidthMax, dogsImageId, downloadLink, externalLink, sidePaddingMobile, sidePaddingNotMobile, view)
 
 import Html exposing (Html)
 import Html.Attributes
@@ -6,13 +6,11 @@ import Html.Events
 import Html.Lazy
 import Icons
 import Json.Decode
-import List.Extra
 import Parser exposing ((|.), (|=), Parser)
 import Result.Extra
 import Route exposing (Route)
 import Set exposing (Set)
 import SyntaxHighlight
-import Time
 import Ui
 import Ui.Font
 import Url
@@ -28,7 +26,7 @@ type Formatting
     | Section String (List Formatting)
     | Image String (List Inline)
     | PixelImage Int Int String (List Inline)
-    | Video String
+    | Video Int Int String
     | DogsGif
 
 
@@ -51,7 +49,7 @@ type alias Model a =
 type alias Config msg =
     { pressedAltText : String -> msg
     , startedVideo : msg
-    , pressedStartShootEmUp : Time.Posix -> msg
+    , pressedStartShootEmUp : msg
     }
 
 
@@ -62,14 +60,7 @@ type alias Shared a =
 view : Bool -> Shared b -> Config msg -> Model a -> List Formatting -> Ui.Element msg
 view shootMode shared config model list =
     Html.div
-        (Html.Attributes.style "line-height" "1.5"
-            :: (if shootMode then
-                    [ Html.Attributes.style "user-select" "none", Html.Attributes.style "cursor" "crosshair" ]
-
-                else
-                    []
-               )
-        )
+        [ Html.Attributes.style "line-height" "1.5" ]
         (Html.node "style" [] [ Html.text "pre { white-space: pre-wrap; }" ]
             :: SyntaxHighlight.useTheme SyntaxHighlight.gitHub
             :: List.map (viewHelper shootMode shared config 0 model) list
@@ -165,7 +156,7 @@ checkFormattingHelper formatting =
             else
                 Ok ()
 
-        Video url ->
+        Video _ _ url ->
             if String.contains ")" url || String.contains "://" url then
                 Err (url ++ " is an invalid url")
 
@@ -460,7 +451,7 @@ viewHelper shootMode shared config depth model item =
         PixelImage imageWidth _ url altText ->
             pixelImage shootMode shared False config imageWidth url altText model
 
-        Video url ->
+        Video width height url ->
             Html.video
                 ([ Html.Attributes.src ("https://" ++ url)
                  , Html.Attributes.style
@@ -470,6 +461,7 @@ viewHelper shootMode shared config depth model item =
                     "margin-left"
                     ("calc(var(--ui-bp-0) * -" ++ String.fromInt sidePaddingMobile ++ "px)")
                  , Html.Events.on "play" (Json.Decode.succeed config.startedVideo)
+                 , Html.Attributes.style "aspect-ratio" (String.fromFloat (toFloat width / toFloat height))
                  ]
                     ++ (if shootMode then
                             [ Html.Attributes.style "opacity" "0.2"
@@ -528,15 +520,13 @@ pixelImage shootMode shared isDogs config imageWidth url altText model =
             (Html.Attributes.src url
                 :: attributes
                 ++ (if isDogs then
-                        [ Html.Events.on
-                            "dblclick"
-                            (Json.Decode.field "timeStamp" Json.Decode.int
-                                |> Json.Decode.map
-                                    (\int ->
-                                        Time.millisToPosix int
-                                            |> config.pressedStartShootEmUp
-                                    )
-                            )
+                        [ Html.Events.onDoubleClick config.pressedStartShootEmUp
+                        , Html.Attributes.id "dogsImage"
+                        , if shootMode then
+                            Html.Attributes.style "opacity" "0"
+
+                          else
+                            Html.Attributes.style "opacity" "1"
                         ]
 
                     else
@@ -550,6 +540,11 @@ pixelImage shootMode shared isDogs config imageWidth url altText model =
             ]
             (List.map (inlineView shootMode shared config model) altText)
         ]
+
+
+dogsImageId : String
+dogsImageId =
+    "dogsImage"
 
 
 sidePaddingMobile : number

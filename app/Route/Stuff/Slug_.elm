@@ -1,6 +1,7 @@
 port module Route.Stuff.Slug_ exposing (ActionData, Data, Model, Msg, route)
 
 import BackendTask exposing (BackendTask)
+import Browser.Dom
 import Browser.Events
 import Date exposing (Date)
 import Dict
@@ -12,12 +13,14 @@ import Head.Seo as Seo
 import Html exposing (Html)
 import Html.Attributes
 import Json.Decode
+import List.Extra
 import Pages.Url
 import PagesMsg exposing (PagesMsg)
 import Random
 import RouteBuilder exposing (App, StatefulRoute)
 import Set exposing (Set)
 import Shared exposing (Breakpoints(..))
+import Task
 import Things exposing (Tag, ThingType(..))
 import Time
 import Ui
@@ -63,9 +66,10 @@ type alias GameState =
     , machineGunAmmo : Int
     , shotgunAmmo : Int
     , bombAmmo : Int
-    , startTime : Time.Posix
+    , elapsedTime : Float
     , cursors : List Cursor
     , dogsGif : { x : Float, y : Float, width : Float, height : Float }
+    , pageHeight : Float
     }
 
 
@@ -73,10 +77,15 @@ type Msg
     = PressedAltText String
     | StartedVideo
     | PressedArrowKey ArrowKey
-    | PressedStartShootEmUp Time.Posix
+    | PressedStartShootEmUp
     | MouseDown MouseDownData
     | PressedGunKey GunType
-    | AnimationFrame Time.Posix
+    | AnimationFrameDelta Float
+    | GotDogsAndPageImage
+        (Result
+            Browser.Dom.Error
+            ( { x : Float, y : Float, width : Float, height : Float }, Float )
+        )
 
 
 type alias MouseDownData =
@@ -114,7 +123,7 @@ route =
             }
 
 
-update : App data action routeParams -> Shared.Model -> Msg -> Model -> ( Model, Effect msg )
+update : App data action routeParams -> Shared.Model -> Msg -> Model -> ( Model, Effect Msg )
 update _ shared msg model =
     case msg of
         PressedAltText altText ->
@@ -133,7 +142,7 @@ update _ shared msg model =
                     skipForwardVideo ()
             )
 
-        PressedStartShootEmUp time ->
+        PressedStartShootEmUp ->
             ( { model
                 | gameState =
                     Just
@@ -141,21 +150,63 @@ update _ shared msg model =
                         , machineGunAmmo = 0
                         , shotgunAmmo = 0
                         , bombAmmo = 0
-                        , startTime = time
+                        , elapsedTime = 0
                         , cursors = []
                         , dogsGif = { x = 0, y = 0, width = 0, height = 0 }
+                        , pageHeight = toFloat shared.windowHeight
                         }
               }
-            , loadSounds ()
+            , Cmd.batch
+                [ loadSounds ()
+                , Task.map2
+                    (\{ element } { scene } -> ( element, scene.height ))
+                    (Browser.Dom.getElement Formatting.dogsImageId)
+                    Browser.Dom.getViewport
+                    |> Task.attempt GotDogsAndPageImage
+                ]
             )
 
         MouseDown { clientX, clientY, pageX, pageY } ->
             case model.gameState of
-                Just { gun } ->
-                    ( { model | bulletHoles = { x = pageX, y = pageY, gunType = Handgun } :: model.bulletHoles }
+                Just gameState ->
+                    ( { model
+                        | bulletHoles = { x = pageX, y = pageY, gunType = Handgun } :: model.bulletHoles
+                        , gameState =
+                            { gun = gameState.gun
+                            , machineGunAmmo = gameState.machineGunAmmo
+                            , shotgunAmmo = gameState.shotgunAmmo
+                            , bombAmmo = gameState.bombAmmo
+                            , elapsedTime = gameState.elapsedTime
+                            , cursors =
+                                List.map
+                                    (\cursor ->
+                                        case cursor.isDead of
+                                            Just _ ->
+                                                cursor
+
+                                            Nothing ->
+                                                let
+                                                    distance =
+                                                        sqrt ((cursor.x - pageX) ^ 2 + (cursor.y - pageY) ^ 2)
+                                                in
+                                                if distance < 16 then
+                                                    { cursor
+                                                        | isDead = Just { diedAt = gameState.elapsedTime }
+                                                        , isAttached = False
+                                                    }
+
+                                                else
+                                                    cursor
+                                    )
+                                    gameState.cursors
+                            , dogsGif = gameState.dogsGif
+                            , pageHeight = gameState.pageHeight
+                            }
+                                |> Just
+                      }
                     , Cmd.batch
                         [ shoot { x = clientX, y = clientY }
-                        , (case gun of
+                        , (case gameState.gun of
                             Handgun ->
                                 "sn_handgun"
 
@@ -198,28 +249,98 @@ update _ shared msg model =
                 Nothing ->
                     ( model, Cmd.none )
 
-        AnimationFrame time ->
+        AnimationFrameDelta elapsed ->
             ( case model.gameState of
                 Just gameState ->
                     let
-                        startTime =
-                            Time.posixToMillis gameState.startTime
-
-                        time2 =
-                            Time.posixToMillis time
-
-                        elapsed =
-                            time2 - startTime
-
                         cursorSpeed =
-                            5
+                            1
+
+                        elapsed2 =
+                            gameState.elapsedTime + elapsed
 
                         newCursors : List Cursor
                         newCursors =
                             Random.step
-                                (spawnCursors shared.windowWidth shared.windowHeight elapsed)
-                                (Random.initialSeed time2)
+                                (spawnCursors shared.windowWidth (round gameState.pageHeight) (round elapsed2))
+                                (Random.initialSeed (elapsed2 * 10000 |> round))
                                 |> Tuple.first
+
+                        gif =
+                            gameState.dogsGif
+
+                        gifCenterX : Float
+                        gifCenterX =
+                            gif.x + gif.width / 2
+
+                        gifCenterY : Float
+                        gifCenterY =
+                            gif.y + gif.height / 2
+
+                        dragCount =
+                            List.Extra.count
+                                (\cursor -> cursor.isAttached && cursor.isDead == Nothing)
+                                gameState.cursors
+                                |> toFloat
+
+                        pageCenterX =
+                            toFloat shared.windowWidth / 2
+
+                        pageCenterY =
+                            gameState.pageHeight / 2
+
+                        dragDirection =
+                            atan2 (pageCenterY - gifCenterY) (pageCenterX - gifCenterX) + pi
+
+                        dragX =
+                            dragCount * 0.1 * cos dragDirection
+
+                        dragY =
+                            dragCount * 0.1 * sin dragDirection
+
+                        updateCursor : Cursor -> Maybe Cursor
+                        updateCursor cursor =
+                            case cursor.isDead of
+                                Just { diedAt } ->
+                                    if elapsed2 - diedAt > 2000 then
+                                        Nothing
+
+                                    else
+                                        Just cursor
+
+                                Nothing ->
+                                    if cursor.isAttached then
+                                        { x = cursor.x + dragX
+                                        , y = cursor.y + dragY
+                                        , isBonus = cursor.isBonus
+                                        , isAttached = True
+                                        , isDead = cursor.isDead
+                                        }
+                                            |> Just
+
+                                    else
+                                        let
+                                            direction : Float
+                                            direction =
+                                                atan2 (gifCenterY - cursor.y) (gifCenterX - cursor.x)
+
+                                            x : Float
+                                            x =
+                                                cursor.x + cursorSpeed * cos direction
+
+                                            y : Float
+                                            y =
+                                                cursor.y + cursorSpeed * sin direction
+                                        in
+                                        { x = x
+                                        , y = y
+                                        , isBonus = cursor.isBonus
+                                        , isAttached =
+                                            (abs (gifCenterX - x) < gif.width / 2)
+                                                && (abs (gifCenterY - y) < gif.height / 2)
+                                        , isDead = cursor.isDead
+                                        }
+                                            |> Just
                     in
                     { model
                         | gameState =
@@ -227,13 +348,10 @@ update _ shared msg model =
                             , machineGunAmmo = gameState.machineGunAmmo
                             , shotgunAmmo = gameState.shotgunAmmo
                             , bombAmmo = gameState.bombAmmo
-                            , startTime = gameState.startTime
-                            , cursors =
-                                newCursors
-                                    ++ List.map
-                                        (\cursor -> { x = cursor.x + 1, y = 0, isBonus = cursor.isBonus })
-                                        gameState.cursors
-                            , dogsGif = gameState.dogsGif
+                            , elapsedTime = elapsed2
+                            , cursors = newCursors ++ List.filterMap updateCursor gameState.cursors
+                            , dogsGif = { gif | x = gif.x + dragX, y = gif.y + dragY }
+                            , pageHeight = gameState.pageHeight
                             }
                                 |> Just
                     }
@@ -242,6 +360,16 @@ update _ shared msg model =
                     model
             , Cmd.none
             )
+
+        GotDogsAndPageImage result ->
+            case ( model.gameState, result ) of
+                ( Just gameState, Ok ( element, pageHeight ) ) ->
+                    ( { model | gameState = Just { gameState | dogsGif = element, pageHeight = pageHeight } }
+                    , Cmd.none
+                    )
+
+                _ ->
+                    ( model, Cmd.none )
 
 
 subscriptions : a -> b -> c -> Model -> Sub Msg
@@ -259,7 +387,7 @@ subscriptions _ _ _ model =
                             (Json.Decode.field "pageY" Json.Decode.float)
                             |> Json.Decode.map MouseDown
                         )
-                    , Browser.Events.onAnimationFrame AnimationFrame
+                    , Browser.Events.onAnimationFrameDelta AnimationFrameDelta
                     ]
 
             Nothing ->
@@ -369,7 +497,7 @@ head app =
 
 
 type alias Cursor =
-    { x : Int, y : Int, isBonus : Bool }
+    { x : Float, y : Float, isBonus : Bool, isAttached : Bool, isDead : Maybe { diedAt : Float } }
 
 
 getAmmo : Random.Generator GunType
@@ -385,7 +513,7 @@ spawnCursors : Int -> Int -> Int -> Random.Generator (List Cursor)
 spawnCursors windowWidth windowHeight timeElapsed =
     Random.andThen
         (\t2 ->
-            if t2 > 0.99 - (toFloat timeElapsed / 100000) then
+            if t2 > 0.995 - (toFloat timeElapsed / 100000) then
                 Random.map3
                     (\t side count ->
                         let
@@ -414,7 +542,14 @@ spawnCursors windowWidth windowHeight timeElapsed =
                         Random.list
                             count
                             (Random.map3
-                                (\x2 y2 isBonus -> { x = x2, y = y2, isBonus = isBonus })
+                                (\x2 y2 isBonus ->
+                                    { x = toFloat x2
+                                    , y = toFloat y2
+                                    , isBonus = isBonus
+                                    , isAttached = False
+                                    , isDead = Nothing
+                                    }
+                                )
                                 (Random.int (x - 50) (x + 50))
                                 (Random.int (y - 50) (y + 50))
                                 (Random.weighted ( 0.8, False ) [ ( 0.2, True ) ])
@@ -436,7 +571,7 @@ drawSprite sprite x y rotation =
     Html.img
         [ Html.Attributes.style "position" "absolute"
         , Html.Attributes.style "left" (String.fromFloat (x - 14) ++ "px")
-        , Html.Attributes.style "top" (String.fromFloat (y - Shared.headerHeight - 14) ++ "px")
+        , Html.Attributes.style "top" (String.fromFloat (y - 14) ++ "px")
         , Html.Attributes.style "pointer-events" "none"
         , Html.Attributes.src ("/secret-santa-game/" ++ sprite)
         , Html.Attributes.style "transform" ("rotate(" ++ String.fromInt (modBy 360 rotation) ++ "deg)")
@@ -444,11 +579,7 @@ drawSprite sprite x y rotation =
         []
 
 
-view :
-    App Data ActionData RouteParams
-    -> Shared.Model
-    -> Model
-    -> View (PagesMsg Msg)
+view : App Data ActionData RouteParams -> Shared.Model -> Model -> View (PagesMsg Msg)
 view app shared model =
     let
         thing : Thing
@@ -457,17 +588,12 @@ view app shared model =
     in
     { title = thing.name
     , body =
-        Ui.el
-            [ List.map
-                (\{ x, y, gunType } -> drawSprite "bullet-hole.png" x y (round x * 1000))
-                model.bulletHoles
-                |> List.reverse
-                |> Html.div []
-                |> Ui.html
-                |> Ui.inFront
-            , case model.gameState of
+        Ui.column
+            (case model.gameState of
                 Just gameState ->
-                    Html.div
+                    [ Html.Attributes.style "cursor" "crosshair" |> Ui.htmlAttribute
+                    , Html.Attributes.style "user-select" "none" |> Ui.htmlAttribute
+                    , Html.div
                         []
                         [ Html.audio
                             [ Html.Attributes.src "/secret-santa-game/audio/norwegian_pirate.mp3"
@@ -475,17 +601,62 @@ view app shared model =
                             ]
                             []
                         , List.map
-                            (\cursor -> drawSprite "cursor.png" (toFloat cursor.x) (toFloat cursor.y) 0)
+                            (\cursor ->
+                                let
+                                    ( offsetX, offsetY, rotation ) =
+                                        case cursor.isDead of
+                                            Just { diedAt } ->
+                                                let
+                                                    elapsed2 =
+                                                        gameState.elapsedTime - diedAt
+                                                in
+                                                ( elapsed2 / 30, (elapsed2 / 30) ^ 2 + 1, elapsed2 )
+
+                                            Nothing ->
+                                                ( 0, 0, 0 )
+                                in
+                                drawSprite
+                                    (if cursor.isBonus then
+                                        "cursor2.png"
+
+                                     else
+                                        "cursor.png"
+                                    )
+                                    (cursor.x + offsetX)
+                                    (cursor.y + offsetY)
+                                    (round rotation)
+                            )
                             gameState.cursors
-                            |> Html.div []
+                            |> Html.div [ Html.Attributes.style "position" "relative" ]
                         ]
                         |> Ui.html
                         |> Ui.inFront
+                    , List.map
+                        (\{ x, y, gunType } -> drawSprite "bullet-hole.png" x y (round x * 1000))
+                        model.bulletHoles
+                        |> List.reverse
+                        |> Html.div []
+                        |> Ui.html
+                        |> Ui.inFront
+                    , Html.img
+                        [ Html.Attributes.src "/secret-santa-game/omfgdogs.gif"
+                        , Html.Attributes.style "width" (String.fromFloat gameState.dogsGif.width ++ "px")
+                        , Html.Attributes.style "height" (String.fromFloat gameState.dogsGif.height ++ "px")
+                        , Html.Attributes.style "position" "absolute"
+                        , Html.Attributes.style "left" (String.fromFloat gameState.dogsGif.x ++ "px")
+                        , Html.Attributes.style "top" (String.fromFloat gameState.dogsGif.y ++ "px")
+                        , Html.Attributes.style "pointer-events" "none"
+                        ]
+                        []
+                        |> Ui.html
+                        |> Ui.inFront
+                    ]
 
                 Nothing ->
-                    Ui.noAttr
-            ]
-            (Ui.column
+                    []
+            )
+            [ Shared.header Nothing
+            , Ui.column
                 [ Ui.Responsive.paddingXY
                     Shared.breakpoints
                     (\label ->
@@ -518,7 +689,7 @@ view app shared model =
                         thing.description
                 , Ui.el [ Ui.height (Ui.px 100) ] Ui.none
                 ]
-            )
+            ]
     }
 
 
@@ -526,7 +697,7 @@ msgConfig : Formatting.Config (PagesMsg Msg)
 msgConfig =
     { pressedAltText = \text -> PressedAltText text |> PagesMsg.fromMsg
     , startedVideo = StartedVideo |> PagesMsg.fromMsg
-    , pressedStartShootEmUp = \time -> PressedStartShootEmUp time |> PagesMsg.fromMsg
+    , pressedStartShootEmUp = PressedStartShootEmUp |> PagesMsg.fromMsg
     }
 
 
@@ -568,11 +739,10 @@ title thing =
                                 ++ (case endedAt of
                                         Just a ->
                                             [ dateView a
-                                            , Ui.text
-                                                (" ("
-                                                    ++ String.fromInt (Date.diff Date.Months startedAt a)
-                                                    ++ "\u{00A0}months)"
-                                                )
+                                            , " ("
+                                                ++ String.fromInt (Date.diff Date.Months startedAt a)
+                                                ++ "\u{00A0}months)"
+                                                |> Ui.text
                                             ]
 
                                         Nothing ->

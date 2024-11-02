@@ -86,9 +86,6 @@ const config: ElmPagesInit = {
                     keyframes.push({ color: "inherit", transform: "translateX(" + x + "px) translateY(" + y + "px) rotate(" + (t * spinSpeed) + "deg)" });
                 }
 
-
-
-
                 elem.style = "display:inline-block; color:transparent; pointer-events:none";
 
                 elem.animate(keyframes, { duration: duration, iterations: 1 });

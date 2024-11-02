@@ -5,6 +5,8 @@ port module Shared exposing
     , Msg(..)
     , breakpoints
     , contentMaxWidth
+    , defaultView
+    , header
     , headerHeight
     , maxColumns
     , pagePadding
@@ -160,15 +162,19 @@ view _ page model toMsg pageView =
             }
             model.uiAnimModel
             [ Ui.height Ui.fill ]
-            (Ui.column
-                [ Ui.height Ui.fill ]
-                [ header page.route
-                , pageView.body
-                ]
-            )
+            pageView.body
         ]
     , title = pageView.title
     }
+
+
+defaultView : Ui.Element msg -> Ui.Element msg
+defaultView pageView =
+    Ui.column
+        [ Ui.height Ui.fill ]
+        [ header Nothing
+        , pageView
+        ]
 
 
 maxColumns : number
