@@ -1,5 +1,6 @@
 module ErrorPage exposing (ErrorPage(..), Model, Msg, init, internalError, notFound, statusCode, update, view)
 
+import Html
 import Ui
 import Ui.Prose
 import View exposing (View)
@@ -65,6 +66,7 @@ view error _ =
 
             InternalError _ ->
                 "Unexpected Error"
+    , overlay = Html.text ""
     }
 
 

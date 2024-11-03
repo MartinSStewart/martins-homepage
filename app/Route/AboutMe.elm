@@ -11,6 +11,7 @@ import Effect
 import FatalError
 import Formatting exposing (Formatting(..), Inline(..))
 import Head
+import Html
 import PagesMsg
 import Route exposing (Route(..))
 import RouteBuilder
@@ -126,6 +127,7 @@ view :
     -> View.View (PagesMsg.PagesMsg Msg)
 view app shared model =
     { title = "About me"
+    , overlay = Html.text ""
     , body =
         Ui.row
             [ Ui.widthMax 1000
@@ -175,7 +177,7 @@ view app shared model =
                     }
                 ]
             ]
-            |> Shared.defaultView
+            |> Shared.defaultView shared
     }
 
 

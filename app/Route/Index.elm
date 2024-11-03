@@ -10,6 +10,7 @@ import Effect exposing (Effect)
 import FatalError exposing (FatalError)
 import Head
 import Head.Seo as Seo
+import Html
 import Html.Attributes
 import List.Extra
 import Pages.Url
@@ -441,7 +442,7 @@ view :
     -> Shared.Model
     -> Model
     -> View (PagesMsg Msg)
-view app _ model =
+view app shared model =
     let
         thingsDone0 : Dict String ( Tier, Thing )
         thingsDone0 =
@@ -508,6 +509,7 @@ view app _ model =
                 Nothing
     in
     { title = "Martin's homepage"
+    , overlay = Html.text ""
     , body =
         Ui.el
             (if model.sortBy == Quality then
@@ -564,7 +566,7 @@ view app _ model =
                 ]
                 |> Ui.map PagesMsg.fromMsg
             )
-            |> Shared.defaultView
+            |> Shared.defaultView shared
     }
 
 

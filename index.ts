@@ -41,20 +41,16 @@ const config: ElmPagesInit = {
     let context = null;
     let sounds = {};
     app.ports.loadSounds.subscribe((a) => {
-        console.log("test");
         context = new AudioContext();
         loadAudio("sn_handgun_voice", context, sounds);
         loadAudio("sn_handgun", context, sounds);
     });
     app.ports.playSound.subscribe((a) => {
-        console.log(a);
-        console.log(sounds);
         const source = context.createBufferSource();
         if (sounds[a]) {
             source.buffer = sounds[a];
             source.connect(context.destination);
             source.start(0);
-            console.log(source);
         }
     });
     app.ports.shoot.subscribe((a) => {

@@ -587,57 +587,23 @@ view app shared model =
             app.data.thing
     in
     { title = thing.name
-    , body =
-        Ui.column
-            (case model.gameState of
-                Just gameState ->
-                    [ Html.Attributes.style "cursor" "crosshair" |> Ui.htmlAttribute
-                    , Html.Attributes.style "user-select" "none" |> Ui.htmlAttribute
-                    , Html.div
-                        []
-                        [ Html.audio
-                            [ Html.Attributes.src "/secret-santa-game/audio/norwegian_pirate.mp3"
-                            , Html.Attributes.autoplay True
-                            ]
-                            []
-                        , List.map
-                            (\cursor ->
-                                let
-                                    ( offsetX, offsetY, rotation ) =
-                                        case cursor.isDead of
-                                            Just { diedAt } ->
-                                                let
-                                                    elapsed2 =
-                                                        gameState.elapsedTime - diedAt
-                                                in
-                                                ( elapsed2 / 30, (elapsed2 / 30) ^ 2 + 1, elapsed2 )
-
-                                            Nothing ->
-                                                ( 0, 0, 0 )
-                                in
-                                drawSprite
-                                    (if cursor.isBonus then
-                                        "cursor2.png"
-
-                                     else
-                                        "cursor.png"
-                                    )
-                                    (cursor.x + offsetX)
-                                    (cursor.y + offsetY)
-                                    (round rotation)
-                            )
-                            gameState.cursors
-                            |> Html.div [ Html.Attributes.style "position" "relative" ]
+    , overlay =
+        case model.gameState of
+            Just gameState ->
+                Html.div
+                    [ Html.Attributes.style "position" "absolute"
+                    , Html.Attributes.style "top" "0"
+                    , Html.Attributes.style "left" "0"
+                    , Html.Attributes.style "overflow" "hidden"
+                    , Html.Attributes.style "width" "100%"
+                    , Html.Attributes.style "height" (String.fromFloat gameState.pageHeight ++ "px")
+                    , Html.Attributes.style "pointer-events" "none"
+                    ]
+                    [ Html.audio
+                        [ Html.Attributes.src "/secret-santa-game/audio/norwegian_pirate.mp3"
+                        , Html.Attributes.autoplay True
                         ]
-                        |> Ui.html
-                        |> Ui.inFront
-                    , List.map
-                        (\{ x, y, gunType } -> drawSprite "bullet-hole.png" x y (round x * 1000))
-                        model.bulletHoles
-                        |> List.reverse
-                        |> Html.div []
-                        |> Ui.html
-                        |> Ui.inFront
+                        []
                     , Html.img
                         [ Html.Attributes.src "/secret-santa-game/omfgdogs.gif"
                         , Html.Attributes.style "width" (String.fromFloat gameState.dogsGif.width ++ "px")
@@ -648,8 +614,49 @@ view app shared model =
                         , Html.Attributes.style "pointer-events" "none"
                         ]
                         []
-                        |> Ui.html
-                        |> Ui.inFront
+                    , List.map
+                        (\cursor ->
+                            let
+                                ( offsetX, offsetY, rotation ) =
+                                    case cursor.isDead of
+                                        Just { diedAt } ->
+                                            let
+                                                elapsed2 =
+                                                    gameState.elapsedTime - diedAt
+                                            in
+                                            ( elapsed2 / 30, (elapsed2 / 30) ^ 2 + 1, elapsed2 )
+
+                                        Nothing ->
+                                            ( 0, 0, 0 )
+                            in
+                            drawSprite
+                                (if cursor.isBonus then
+                                    "cursor2.png"
+
+                                 else
+                                    "cursor.png"
+                                )
+                                (cursor.x + offsetX)
+                                (cursor.y + offsetY)
+                                (round rotation)
+                        )
+                        gameState.cursors
+                        |> Html.div [ Html.Attributes.style "position" "absolute" ]
+                    , List.map
+                        (\{ x, y, gunType } -> drawSprite "bullet-hole.png" x y (round x * 1000))
+                        model.bulletHoles
+                        |> List.reverse
+                        |> Html.div [ Html.Attributes.style "position" "absolute" ]
+                    ]
+
+            Nothing ->
+                Html.div [] []
+    , body =
+        Ui.column
+            (case model.gameState of
+                Just _ ->
+                    [ Html.Attributes.style "cursor" "crosshair" |> Ui.htmlAttribute
+                    , Html.Attributes.style "user-select" "none" |> Ui.htmlAttribute
                     ]
 
                 Nothing ->

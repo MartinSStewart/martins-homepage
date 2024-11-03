@@ -161,15 +161,16 @@ view _ page model toMsg pageView =
             , breakpoints = Just breakpoints
             }
             model.uiAnimModel
-            [ Ui.height Ui.fill ]
+            []
             pageView.body
+        , pageView.overlay
         ]
     , title = pageView.title
     }
 
 
-defaultView : Ui.Element msg -> Ui.Element msg
-defaultView pageView =
+defaultView : Model -> Ui.Element msg -> Ui.Element msg
+defaultView model pageView =
     Ui.column
         [ Ui.height Ui.fill ]
         [ header Nothing
