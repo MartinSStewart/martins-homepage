@@ -16,6 +16,7 @@ import Json.Decode
 import List.Extra
 import Pages.Url
 import PagesMsg exposing (PagesMsg)
+import Process
 import Random
 import Round
 import RouteBuilder exposing (App, StatefulRoute)
@@ -316,14 +317,14 @@ update _ shared msg model =
                 Just game ->
                     case game.gameEnded of
                         Just _ ->
-                            { model | game = gameInit game.gifStart shared |> Just }
+                            { model | game = Nothing }
 
                         Nothing ->
                             model
 
                 Nothing ->
                     model
-            , Cmd.none
+            , Process.sleep 1 |> Task.perform (\() -> PressedStartShootEmUp)
             )
 
         PressedQuit ->

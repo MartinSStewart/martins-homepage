@@ -44,6 +44,12 @@ const config: ElmPagesInit = {
         context = new AudioContext();
         loadAudio("sn_handgun_voice", context, sounds);
         loadAudio("sn_handgun", context, sounds);
+        loadAudio("sn_machinegun_voice", context, sounds);
+        loadAudio("sn_machinegun", context, sounds);
+        loadAudio("sn_shotgun_voice", context, sounds);
+        loadAudio("sn_shotgun", context, sounds);
+        loadAudio("sn_empty", context, sounds);
+        loadAudio("sn_bomb_voice", context, sounds);
     });
     app.ports.playSound.subscribe((a) => {
         const source = context.createBufferSource();

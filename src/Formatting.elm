@@ -462,6 +462,7 @@ viewHelper shootMode shared config depth model item =
                     ("calc(var(--ui-bp-0) * -" ++ String.fromInt sidePaddingMobile ++ "px)")
                  , Html.Events.on "play" (Json.Decode.succeed config.startedVideo)
                  , Html.Attributes.style "aspect-ratio" (String.fromFloat (toFloat width / toFloat height))
+                 , Html.Attributes.controls True
                  ]
                     ++ (if shootMode then
                             [ Html.Attributes.style "opacity" "0.2"
