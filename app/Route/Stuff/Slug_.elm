@@ -57,12 +57,11 @@ type GunType
 type alias Model =
     { selectedAltText : Set String
     , videoIsPlaying : Bool
-    , bulletHoles : List { x : Float, y : Float, gunType : GunType }
-    , gameState : Maybe GameState
+    , gameState : Maybe Game
     }
 
 
-type alias GameState =
+type alias Game =
     { gun : GunType
     , machineGunAmmo : Int
     , shotgunAmmo : Int
@@ -71,8 +70,9 @@ type alias GameState =
     , cursors : List Cursor
     , dogsGif : { x : Float, y : Float, width : Float, height : Float }
     , pageHeight : Float
-    , gameEnded : Maybe Float
+    , gameEnded : Maybe { duration : Float, hideMenu : Bool }
     , lastSpawnCheck : Float
+    , bulletHoles : List { x : Float, y : Float, gunType : GunType }
     }
 
 
@@ -89,6 +89,9 @@ type Msg
             Browser.Dom.Error
             ( { x : Float, y : Float, width : Float, height : Float }, Float )
         )
+    | PressedRestart
+    | PressedQuit
+    | PressedHide
 
 
 type alias MouseDownData =
@@ -106,7 +109,7 @@ type alias RouteParams =
 
 init : App Data action routeParams -> Shared.Model -> ( Model, Cmd Msg )
 init _ _ =
-    ( { selectedAltText = Set.empty, videoIsPlaying = False, bulletHoles = [], gameState = Nothing }
+    ( { selectedAltText = Set.empty, videoIsPlaying = False, gameState = Nothing }
     , Cmd.none
     )
 
@@ -126,6 +129,22 @@ route =
             }
 
 
+gameInit : Shared.Model -> Game
+gameInit shared =
+    { gun = Handgun
+    , machineGunAmmo = 0
+    , shotgunAmmo = 0
+    , bombAmmo = 0
+    , elapsedTime = 0
+    , cursors = []
+    , dogsGif = { x = 0, y = 0, width = 0, height = 0 }
+    , pageHeight = toFloat shared.windowHeight
+    , gameEnded = Nothing
+    , lastSpawnCheck = 0
+    , bulletHoles = []
+    }
+
+
 update : App data action routeParams -> Shared.Model -> Msg -> Model -> ( Model, Effect Msg )
 update _ shared msg model =
     case msg of
@@ -136,31 +155,21 @@ update _ shared msg model =
             ( { model | videoIsPlaying = True }, Effect.none )
 
         PressedArrowKey arrowKey ->
-            ( model
-            , case arrowKey of
-                LeftArrowKey ->
-                    skipBackwardVideo ()
+            if model.videoIsPlaying then
+                ( model
+                , case arrowKey of
+                    LeftArrowKey ->
+                        skipBackwardVideo ()
 
-                RightArrowKey ->
-                    skipForwardVideo ()
-            )
+                    RightArrowKey ->
+                        skipForwardVideo ()
+                )
+
+            else
+                ( model, Cmd.none )
 
         PressedStartShootEmUp ->
-            ( { model
-                | gameState =
-                    Just
-                        { gun = Handgun
-                        , machineGunAmmo = 0
-                        , shotgunAmmo = 0
-                        , bombAmmo = 0
-                        , elapsedTime = 0
-                        , cursors = []
-                        , dogsGif = { x = 0, y = 0, width = 0, height = 0 }
-                        , pageHeight = toFloat shared.windowHeight
-                        , gameEnded = Nothing
-                        , lastSpawnCheck = 0
-                        }
-              }
+            ( { model | gameState = gameInit shared |> Just }
             , Cmd.batch
                 [ loadSounds ()
                 , Task.map2
@@ -173,21 +182,21 @@ update _ shared msg model =
 
         MouseDown { clientX, clientY, pageX, pageY } ->
             case model.gameState of
-                Just gameState ->
-                    case gameState.gameEnded of
+                Just game ->
+                    case game.gameEnded of
                         Just _ ->
                             ( model, Cmd.none )
 
                         Nothing ->
                             ( { model
-                                | bulletHoles = { x = pageX, y = pageY, gunType = Handgun } :: model.bulletHoles
-                                , gameState =
-                                    { gun = gameState.gun
-                                    , machineGunAmmo = gameState.machineGunAmmo
-                                    , shotgunAmmo = gameState.shotgunAmmo
-                                    , bombAmmo = gameState.bombAmmo
-                                    , elapsedTime = gameState.elapsedTime
-                                    , lastSpawnCheck = gameState.lastSpawnCheck
+                                | gameState =
+                                    { gun = game.gun
+                                    , machineGunAmmo = game.machineGunAmmo
+                                    , shotgunAmmo = game.shotgunAmmo
+                                    , bombAmmo = game.bombAmmo
+                                    , elapsedTime = game.elapsedTime
+                                    , lastSpawnCheck = game.lastSpawnCheck
+                                    , bulletHoles = { x = pageX, y = pageY, gunType = Handgun } :: game.bulletHoles
                                     , cursors =
                                         List.map
                                             (\cursor ->
@@ -202,23 +211,23 @@ update _ shared msg model =
                                                         in
                                                         if distance < 16 then
                                                             { cursor
-                                                                | isDead = Just { diedAt = gameState.elapsedTime }
+                                                                | isDead = Just { diedAt = game.elapsedTime }
                                                                 , isAttached = False
                                                             }
 
                                                         else
                                                             cursor
                                             )
-                                            gameState.cursors
-                                    , dogsGif = gameState.dogsGif
-                                    , pageHeight = gameState.pageHeight
-                                    , gameEnded = gameState.gameEnded
+                                            game.cursors
+                                    , dogsGif = game.dogsGif
+                                    , pageHeight = game.pageHeight
+                                    , gameEnded = game.gameEnded
                                     }
                                         |> Just
                               }
                             , Cmd.batch
                                 [ shoot { x = clientX, y = clientY }
-                                , (case gameState.gun of
+                                , (case game.gun of
                                     Handgun ->
                                         "sn_handgun"
 
@@ -286,14 +295,66 @@ update _ shared msg model =
                 _ ->
                     ( model, Cmd.none )
 
+        PressedRestart ->
+            ( case model.gameState of
+                Just game ->
+                    case game.gameEnded of
+                        Just _ ->
+                            { model | gameState = gameInit shared |> Just }
 
-updateGameState : Shared.Model -> Float -> GameState -> GameState
-updateGameState shared elapsed gameState =
+                        Nothing ->
+                            model
+
+                Nothing ->
+                    model
+            , Cmd.none
+            )
+
+        PressedQuit ->
+            ( case model.gameState of
+                Just game ->
+                    case game.gameEnded of
+                        Just _ ->
+                            { model | gameState = Nothing }
+
+                        Nothing ->
+                            model
+
+                Nothing ->
+                    model
+            , Cmd.none
+            )
+
+        PressedHide ->
+            ( { model
+                | gameState =
+                    case model.gameState of
+                        Just game ->
+                            { game
+                                | gameEnded =
+                                    case game.gameEnded of
+                                        Just ended ->
+                                            { ended | hideMenu = not ended.hideMenu } |> Just
+
+                                        Nothing ->
+                                            Nothing
+                            }
+                                |> Just
+
+                        Nothing ->
+                            Nothing
+              }
+            , Cmd.none
+            )
+
+
+updateGameState : Shared.Model -> Float -> Game -> Game
+updateGameState shared elapsed game =
     let
         elapsed2 =
-            gameState.elapsedTime + elapsed
+            game.elapsedTime + elapsed
     in
-    case gameState.gameEnded of
+    case game.gameEnded of
         Just _ ->
             let
                 updateCursor : Cursor -> Maybe Cursor
@@ -309,7 +370,7 @@ updateGameState shared elapsed gameState =
                         Nothing ->
                             Just cursor
             in
-            { gameState | cursors = List.filterMap updateCursor gameState.cursors, elapsedTime = elapsed2 }
+            { game | cursors = List.filterMap updateCursor game.cursors, elapsedTime = elapsed2 }
 
         Nothing ->
             let
@@ -319,13 +380,13 @@ updateGameState shared elapsed gameState =
                 {- Try spawning cursors 30 times per second -}
                 doSpawnCheck : Bool
                 doSpawnCheck =
-                    elapsed2 - gameState.lastSpawnCheck > 1000 / 30
+                    elapsed2 - game.lastSpawnCheck > 1000 / 30
 
                 newCursors : List Cursor
                 newCursors =
                     if doSpawnCheck then
                         Random.step
-                            (spawnCursors shared.windowWidth (round gameState.pageHeight) (round elapsed2))
+                            (spawnCursors shared.windowWidth (round game.pageHeight) (round elapsed2))
                             (Random.initialSeed (elapsed2 * 10000 |> round))
                             |> Tuple.first
 
@@ -333,7 +394,7 @@ updateGameState shared elapsed gameState =
                         []
 
                 gif =
-                    gameState.dogsGif
+                    game.dogsGif
 
                 gifCenterX : Float
                 gifCenterX =
@@ -346,14 +407,14 @@ updateGameState shared elapsed gameState =
                 dragCount =
                     List.Extra.count
                         (\cursor -> cursor.isAttached && cursor.isDead == Nothing)
-                        gameState.cursors
+                        game.cursors
                         |> toFloat
 
                 pageCenterX =
                     toFloat shared.windowWidth / 2
 
                 pageCenterY =
-                    gameState.pageHeight / 2
+                    game.pageHeight / 2
 
                 dragDirection =
                     atan2 (pageCenterY - gifCenterY) (pageCenterX - gifCenterX) + pi
@@ -408,30 +469,31 @@ updateGameState shared elapsed gameState =
                                 }
                                     |> Just
             in
-            { gun = gameState.gun
-            , machineGunAmmo = gameState.machineGunAmmo
-            , shotgunAmmo = gameState.shotgunAmmo
-            , bombAmmo = gameState.bombAmmo
+            { gun = game.gun
+            , machineGunAmmo = game.machineGunAmmo
+            , shotgunAmmo = game.shotgunAmmo
+            , bombAmmo = game.bombAmmo
             , elapsedTime = elapsed2
+            , bulletHoles = game.bulletHoles
             , lastSpawnCheck =
-                gameState.lastSpawnCheck
+                game.lastSpawnCheck
                     + (if doSpawnCheck then
                         1000 / 30
 
                        else
                         0
                       )
-            , cursors = newCursors ++ List.filterMap updateCursor gameState.cursors
+            , cursors = newCursors ++ List.filterMap updateCursor game.cursors
             , dogsGif = { gif | x = gif.x + dragX, y = gif.y + dragY }
-            , pageHeight = gameState.pageHeight
+            , pageHeight = game.pageHeight
             , gameEnded =
                 if
                     (gif.x + gif.width < -20)
                         || (gif.y + gif.height < -20)
                         || (gif.x > toFloat shared.windowWidth + 20)
-                        || (gif.y > gameState.pageHeight + 20)
+                        || (gif.y > game.pageHeight + 20)
                 then
-                    Just elapsed2
+                    Just { duration = elapsed2, hideMenu = False }
 
                 else
                     Nothing
@@ -458,36 +520,41 @@ subscriptions _ _ _ model =
 
             Nothing ->
                 Sub.none
-        , if model.videoIsPlaying then
-            Browser.Events.onKeyDown
-                (Json.Decode.field "key" Json.Decode.string
-                    |> Json.Decode.andThen
-                        (\key ->
-                            if key == "ArrowLeft" then
-                                Json.Decode.succeed (PressedArrowKey LeftArrowKey)
+        , Browser.Events.onKeyDown
+            (Json.Decode.field "key" Json.Decode.string
+                |> Json.Decode.andThen
+                    (\key ->
+                        if Debug.log "key" key == "ArrowLeft" then
+                            Json.Decode.succeed (PressedArrowKey LeftArrowKey)
 
-                            else if key == "ArrowRight" then
-                                Json.Decode.succeed (PressedArrowKey RightArrowKey)
+                        else if key == "ArrowRight" then
+                            Json.Decode.succeed (PressedArrowKey RightArrowKey)
 
-                            else if key == "1" then
-                                Json.Decode.succeed (PressedGunKey Handgun)
+                        else if key == "1" then
+                            Json.Decode.succeed (PressedGunKey Handgun)
 
-                            else if key == "2" then
-                                Json.Decode.succeed (PressedGunKey MachineGun)
+                        else if key == "2" then
+                            Json.Decode.succeed (PressedGunKey MachineGun)
 
-                            else if key == "3" then
-                                Json.Decode.succeed (PressedGunKey Shotgun)
+                        else if key == "3" then
+                            Json.Decode.succeed (PressedGunKey Shotgun)
 
-                            else if key == "4" then
-                                Json.Decode.succeed (PressedGunKey Bomb)
+                        else if key == "4" then
+                            Json.Decode.succeed (PressedGunKey Bomb)
 
-                            else
-                                Json.Decode.fail ""
-                        )
-                )
+                        else if key == "r" then
+                            Json.Decode.succeed PressedRestart
 
-          else
-            Sub.none
+                        else if key == "q" then
+                            Json.Decode.succeed PressedQuit
+
+                        else if key == "h" then
+                            Json.Decode.succeed PressedHide
+
+                        else
+                            Json.Decode.fail ""
+                    )
+            )
         ]
 
 
@@ -655,7 +722,7 @@ view app shared model =
     { title = thing.name
     , overlay =
         case model.gameState of
-            Just gameState ->
+            Just game ->
                 Html.div
                     []
                     [ Html.div
@@ -664,10 +731,10 @@ view app shared model =
                         , Html.Attributes.style "left" "0"
                         , Html.Attributes.style "overflow" "hidden"
                         , Html.Attributes.style "width" "100%"
-                        , Html.Attributes.style "height" (String.fromFloat gameState.pageHeight ++ "px")
+                        , Html.Attributes.style "height" (String.fromFloat game.pageHeight ++ "px")
                         , Html.Attributes.style "pointer-events" "none"
                         ]
-                        [ case gameState.gameEnded of
+                        [ case game.gameEnded of
                             Just _ ->
                                 Html.audio
                                     [ Html.Attributes.src "/secret-santa-game/audio/sn_boo.mp3"
@@ -683,17 +750,17 @@ view app shared model =
                                     []
                         , Html.img
                             [ Html.Attributes.src "/secret-santa-game/omfgdogs.gif"
-                            , Html.Attributes.style "width" (String.fromFloat gameState.dogsGif.width ++ "px")
-                            , Html.Attributes.style "height" (String.fromFloat gameState.dogsGif.height ++ "px")
+                            , Html.Attributes.style "width" (String.fromFloat game.dogsGif.width ++ "px")
+                            , Html.Attributes.style "height" (String.fromFloat game.dogsGif.height ++ "px")
                             , Html.Attributes.style "position" "absolute"
-                            , Html.Attributes.style "left" (String.fromFloat gameState.dogsGif.x ++ "px")
-                            , Html.Attributes.style "top" (String.fromFloat gameState.dogsGif.y ++ "px")
+                            , Html.Attributes.style "left" (String.fromFloat game.dogsGif.x ++ "px")
+                            , Html.Attributes.style "top" (String.fromFloat game.dogsGif.y ++ "px")
                             , Html.Attributes.style "pointer-events" "none"
                             ]
                             []
                         , List.map
                             (\{ x, y, gunType } -> drawSprite "bullet-hole.png" x y (round x * 1000))
-                            model.bulletHoles
+                            game.bulletHoles
                             |> List.reverse
                             |> Html.div [ Html.Attributes.style "position" "absolute" ]
                         , List.map
@@ -704,7 +771,7 @@ view app shared model =
                                             Just { diedAt } ->
                                                 let
                                                     elapsed2 =
-                                                        gameState.elapsedTime - diedAt
+                                                        game.elapsedTime - diedAt
                                                 in
                                                 ( elapsed2 / 30, (elapsed2 / 30) ^ 2 + 1, elapsed2 )
 
@@ -722,38 +789,42 @@ view app shared model =
                                     (cursor.y + offsetY)
                                     (round rotation)
                             )
-                            gameState.cursors
+                            game.cursors
                             |> Html.div [ Html.Attributes.style "position" "absolute" ]
                         ]
-                    , case gameState.gameEnded of
-                        Just duration ->
-                            Html.div
-                                [ Html.Attributes.style "color" "white"
-                                , Html.Attributes.style "position" "fixed"
-                                , Html.Attributes.style "top" "50%"
-                                , Html.Attributes.style "left" "50%"
-                                , Html.Attributes.style "transform" "translateX(-50%) translateY(-50%)"
-                                , Html.Attributes.style "text-align" "center"
-                                , Html.Attributes.style "font-size" "36px"
-                                , Html.Attributes.style "background-color" "rgba(0,0,0,0.8)"
-                                , Html.Attributes.style "padding" "16px"
-                                , Html.Attributes.style "border-radius" "8px"
-                                ]
-                                [ "Webpage ruined! You survived for "
-                                    ++ Round.round 2 (duration / 1000)
-                                    ++ " seconds"
-                                    |> Html.text
-                                , Html.hr [] []
-                                , Html.div
-                                    [ Html.Attributes.style "font-size" "18px" ]
-                                    [ Html.text "R key to restart" ]
-                                , Html.div
-                                    [ Html.Attributes.style "font-size" "18px" ]
-                                    [ Html.text "H key to hide window" ]
-                                , Html.div
-                                    [ Html.Attributes.style "font-size" "18px" ]
-                                    [ Html.text "Q key to quit" ]
-                                ]
+                    , case game.gameEnded of
+                        Just ended ->
+                            if ended.hideMenu then
+                                Html.text ""
+
+                            else
+                                Html.div
+                                    [ Html.Attributes.style "color" "white"
+                                    , Html.Attributes.style "position" "fixed"
+                                    , Html.Attributes.style "top" "50%"
+                                    , Html.Attributes.style "left" "50%"
+                                    , Html.Attributes.style "transform" "translateX(-50%) translateY(-50%)"
+                                    , Html.Attributes.style "text-align" "center"
+                                    , Html.Attributes.style "font-size" "36px"
+                                    , Html.Attributes.style "background-color" "rgba(0,0,0,0.8)"
+                                    , Html.Attributes.style "padding" "16px"
+                                    , Html.Attributes.style "border-radius" "8px"
+                                    ]
+                                    [ "Webpage ruined! You survived for "
+                                        ++ Round.round 2 (ended.duration / 1000)
+                                        ++ " seconds"
+                                        |> Html.text
+                                    , Html.hr [] []
+                                    , Html.div
+                                        [ Html.Attributes.style "font-size" "18px" ]
+                                        [ Html.text "R key to restart" ]
+                                    , Html.div
+                                        [ Html.Attributes.style "font-size" "18px" ]
+                                        [ Html.text "H key to hide window" ]
+                                    , Html.div
+                                        [ Html.Attributes.style "font-size" "18px" ]
+                                        [ Html.text "Q key to quit" ]
+                                    ]
 
                         Nothing ->
                             Html.text ""
