@@ -17,6 +17,7 @@ import List.Extra
 import Pages.Url
 import PagesMsg exposing (PagesMsg)
 import Random
+import Round
 import RouteBuilder exposing (App, StatefulRoute)
 import Set exposing (Set)
 import Shared exposing (Breakpoints(..))
@@ -70,6 +71,8 @@ type alias GameState =
     , cursors : List Cursor
     , dogsGif : { x : Float, y : Float, width : Float, height : Float }
     , pageHeight : Float
+    , gameEnded : Maybe Float
+    , lastSpawnCheck : Float
     }
 
 
@@ -154,6 +157,8 @@ update _ shared msg model =
                         , cursors = []
                         , dogsGif = { x = 0, y = 0, width = 0, height = 0 }
                         , pageHeight = toFloat shared.windowHeight
+                        , gameEnded = Nothing
+                        , lastSpawnCheck = 0
                         }
               }
             , Cmd.batch
@@ -169,59 +174,66 @@ update _ shared msg model =
         MouseDown { clientX, clientY, pageX, pageY } ->
             case model.gameState of
                 Just gameState ->
-                    ( { model
-                        | bulletHoles = { x = pageX, y = pageY, gunType = Handgun } :: model.bulletHoles
-                        , gameState =
-                            { gun = gameState.gun
-                            , machineGunAmmo = gameState.machineGunAmmo
-                            , shotgunAmmo = gameState.shotgunAmmo
-                            , bombAmmo = gameState.bombAmmo
-                            , elapsedTime = gameState.elapsedTime
-                            , cursors =
-                                List.map
-                                    (\cursor ->
-                                        case cursor.isDead of
-                                            Just _ ->
-                                                cursor
+                    case gameState.gameEnded of
+                        Just _ ->
+                            ( model, Cmd.none )
 
-                                            Nothing ->
-                                                let
-                                                    distance =
-                                                        sqrt ((cursor.x - pageX) ^ 2 + (cursor.y - pageY) ^ 2)
-                                                in
-                                                if distance < 16 then
-                                                    { cursor
-                                                        | isDead = Just { diedAt = gameState.elapsedTime }
-                                                        , isAttached = False
-                                                    }
+                        Nothing ->
+                            ( { model
+                                | bulletHoles = { x = pageX, y = pageY, gunType = Handgun } :: model.bulletHoles
+                                , gameState =
+                                    { gun = gameState.gun
+                                    , machineGunAmmo = gameState.machineGunAmmo
+                                    , shotgunAmmo = gameState.shotgunAmmo
+                                    , bombAmmo = gameState.bombAmmo
+                                    , elapsedTime = gameState.elapsedTime
+                                    , lastSpawnCheck = gameState.lastSpawnCheck
+                                    , cursors =
+                                        List.map
+                                            (\cursor ->
+                                                case cursor.isDead of
+                                                    Just _ ->
+                                                        cursor
 
-                                                else
-                                                    cursor
-                                    )
-                                    gameState.cursors
-                            , dogsGif = gameState.dogsGif
-                            , pageHeight = gameState.pageHeight
-                            }
-                                |> Just
-                      }
-                    , Cmd.batch
-                        [ shoot { x = clientX, y = clientY }
-                        , (case gameState.gun of
-                            Handgun ->
-                                "sn_handgun"
+                                                    Nothing ->
+                                                        let
+                                                            distance =
+                                                                sqrt ((cursor.x - pageX) ^ 2 + (cursor.y - pageY) ^ 2)
+                                                        in
+                                                        if distance < 16 then
+                                                            { cursor
+                                                                | isDead = Just { diedAt = gameState.elapsedTime }
+                                                                , isAttached = False
+                                                            }
 
-                            MachineGun ->
-                                "sn_machinegun"
+                                                        else
+                                                            cursor
+                                            )
+                                            gameState.cursors
+                                    , dogsGif = gameState.dogsGif
+                                    , pageHeight = gameState.pageHeight
+                                    , gameEnded = gameState.gameEnded
+                                    }
+                                        |> Just
+                              }
+                            , Cmd.batch
+                                [ shoot { x = clientX, y = clientY }
+                                , (case gameState.gun of
+                                    Handgun ->
+                                        "sn_handgun"
 
-                            Shotgun ->
-                                "sn_shotgun"
+                                    MachineGun ->
+                                        "sn_machinegun"
 
-                            Bomb ->
-                                "sn_explosion"
-                          )
-                            |> playSound
-                        ]
-                    )
+                                    Shotgun ->
+                                        "sn_shotgun"
+
+                                    Bomb ->
+                                        "sn_explosion"
+                                  )
+                                    |> playSound
+                                ]
+                            )
 
                 Nothing ->
                     ( model, Cmd.none )
@@ -229,22 +241,27 @@ update _ shared msg model =
         PressedGunKey gunType ->
             case model.gameState of
                 Just gameState ->
-                    ( { model | gameState = Just { gameState | gun = gunType } }
-                    , (case gunType of
-                        Handgun ->
-                            "sn_handgun_voice"
+                    case gameState.gameEnded of
+                        Just _ ->
+                            ( model, Cmd.none )
 
-                        MachineGun ->
-                            "sn_machinegun_voice"
+                        Nothing ->
+                            ( { model | gameState = Just { gameState | gun = gunType } }
+                            , (case gunType of
+                                Handgun ->
+                                    "sn_handgun_voice"
 
-                        Shotgun ->
-                            "sn_shotgun_voice"
+                                MachineGun ->
+                                    "sn_machinegun_voice"
 
-                        Bomb ->
-                            "sn_bomb_voice"
-                      )
-                        |> playSound
-                    )
+                                Shotgun ->
+                                    "sn_shotgun_voice"
+
+                                Bomb ->
+                                    "sn_bomb_voice"
+                              )
+                                |> playSound
+                            )
 
                 Nothing ->
                     ( model, Cmd.none )
@@ -252,109 +269,7 @@ update _ shared msg model =
         AnimationFrameDelta elapsed ->
             ( case model.gameState of
                 Just gameState ->
-                    let
-                        cursorSpeed =
-                            1
-
-                        elapsed2 =
-                            gameState.elapsedTime + elapsed
-
-                        newCursors : List Cursor
-                        newCursors =
-                            Random.step
-                                (spawnCursors shared.windowWidth (round gameState.pageHeight) (round elapsed2))
-                                (Random.initialSeed (elapsed2 * 10000 |> round))
-                                |> Tuple.first
-
-                        gif =
-                            gameState.dogsGif
-
-                        gifCenterX : Float
-                        gifCenterX =
-                            gif.x + gif.width / 2
-
-                        gifCenterY : Float
-                        gifCenterY =
-                            gif.y + gif.height / 2
-
-                        dragCount =
-                            List.Extra.count
-                                (\cursor -> cursor.isAttached && cursor.isDead == Nothing)
-                                gameState.cursors
-                                |> toFloat
-
-                        pageCenterX =
-                            toFloat shared.windowWidth / 2
-
-                        pageCenterY =
-                            gameState.pageHeight / 2
-
-                        dragDirection =
-                            atan2 (pageCenterY - gifCenterY) (pageCenterX - gifCenterX) + pi
-
-                        dragX =
-                            dragCount * 0.1 * cos dragDirection
-
-                        dragY =
-                            dragCount * 0.1 * sin dragDirection
-
-                        updateCursor : Cursor -> Maybe Cursor
-                        updateCursor cursor =
-                            case cursor.isDead of
-                                Just { diedAt } ->
-                                    if elapsed2 - diedAt > 2000 then
-                                        Nothing
-
-                                    else
-                                        Just cursor
-
-                                Nothing ->
-                                    if cursor.isAttached then
-                                        { x = cursor.x + dragX
-                                        , y = cursor.y + dragY
-                                        , isBonus = cursor.isBonus
-                                        , isAttached = True
-                                        , isDead = cursor.isDead
-                                        }
-                                            |> Just
-
-                                    else
-                                        let
-                                            direction : Float
-                                            direction =
-                                                atan2 (gifCenterY - cursor.y) (gifCenterX - cursor.x)
-
-                                            x : Float
-                                            x =
-                                                cursor.x + cursorSpeed * cos direction
-
-                                            y : Float
-                                            y =
-                                                cursor.y + cursorSpeed * sin direction
-                                        in
-                                        { x = x
-                                        , y = y
-                                        , isBonus = cursor.isBonus
-                                        , isAttached =
-                                            (abs (gifCenterX - x) < gif.width / 2)
-                                                && (abs (gifCenterY - y) < gif.height / 2)
-                                        , isDead = cursor.isDead
-                                        }
-                                            |> Just
-                    in
-                    { model
-                        | gameState =
-                            { gun = gameState.gun
-                            , machineGunAmmo = gameState.machineGunAmmo
-                            , shotgunAmmo = gameState.shotgunAmmo
-                            , bombAmmo = gameState.bombAmmo
-                            , elapsedTime = elapsed2
-                            , cursors = newCursors ++ List.filterMap updateCursor gameState.cursors
-                            , dogsGif = { gif | x = gif.x + dragX, y = gif.y + dragY }
-                            , pageHeight = gameState.pageHeight
-                            }
-                                |> Just
-                    }
+                    { model | gameState = updateGameState shared elapsed gameState |> Just }
 
                 Nothing ->
                     model
@@ -370,6 +285,157 @@ update _ shared msg model =
 
                 _ ->
                     ( model, Cmd.none )
+
+
+updateGameState : Shared.Model -> Float -> GameState -> GameState
+updateGameState shared elapsed gameState =
+    let
+        elapsed2 =
+            gameState.elapsedTime + elapsed
+    in
+    case gameState.gameEnded of
+        Just _ ->
+            let
+                updateCursor : Cursor -> Maybe Cursor
+                updateCursor cursor =
+                    case cursor.isDead of
+                        Just { diedAt } ->
+                            if elapsed2 - diedAt > 2000 then
+                                Nothing
+
+                            else
+                                Just cursor
+
+                        Nothing ->
+                            Just cursor
+            in
+            { gameState | cursors = List.filterMap updateCursor gameState.cursors, elapsedTime = elapsed2 }
+
+        Nothing ->
+            let
+                cursorSpeed =
+                    1.5
+
+                {- Try spawning cursors 30 times per second -}
+                doSpawnCheck : Bool
+                doSpawnCheck =
+                    elapsed2 - gameState.lastSpawnCheck > 1000 / 30
+
+                newCursors : List Cursor
+                newCursors =
+                    if doSpawnCheck then
+                        Random.step
+                            (spawnCursors shared.windowWidth (round gameState.pageHeight) (round elapsed2))
+                            (Random.initialSeed (elapsed2 * 10000 |> round))
+                            |> Tuple.first
+
+                    else
+                        []
+
+                gif =
+                    gameState.dogsGif
+
+                gifCenterX : Float
+                gifCenterX =
+                    gif.x + gif.width / 2
+
+                gifCenterY : Float
+                gifCenterY =
+                    gif.y + gif.height / 2
+
+                dragCount =
+                    List.Extra.count
+                        (\cursor -> cursor.isAttached && cursor.isDead == Nothing)
+                        gameState.cursors
+                        |> toFloat
+
+                pageCenterX =
+                    toFloat shared.windowWidth / 2
+
+                pageCenterY =
+                    gameState.pageHeight / 2
+
+                dragDirection =
+                    atan2 (pageCenterY - gifCenterY) (pageCenterX - gifCenterX) + pi
+
+                dragX =
+                    dragCount * 0.2 * cos dragDirection
+
+                dragY =
+                    dragCount * 0.2 * sin dragDirection
+
+                updateCursor : Cursor -> Maybe Cursor
+                updateCursor cursor =
+                    case cursor.isDead of
+                        Just { diedAt } ->
+                            if elapsed2 - diedAt > 2000 then
+                                Nothing
+
+                            else
+                                Just cursor
+
+                        Nothing ->
+                            if cursor.isAttached then
+                                { x = cursor.x + dragX
+                                , y = cursor.y + dragY
+                                , isBonus = cursor.isBonus
+                                , isAttached = True
+                                , isDead = cursor.isDead
+                                }
+                                    |> Just
+
+                            else
+                                let
+                                    direction : Float
+                                    direction =
+                                        atan2 (gifCenterY - cursor.y) (gifCenterX - cursor.x)
+
+                                    x : Float
+                                    x =
+                                        cursor.x + cursorSpeed * cos direction
+
+                                    y : Float
+                                    y =
+                                        cursor.y + cursorSpeed * sin direction
+                                in
+                                { x = x
+                                , y = y
+                                , isBonus = cursor.isBonus
+                                , isAttached =
+                                    (abs (gifCenterX - x) < gif.width / 2)
+                                        && (abs (gifCenterY - y) < gif.height / 2)
+                                , isDead = cursor.isDead
+                                }
+                                    |> Just
+            in
+            { gun = gameState.gun
+            , machineGunAmmo = gameState.machineGunAmmo
+            , shotgunAmmo = gameState.shotgunAmmo
+            , bombAmmo = gameState.bombAmmo
+            , elapsedTime = elapsed2
+            , lastSpawnCheck =
+                gameState.lastSpawnCheck
+                    + (if doSpawnCheck then
+                        1000 / 30
+
+                       else
+                        0
+                      )
+            , cursors = newCursors ++ List.filterMap updateCursor gameState.cursors
+            , dogsGif = { gif | x = gif.x + dragX, y = gif.y + dragY }
+            , pageHeight = gameState.pageHeight
+            , gameEnded =
+                if
+                    (gif.x + gif.width < -20)
+                        || (gif.y + gif.height < -20)
+                        || (gif.x > toFloat shared.windowWidth + 20)
+                        || (gif.y > gameState.pageHeight + 20)
+                then
+                    Just elapsed2
+
+                else
+                    Nothing
+            }
 
 
 subscriptions : a -> b -> c -> Model -> Sub Msg
@@ -513,7 +579,7 @@ spawnCursors : Int -> Int -> Int -> Random.Generator (List Cursor)
 spawnCursors windowWidth windowHeight timeElapsed =
     Random.andThen
         (\t2 ->
-            if t2 > 0.995 - (toFloat timeElapsed / 100000) then
+            if t2 > 0.995 - (toFloat timeElapsed / 1000000) then
                 Random.map3
                     (\t side count ->
                         let
@@ -591,62 +657,106 @@ view app shared model =
         case model.gameState of
             Just gameState ->
                 Html.div
-                    [ Html.Attributes.style "position" "absolute"
-                    , Html.Attributes.style "top" "0"
-                    , Html.Attributes.style "left" "0"
-                    , Html.Attributes.style "overflow" "hidden"
-                    , Html.Attributes.style "width" "100%"
-                    , Html.Attributes.style "height" (String.fromFloat gameState.pageHeight ++ "px")
-                    , Html.Attributes.style "pointer-events" "none"
-                    ]
-                    [ Html.audio
-                        [ Html.Attributes.src "/secret-santa-game/audio/norwegian_pirate.mp3"
-                        , Html.Attributes.autoplay True
-                        ]
-                        []
-                    , Html.img
-                        [ Html.Attributes.src "/secret-santa-game/omfgdogs.gif"
-                        , Html.Attributes.style "width" (String.fromFloat gameState.dogsGif.width ++ "px")
-                        , Html.Attributes.style "height" (String.fromFloat gameState.dogsGif.height ++ "px")
-                        , Html.Attributes.style "position" "absolute"
-                        , Html.Attributes.style "left" (String.fromFloat gameState.dogsGif.x ++ "px")
-                        , Html.Attributes.style "top" (String.fromFloat gameState.dogsGif.y ++ "px")
+                    []
+                    [ Html.div
+                        [ Html.Attributes.style "position" "absolute"
+                        , Html.Attributes.style "top" "0"
+                        , Html.Attributes.style "left" "0"
+                        , Html.Attributes.style "overflow" "hidden"
+                        , Html.Attributes.style "width" "100%"
+                        , Html.Attributes.style "height" (String.fromFloat gameState.pageHeight ++ "px")
                         , Html.Attributes.style "pointer-events" "none"
                         ]
-                        []
-                    , List.map
-                        (\cursor ->
-                            let
-                                ( offsetX, offsetY, rotation ) =
-                                    case cursor.isDead of
-                                        Just { diedAt } ->
-                                            let
-                                                elapsed2 =
-                                                    gameState.elapsedTime - diedAt
-                                            in
-                                            ( elapsed2 / 30, (elapsed2 / 30) ^ 2 + 1, elapsed2 )
+                        [ case gameState.gameEnded of
+                            Just _ ->
+                                Html.audio
+                                    [ Html.Attributes.src "/secret-santa-game/audio/sn_boo.mp3"
+                                    , Html.Attributes.autoplay True
+                                    ]
+                                    []
 
-                                        Nothing ->
-                                            ( 0, 0, 0 )
-                            in
-                            drawSprite
-                                (if cursor.isBonus then
-                                    "cursor2.png"
+                            Nothing ->
+                                Html.audio
+                                    [ Html.Attributes.src "/secret-santa-game/audio/norwegian_pirate.mp3"
+                                    , Html.Attributes.autoplay True
+                                    ]
+                                    []
+                        , Html.img
+                            [ Html.Attributes.src "/secret-santa-game/omfgdogs.gif"
+                            , Html.Attributes.style "width" (String.fromFloat gameState.dogsGif.width ++ "px")
+                            , Html.Attributes.style "height" (String.fromFloat gameState.dogsGif.height ++ "px")
+                            , Html.Attributes.style "position" "absolute"
+                            , Html.Attributes.style "left" (String.fromFloat gameState.dogsGif.x ++ "px")
+                            , Html.Attributes.style "top" (String.fromFloat gameState.dogsGif.y ++ "px")
+                            , Html.Attributes.style "pointer-events" "none"
+                            ]
+                            []
+                        , List.map
+                            (\{ x, y, gunType } -> drawSprite "bullet-hole.png" x y (round x * 1000))
+                            model.bulletHoles
+                            |> List.reverse
+                            |> Html.div [ Html.Attributes.style "position" "absolute" ]
+                        , List.map
+                            (\cursor ->
+                                let
+                                    ( offsetX, offsetY, rotation ) =
+                                        case cursor.isDead of
+                                            Just { diedAt } ->
+                                                let
+                                                    elapsed2 =
+                                                        gameState.elapsedTime - diedAt
+                                                in
+                                                ( elapsed2 / 30, (elapsed2 / 30) ^ 2 + 1, elapsed2 )
 
-                                 else
-                                    "cursor.png"
-                                )
-                                (cursor.x + offsetX)
-                                (cursor.y + offsetY)
-                                (round rotation)
-                        )
-                        gameState.cursors
-                        |> Html.div [ Html.Attributes.style "position" "absolute" ]
-                    , List.map
-                        (\{ x, y, gunType } -> drawSprite "bullet-hole.png" x y (round x * 1000))
-                        model.bulletHoles
-                        |> List.reverse
-                        |> Html.div [ Html.Attributes.style "position" "absolute" ]
+                                            Nothing ->
+                                                ( 0, 0, 0 )
+                                in
+                                drawSprite
+                                    (if cursor.isBonus then
+                                        "cursor2.png"
+
+                                     else
+                                        "cursor.png"
+                                    )
+                                    (cursor.x + offsetX)
+                                    (cursor.y + offsetY)
+                                    (round rotation)
+                            )
+                            gameState.cursors
+                            |> Html.div [ Html.Attributes.style "position" "absolute" ]
+                        ]
+                    , case gameState.gameEnded of
+                        Just duration ->
+                            Html.div
+                                [ Html.Attributes.style "color" "white"
+                                , Html.Attributes.style "position" "fixed"
+                                , Html.Attributes.style "top" "50%"
+                                , Html.Attributes.style "left" "50%"
+                                , Html.Attributes.style "transform" "translateX(-50%) translateY(-50%)"
+                                , Html.Attributes.style "text-align" "center"
+                                , Html.Attributes.style "font-size" "36px"
+                                , Html.Attributes.style "background-color" "rgba(0,0,0,0.8)"
+                                , Html.Attributes.style "padding" "16px"
+                                , Html.Attributes.style "border-radius" "8px"
+                                ]
+                                [ "Webpage ruined! You survived for "
+                                    ++ Round.round 2 (duration / 1000)
+                                    ++ " seconds"
+                                    |> Html.text
+                                , Html.hr [] []
+                                , Html.div
+                                    [ Html.Attributes.style "font-size" "18px" ]
+                                    [ Html.text "R key to restart" ]
+                                , Html.div
+                                    [ Html.Attributes.style "font-size" "18px" ]
+                                    [ Html.text "H key to hide window" ]
+                                , Html.div
+                                    [ Html.Attributes.style "font-size" "18px" ]
+                                    [ Html.text "Q key to quit" ]
+                                ]
+
+                        Nothing ->
+                            Html.text ""
                     ]
 
             Nothing ->
