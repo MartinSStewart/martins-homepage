@@ -68,7 +68,8 @@ type alias Game =
     , bombAmmo : Int
     , elapsedTime : Float
     , cursors : List Cursor
-    , dogsGif : { x : Float, y : Float, width : Float, height : Float }
+    , gif : { x : Float, y : Float }
+    , gifStart : { x : Float, y : Float, width : Float, height : Float }
     , pageHeight : Float
     , gameEnded : Maybe { duration : Float, hideMenu : Bool }
     , lastSpawnCheck : Float
@@ -130,14 +131,15 @@ route =
 
 
 gameInit : { x : Float, y : Float, width : Float, height : Float } -> Shared.Model -> Game
-gameInit gif shared =
+gameInit gifStart shared =
     { gun = Handgun
     , machineGunAmmo = 0
     , shotgunAmmo = 0
     , bombAmmo = 0
     , elapsedTime = 0
     , cursors = []
-    , dogsGif = gif
+    , gif = { x = gifStart.x, y = gifStart.y }
+    , gifStart = gifStart
     , pageHeight = toFloat shared.windowHeight
     , gameEnded = Nothing
     , lastSpawnCheck = 0
@@ -169,16 +171,21 @@ update _ shared msg model =
                 ( model, Cmd.none )
 
         PressedStartShootEmUp ->
-            ( { model | game = gameInit { x = 0, y = 0, width = 0, height = 0 } shared |> Just }
-            , Cmd.batch
-                [ loadSounds ()
-                , Task.map2
-                    (\{ element } { scene } -> ( element, scene.height ))
-                    (Browser.Dom.getElement Formatting.dogsImageId)
-                    Browser.Dom.getViewport
-                    |> Task.attempt GotDogsAndPageImage
-                ]
-            )
+            case model.game of
+                Just _ ->
+                    ( model, Cmd.none )
+
+                Nothing ->
+                    ( { model | game = gameInit { x = 0, y = 0, width = 0, height = 0 } shared |> Just }
+                    , Cmd.batch
+                        [ loadSounds ()
+                        , Task.map2
+                            (\{ element } { scene } -> ( element, scene.height ))
+                            (Browser.Dom.getElement Formatting.dogsImageId)
+                            Browser.Dom.getViewport
+                            |> Task.attempt GotDogsAndPageImage
+                        ]
+                    )
 
         MouseDown { clientX, clientY, pageX, pageY } ->
             case model.game of
@@ -219,7 +226,8 @@ update _ shared msg model =
                                                             cursor
                                             )
                                             game.cursors
-                                    , dogsGif = game.dogsGif
+                                    , gif = game.gif
+                                    , gifStart = game.gifStart
                                     , pageHeight = game.pageHeight
                                     , gameEnded = game.gameEnded
                                     }
@@ -288,7 +296,15 @@ update _ shared msg model =
         GotDogsAndPageImage result ->
             case ( model.game, result ) of
                 ( Just gameState, Ok ( element, pageHeight ) ) ->
-                    ( { model | game = Just { gameState | dogsGif = element, pageHeight = pageHeight } }
+                    ( { model
+                        | game =
+                            Just
+                                { gameState
+                                    | gifStart = element
+                                    , gif = { x = element.x, y = element.y }
+                                    , pageHeight = pageHeight
+                                }
+                      }
                     , Cmd.none
                     )
 
@@ -300,7 +316,7 @@ update _ shared msg model =
                 Just game ->
                     case game.gameEnded of
                         Just _ ->
-                            { model | game = gameInit game.dogsGif shared |> Just }
+                            { model | game = gameInit game.gifStart shared |> Just }
 
                         Nothing ->
                             model
@@ -394,15 +410,15 @@ updateGameState shared elapsed game =
                         []
 
                 gif =
-                    game.dogsGif
+                    game.gif
 
                 gifCenterX : Float
                 gifCenterX =
-                    gif.x + gif.width / 2
+                    gif.x + game.gifStart.width / 2
 
                 gifCenterY : Float
                 gifCenterY =
-                    gif.y + gif.height / 2
+                    gif.y + game.gifStart.height / 2
 
                 dragCount =
                     List.Extra.count
@@ -463,8 +479,8 @@ updateGameState shared elapsed game =
                                 , y = y
                                 , isBonus = cursor.isBonus
                                 , isAttached =
-                                    (abs (gifCenterX - x) < gif.width / 2)
-                                        && (abs (gifCenterY - y) < gif.height / 2)
+                                    (abs (gifCenterX - x) < game.gifStart.width / 2)
+                                        && (abs (gifCenterY - y) < game.gifStart.height / 2)
                                 , isDead = cursor.isDead
                                 }
                                     |> Just
@@ -484,12 +500,13 @@ updateGameState shared elapsed game =
                         0
                       )
             , cursors = newCursors ++ List.filterMap updateCursor game.cursors
-            , dogsGif = { gif | x = gif.x + dragX, y = gif.y + dragY }
+            , gif = { gif | x = gif.x + dragX, y = gif.y + dragY }
+            , gifStart = game.gifStart
             , pageHeight = game.pageHeight
             , gameEnded =
                 if
-                    (gif.x + gif.width < -20)
-                        || (gif.y + gif.height < -20)
+                    (gif.x + game.gifStart.width < -20)
+                        || (gif.y + game.gifStart.height < -20)
                         || (gif.x > toFloat shared.windowWidth + 20)
                         || (gif.y > game.pageHeight + 20)
                 then
@@ -750,11 +767,11 @@ view app shared model =
                                     []
                         , Html.img
                             [ Html.Attributes.src "/secret-santa-game/omfgdogs.gif"
-                            , Html.Attributes.style "width" (String.fromFloat game.dogsGif.width ++ "px")
-                            , Html.Attributes.style "height" (String.fromFloat game.dogsGif.height ++ "px")
+                            , Html.Attributes.style "width" (String.fromFloat game.gifStart.width ++ "px")
+                            , Html.Attributes.style "height" (String.fromFloat game.gifStart.height ++ "px")
                             , Html.Attributes.style "position" "absolute"
-                            , Html.Attributes.style "left" (String.fromFloat game.dogsGif.x ++ "px")
-                            , Html.Attributes.style "top" (String.fromFloat game.dogsGif.y ++ "px")
+                            , Html.Attributes.style "left" (String.fromFloat game.gif.x ++ "px")
+                            , Html.Attributes.style "top" (String.fromFloat game.gif.y ++ "px")
                             , Html.Attributes.style "pointer-events" "none"
                             ]
                             []
