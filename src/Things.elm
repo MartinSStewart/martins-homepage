@@ -1176,7 +1176,8 @@ myTypeCodec =
                 ]
             , BulletList
                 [ Bold "How to play:" ]
-                [ Paragraph [ Text "1, 2, 3, and 4 keys swap between weapons (you're going to want to use a mouse and keyboard)" ]
+                [ Paragraph [ Text "Mouse and keyboard are required to play" ]
+                , Paragraph [ Text "1, 2, 3, and 4 keys swap between weapons" ]
                 , Paragraph [ Text "Shoot the incoming cursors and prevent them from dragging the dogs gif off the screen" ]
                 , Paragraph [ Text "Double click on the dogs gif to start!" ]
                 ]

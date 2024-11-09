@@ -51,7 +51,7 @@ type GunType
     = Handgun
     | MachineGun
     | Shotgun
-    | Bomb
+    | BombType
 
 
 type alias Model =
@@ -75,6 +75,7 @@ type alias Game =
     , lastSpawnCheck : Float
     , bulletHoles : List { x : Float, y : Float, gunType : GunType }
     , animatedText : List AnimatedText
+    , bombs : List Bomb
     }
 
 
@@ -146,6 +147,7 @@ gameInit gifStart shared =
     , lastSpawnCheck = 0
     , bulletHoles = []
     , animatedText = []
+    , bombs = []
     }
 
 
@@ -159,6 +161,10 @@ cursorHeight =
 
 type alias AnimatedText =
     { gunType : GunType, x : Float, y : Float, createdAt : Float }
+
+
+type alias Bomb =
+    { x : Float, y : Float, createdAt : Float }
 
 
 shootUpdate : MouseDownData -> Game -> Model -> ( Model, Cmd Msg )
@@ -197,8 +203,8 @@ shootUpdate { clientX, clientY, pageX, pageY } game model =
                                                 | machineGunAmmo = game3.machineGunAmmo + 30
                                                 , animatedText =
                                                     { gunType = MachineGun
-                                                    , x = pageX
-                                                    , y = pageY
+                                                    , x = cursor.x
+                                                    , y = cursor.y
                                                     , createdAt = game.elapsedTime
                                                     }
                                                         :: game3.animatedText
@@ -212,20 +218,20 @@ shootUpdate { clientX, clientY, pageX, pageY } game model =
                                                 | shotgunAmmo = game3.shotgunAmmo + 5
                                                 , animatedText =
                                                     { gunType = Shotgun
-                                                    , x = pageX
-                                                    , y = pageY
+                                                    , x = cursor.x
+                                                    , y = cursor.y
                                                     , createdAt = game.elapsedTime
                                                     }
                                                         :: game3.animatedText
                                             }
 
-                                        Bomb ->
+                                        BombType ->
                                             { game3
                                                 | bombAmmo = game3.bombAmmo + 1
                                                 , animatedText =
-                                                    { gunType = Bomb
-                                                    , x = pageX
-                                                    , y = pageY
+                                                    { gunType = BombType
+                                                    , x = cursor.x
+                                                    , y = cursor.y
                                                     , createdAt = game.elapsedTime
                                                     }
                                                         :: game3.animatedText
@@ -256,6 +262,7 @@ shootUpdate { clientX, clientY, pageX, pageY } game model =
             , pageHeight = game2.pageHeight
             , animatedText = game2.animatedText
             , gameEnded = game2.gameEnded
+            , bombs = game2.bombs
             }
                 |> Just
       }
@@ -271,7 +278,7 @@ shootUpdate { clientX, clientY, pageX, pageY } game model =
             Shotgun ->
                 "sn_shotgun"
 
-            Bomb ->
+            BombType ->
                 "sn_explosion"
           )
             |> playSound
@@ -351,7 +358,7 @@ update _ shared msg model =
                                 Shotgun ->
                                     "sn_shotgun_voice"
 
-                                Bomb ->
+                                BombType ->
                                     "sn_bomb_voice"
                               )
                                 |> playSound
@@ -363,7 +370,7 @@ update _ shared msg model =
         AnimationFrameDelta elapsed ->
             ( case model.game of
                 Just gameState ->
-                    { model | game = updateGameState shared elapsed gameState |> Just }
+                    { model | game = updateGame shared elapsed gameState |> Just }
 
                 Nothing ->
                     model
@@ -441,8 +448,8 @@ update _ shared msg model =
             )
 
 
-updateGameState : Shared.Model -> Float -> Game -> Game
-updateGameState shared elapsed game =
+updateGame : Shared.Model -> Float -> Game -> Game
+updateGame shared elapsed game =
     let
         elapsed2 =
             game.elapsedTime + elapsed
@@ -463,7 +470,11 @@ updateGameState shared elapsed game =
                         Nothing ->
                             Just cursor
             in
-            { game | cursors = List.filterMap updateCursor game.cursors, elapsedTime = elapsed2 }
+            { game
+                | cursors = List.filterMap updateCursor game.cursors
+                , elapsedTime = elapsed2
+                , animatedText = List.filter (\text -> text.createdAt + 2000 > game.elapsedTime) game.animatedText
+            }
 
         Nothing ->
             let
@@ -572,7 +583,7 @@ updateGameState shared elapsed game =
             , bombAmmo = game.bombAmmo
             , elapsedTime = elapsed2
             , bulletHoles = game.bulletHoles
-            , animatedText = game.animatedText
+            , animatedText = List.filter (\text -> text.createdAt + 1000 > game.elapsedTime) game.animatedText
             , lastSpawnCheck =
                 game.lastSpawnCheck
                     + (if doSpawnCheck then
@@ -596,6 +607,7 @@ updateGameState shared elapsed game =
 
                 else
                     Nothing
+            , bombs = game.bombs
             }
 
 
@@ -639,7 +651,7 @@ subscriptions _ _ _ model =
                             Json.Decode.succeed (PressedGunKey Shotgun)
 
                         else if key == "4" then
-                            Json.Decode.succeed (PressedGunKey Bomb)
+                            Json.Decode.succeed (PressedGunKey BombType)
 
                         else if key == "r" then
                             Json.Decode.succeed PressedRestart
@@ -737,7 +749,7 @@ getAmmo =
     Random.weighted
         ( 0.5, MachineGun )
         [ ( 0.35, Shotgun )
-        , ( 0.15, Bomb )
+        , ( 0.15, BombType )
         ]
 
 
@@ -833,7 +845,7 @@ animatedText color x y gunType =
                 Shotgun ->
                     "SGA+5"
 
-                Bomb ->
+                BombType ->
                     "Bomb+1"
             )
         ]
@@ -938,15 +950,19 @@ view app shared model =
                             |> Html.div [ Html.Attributes.style "position" "absolute" ]
                         , List.concatMap
                             (\text ->
-                                [ animatedText "black" (text.x - 1) (text.y - 1) text.gunType
-                                , animatedText "black" (text.x + 1) (text.y - 1) text.gunType
-                                , animatedText "black" (text.x - 1) text.y text.gunType
-                                , animatedText "black" (text.x + 1) text.y text.gunType
-                                , animatedText "black" (text.x - 1) (text.y + 1) text.gunType
-                                , animatedText "black" (text.x + 1) (text.y + 1) text.gunType
-                                , animatedText "black" text.x (text.y - 1) text.gunType
-                                , animatedText "black" text.x (text.y + 1) text.gunType
-                                , animatedText "yellow" text.x text.y text.gunType
+                                let
+                                    y =
+                                        text.y - 0.05 * (game.elapsedTime - text.createdAt)
+                                in
+                                [ animatedText "black" (text.x - 1) (y - 1) text.gunType
+                                , animatedText "black" (text.x + 1) (y - 1) text.gunType
+                                , animatedText "black" (text.x - 1) y text.gunType
+                                , animatedText "black" (text.x + 1) y text.gunType
+                                , animatedText "black" (text.x - 1) (y + 1) text.gunType
+                                , animatedText "black" (text.x + 1) (y + 1) text.gunType
+                                , animatedText "black" text.x (y - 1) text.gunType
+                                , animatedText "black" text.x (y + 1) text.gunType
+                                , animatedText "yellow" text.x y text.gunType
                                 ]
                             )
                             game.animatedText
