@@ -24,7 +24,6 @@ import Set exposing (Set)
 import Shared exposing (Breakpoints(..))
 import Task
 import Things exposing (Tag, ThingType(..))
-import Time
 import Ui
 import Ui.Font
 import Ui.Lazy
@@ -75,6 +74,7 @@ type alias Game =
     , gameEnded : Maybe { duration : Float, hideMenu : Bool }
     , lastSpawnCheck : Float
     , bulletHoles : List { x : Float, y : Float, gunType : GunType }
+    , animatedText : List AnimatedText
     }
 
 
@@ -145,7 +145,138 @@ gameInit gifStart shared =
     , gameEnded = Nothing
     , lastSpawnCheck = 0
     , bulletHoles = []
+    , animatedText = []
     }
+
+
+cursorWidth =
+    12
+
+
+cursorHeight =
+    19
+
+
+type alias AnimatedText =
+    { gunType : GunType, x : Float, y : Float, createdAt : Float }
+
+
+shootUpdate : MouseDownData -> Game -> Model -> ( Model, Cmd Msg )
+shootUpdate { clientX, clientY, pageX, pageY } game model =
+    let
+        ( _, cursors2, game2 ) =
+            List.foldl
+                (\cursor ( count, cursors3, game3 ) ->
+                    case cursor.isDead of
+                        Just _ ->
+                            ( count, cursor :: cursors3, game3 )
+
+                        Nothing ->
+                            let
+                                distance =
+                                    sqrt ((cursor.x - pageX - cursorWidth / 2) ^ 2 + (cursor.y - pageY - cursorHeight / 2) ^ 2)
+                            in
+                            if distance < 16 then
+                                ( count + 1
+                                , { cursor
+                                    | isDead = Just { diedAt = game.elapsedTime }
+                                    , isAttached = False
+                                  }
+                                    :: cursors3
+                                , if cursor.isBonus then
+                                    case
+                                        Random.step
+                                            getAmmo
+                                            (Random.initialSeed
+                                                (round (1000 * game.elapsedTime) + count)
+                                            )
+                                            |> Tuple.first
+                                    of
+                                        MachineGun ->
+                                            { game3
+                                                | machineGunAmmo = game3.machineGunAmmo + 30
+                                                , animatedText =
+                                                    { gunType = MachineGun
+                                                    , x = pageX
+                                                    , y = pageY
+                                                    , createdAt = game.elapsedTime
+                                                    }
+                                                        :: game3.animatedText
+                                            }
+
+                                        Handgun ->
+                                            game3
+
+                                        Shotgun ->
+                                            { game3
+                                                | shotgunAmmo = game3.shotgunAmmo + 5
+                                                , animatedText =
+                                                    { gunType = Shotgun
+                                                    , x = pageX
+                                                    , y = pageY
+                                                    , createdAt = game.elapsedTime
+                                                    }
+                                                        :: game3.animatedText
+                                            }
+
+                                        Bomb ->
+                                            { game3
+                                                | bombAmmo = game3.bombAmmo + 1
+                                                , animatedText =
+                                                    { gunType = Bomb
+                                                    , x = pageX
+                                                    , y = pageY
+                                                    , createdAt = game.elapsedTime
+                                                    }
+                                                        :: game3.animatedText
+                                            }
+
+                                  else
+                                    game3
+                                )
+
+                            else
+                                ( count, cursor :: cursors3, game3 )
+                )
+                ( 0, [], game )
+                game.cursors
+    in
+    ( { model
+        | game =
+            { gun = game2.gun
+            , machineGunAmmo = game2.machineGunAmmo
+            , shotgunAmmo = game2.shotgunAmmo
+            , bombAmmo = game2.bombAmmo
+            , elapsedTime = game2.elapsedTime
+            , lastSpawnCheck = game2.lastSpawnCheck
+            , bulletHoles = { x = pageX, y = pageY, gunType = game2.gun } :: game2.bulletHoles
+            , cursors = List.reverse cursors2
+            , gif = game2.gif
+            , gifStart = game2.gifStart
+            , pageHeight = game2.pageHeight
+            , animatedText = game2.animatedText
+            , gameEnded = game2.gameEnded
+            }
+                |> Just
+      }
+    , Cmd.batch
+        [ shoot { x = clientX, y = clientY }
+        , (case game.gun of
+            Handgun ->
+                "sn_handgun"
+
+            MachineGun ->
+                "sn_machinegun"
+
+            Shotgun ->
+                "sn_shotgun"
+
+            Bomb ->
+                "sn_explosion"
+          )
+            |> playSound
+        ]
+    )
 
 
 update : App data action routeParams -> Shared.Model -> Msg -> Model -> ( Model, Effect Msg )
@@ -188,7 +319,7 @@ update _ shared msg model =
                         ]
                     )
 
-        MouseDown { clientX, clientY, pageX, pageY } ->
+        MouseDown element ->
             case model.game of
                 Just game ->
                     case game.gameEnded of
@@ -196,62 +327,7 @@ update _ shared msg model =
                             ( model, Cmd.none )
 
                         Nothing ->
-                            ( { model
-                                | game =
-                                    { gun = game.gun
-                                    , machineGunAmmo = game.machineGunAmmo
-                                    , shotgunAmmo = game.shotgunAmmo
-                                    , bombAmmo = game.bombAmmo
-                                    , elapsedTime = game.elapsedTime
-                                    , lastSpawnCheck = game.lastSpawnCheck
-                                    , bulletHoles = { x = pageX, y = pageY, gunType = Handgun } :: game.bulletHoles
-                                    , cursors =
-                                        List.map
-                                            (\cursor ->
-                                                case cursor.isDead of
-                                                    Just _ ->
-                                                        cursor
-
-                                                    Nothing ->
-                                                        let
-                                                            distance =
-                                                                sqrt ((cursor.x - pageX) ^ 2 + (cursor.y - pageY) ^ 2)
-                                                        in
-                                                        if distance < 16 then
-                                                            { cursor
-                                                                | isDead = Just { diedAt = game.elapsedTime }
-                                                                , isAttached = False
-                                                            }
-
-                                                        else
-                                                            cursor
-                                            )
-                                            game.cursors
-                                    , gif = game.gif
-                                    , gifStart = game.gifStart
-                                    , pageHeight = game.pageHeight
-                                    , gameEnded = game.gameEnded
-                                    }
-                                        |> Just
-                              }
-                            , Cmd.batch
-                                [ shoot { x = clientX, y = clientY }
-                                , (case game.gun of
-                                    Handgun ->
-                                        "sn_handgun"
-
-                                    MachineGun ->
-                                        "sn_machinegun"
-
-                                    Shotgun ->
-                                        "sn_shotgun"
-
-                                    Bomb ->
-                                        "sn_explosion"
-                                  )
-                                    |> playSound
-                                ]
-                            )
+                            shootUpdate element game model
 
                 Nothing ->
                     ( model, Cmd.none )
@@ -392,7 +468,7 @@ updateGameState shared elapsed game =
         Nothing ->
             let
                 cursorSpeed =
-                    1.5
+                    0
 
                 {- Try spawning cursors 30 times per second -}
                 doSpawnCheck : Bool
@@ -402,10 +478,14 @@ updateGameState shared elapsed game =
                 newCursors : List Cursor
                 newCursors =
                     if doSpawnCheck then
-                        Random.step
-                            (spawnCursors shared.windowWidth (round game.pageHeight) (round elapsed2))
-                            (Random.initialSeed (elapsed2 * 10000 |> round))
-                            |> Tuple.first
+                        if List.length game.cursors < 200 then
+                            Random.step
+                                (spawnCursors shared.windowWidth (round game.pageHeight) (round elapsed2))
+                                (Random.initialSeed (elapsed2 * 10000 |> round))
+                                |> Tuple.first
+
+                        else
+                            []
 
                     else
                         []
@@ -492,6 +572,7 @@ updateGameState shared elapsed game =
             , bombAmmo = game.bombAmmo
             , elapsedTime = elapsed2
             , bulletHoles = game.bulletHoles
+            , animatedText = game.animatedText
             , lastSpawnCheck =
                 game.lastSpawnCheck
                     + (if doSpawnCheck then
@@ -730,6 +811,34 @@ drawSprite sprite x y rotation =
         []
 
 
+animatedText : String -> Float -> Float -> GunType -> Html msg
+animatedText color x y gunType =
+    Html.div
+        [ Html.Attributes.style "position" "absolute"
+        , Html.Attributes.style "left" (String.fromFloat x ++ "px")
+        , Html.Attributes.style "top" (String.fromFloat y ++ "px")
+        , Html.Attributes.style "pointer-events" "none"
+        , Html.Attributes.style "color" color
+        , Html.Attributes.style "font-size" "12px"
+        , Html.Attributes.style "white-space" "nowrap"
+        ]
+        [ Html.text
+            (case gunType of
+                Handgun ->
+                    ""
+
+                MachineGun ->
+                    "MGA+30"
+
+                Shotgun ->
+                    "SGA+5"
+
+                Bomb ->
+                    "Bomb+1"
+            )
+        ]
+
+
 view : App Data ActionData RouteParams -> Shared.Model -> Model -> View (PagesMsg Msg)
 view app shared model =
     let
@@ -826,6 +935,21 @@ view app shared model =
                                     (round rotation)
                             )
                             game.cursors
+                            |> Html.div [ Html.Attributes.style "position" "absolute" ]
+                        , List.concatMap
+                            (\text ->
+                                [ animatedText "black" (text.x - 1) (text.y - 1) text.gunType
+                                , animatedText "black" (text.x + 1) (text.y - 1) text.gunType
+                                , animatedText "black" (text.x - 1) text.y text.gunType
+                                , animatedText "black" (text.x + 1) text.y text.gunType
+                                , animatedText "black" (text.x - 1) (text.y + 1) text.gunType
+                                , animatedText "black" (text.x + 1) (text.y + 1) text.gunType
+                                , animatedText "black" text.x (text.y - 1) text.gunType
+                                , animatedText "black" text.x (text.y + 1) text.gunType
+                                , animatedText "yellow" text.x text.y text.gunType
+                                ]
+                            )
+                            game.animatedText
                             |> Html.div [ Html.Attributes.style "position" "absolute" ]
                         ]
                     , case game.gameEnded of
