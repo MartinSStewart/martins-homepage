@@ -57,7 +57,7 @@ type GunType
 type alias Model =
     { selectedAltText : Set String
     , videoIsPlaying : Bool
-    , gameState : Maybe Game
+    , game : Maybe Game
     }
 
 
@@ -109,7 +109,7 @@ type alias RouteParams =
 
 init : App Data action routeParams -> Shared.Model -> ( Model, Cmd Msg )
 init _ _ =
-    ( { selectedAltText = Set.empty, videoIsPlaying = False, gameState = Nothing }
+    ( { selectedAltText = Set.empty, videoIsPlaying = False, game = Nothing }
     , Cmd.none
     )
 
@@ -129,15 +129,15 @@ route =
             }
 
 
-gameInit : Shared.Model -> Game
-gameInit shared =
+gameInit : { x : Float, y : Float, width : Float, height : Float } -> Shared.Model -> Game
+gameInit gif shared =
     { gun = Handgun
     , machineGunAmmo = 0
     , shotgunAmmo = 0
     , bombAmmo = 0
     , elapsedTime = 0
     , cursors = []
-    , dogsGif = { x = 0, y = 0, width = 0, height = 0 }
+    , dogsGif = gif
     , pageHeight = toFloat shared.windowHeight
     , gameEnded = Nothing
     , lastSpawnCheck = 0
@@ -169,7 +169,7 @@ update _ shared msg model =
                 ( model, Cmd.none )
 
         PressedStartShootEmUp ->
-            ( { model | gameState = gameInit shared |> Just }
+            ( { model | game = gameInit { x = 0, y = 0, width = 0, height = 0 } shared |> Just }
             , Cmd.batch
                 [ loadSounds ()
                 , Task.map2
@@ -181,7 +181,7 @@ update _ shared msg model =
             )
 
         MouseDown { clientX, clientY, pageX, pageY } ->
-            case model.gameState of
+            case model.game of
                 Just game ->
                     case game.gameEnded of
                         Just _ ->
@@ -189,7 +189,7 @@ update _ shared msg model =
 
                         Nothing ->
                             ( { model
-                                | gameState =
+                                | game =
                                     { gun = game.gun
                                     , machineGunAmmo = game.machineGunAmmo
                                     , shotgunAmmo = game.shotgunAmmo
@@ -248,14 +248,14 @@ update _ shared msg model =
                     ( model, Cmd.none )
 
         PressedGunKey gunType ->
-            case model.gameState of
+            case model.game of
                 Just gameState ->
                     case gameState.gameEnded of
                         Just _ ->
                             ( model, Cmd.none )
 
                         Nothing ->
-                            ( { model | gameState = Just { gameState | gun = gunType } }
+                            ( { model | game = Just { gameState | gun = gunType } }
                             , (case gunType of
                                 Handgun ->
                                     "sn_handgun_voice"
@@ -276,9 +276,9 @@ update _ shared msg model =
                     ( model, Cmd.none )
 
         AnimationFrameDelta elapsed ->
-            ( case model.gameState of
+            ( case model.game of
                 Just gameState ->
-                    { model | gameState = updateGameState shared elapsed gameState |> Just }
+                    { model | game = updateGameState shared elapsed gameState |> Just }
 
                 Nothing ->
                     model
@@ -286,9 +286,9 @@ update _ shared msg model =
             )
 
         GotDogsAndPageImage result ->
-            case ( model.gameState, result ) of
+            case ( model.game, result ) of
                 ( Just gameState, Ok ( element, pageHeight ) ) ->
-                    ( { model | gameState = Just { gameState | dogsGif = element, pageHeight = pageHeight } }
+                    ( { model | game = Just { gameState | dogsGif = element, pageHeight = pageHeight } }
                     , Cmd.none
                     )
 
@@ -296,11 +296,11 @@ update _ shared msg model =
                     ( model, Cmd.none )
 
         PressedRestart ->
-            ( case model.gameState of
+            ( case model.game of
                 Just game ->
                     case game.gameEnded of
                         Just _ ->
-                            { model | gameState = gameInit shared |> Just }
+                            { model | game = gameInit game.dogsGif shared |> Just }
 
                         Nothing ->
                             model
@@ -311,11 +311,11 @@ update _ shared msg model =
             )
 
         PressedQuit ->
-            ( case model.gameState of
+            ( case model.game of
                 Just game ->
                     case game.gameEnded of
                         Just _ ->
-                            { model | gameState = Nothing }
+                            { model | game = Nothing }
 
                         Nothing ->
                             model
@@ -327,8 +327,8 @@ update _ shared msg model =
 
         PressedHide ->
             ( { model
-                | gameState =
-                    case model.gameState of
+                | game =
+                    case model.game of
                         Just game ->
                             { game
                                 | gameEnded =
@@ -503,7 +503,7 @@ updateGameState shared elapsed game =
 subscriptions : a -> b -> c -> Model -> Sub Msg
 subscriptions _ _ _ model =
     Sub.batch
-        [ case model.gameState of
+        [ case model.game of
             Just _ ->
                 Sub.batch
                     [ Browser.Events.onMouseDown
@@ -721,7 +721,7 @@ view app shared model =
     in
     { title = thing.name
     , overlay =
-        case model.gameState of
+        case model.game of
             Just game ->
                 Html.div
                     []
@@ -770,10 +770,28 @@ view app shared model =
                                         case cursor.isDead of
                                             Just { diedAt } ->
                                                 let
+                                                    ( hSpeed, vSpeed, rSpeed ) =
+                                                        Random.step
+                                                            (Random.map3
+                                                                (\a b c -> ( a, b, c ))
+                                                                (Random.float -0.3 0.3)
+                                                                (Random.float -0.3 0.3)
+                                                                (Random.float -1 1)
+                                                            )
+                                                            (Random.initialSeed
+                                                                (round
+                                                                    (1000 * diedAt + cursor.x + cursor.y * 7)
+                                                                )
+                                                            )
+                                                            |> Tuple.first
+
                                                     elapsed2 =
                                                         game.elapsedTime - diedAt
                                                 in
-                                                ( elapsed2 / 30, (elapsed2 / 30) ^ 2 + 1, elapsed2 )
+                                                ( elapsed2 * hSpeed
+                                                , (elapsed2 / 30) ^ 2 + elapsed2 * vSpeed
+                                                , elapsed2 * rSpeed
+                                                )
 
                                             Nothing ->
                                                 ( 0, 0, 0 )
@@ -834,7 +852,7 @@ view app shared model =
                 Html.div [] []
     , body =
         Ui.column
-            (case model.gameState of
+            (case model.game of
                 Just _ ->
                     [ Html.Attributes.style "cursor" "crosshair" |> Ui.htmlAttribute
                     , Html.Attributes.style "user-select" "none" |> Ui.htmlAttribute
@@ -870,7 +888,7 @@ view app shared model =
                   else
                     Ui.Lazy.lazy5
                         Formatting.view
-                        (model.gameState /= Nothing)
+                        (model.game /= Nothing)
                         shared
                         msgConfig
                         model
