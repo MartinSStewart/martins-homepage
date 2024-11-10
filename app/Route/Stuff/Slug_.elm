@@ -814,8 +814,8 @@ drawSprite : String -> Float -> Float -> Int -> Html msg
 drawSprite sprite x y rotation =
     Html.img
         [ Html.Attributes.style "position" "absolute"
-        , Html.Attributes.style "left" (String.fromFloat (x - 14) ++ "px")
-        , Html.Attributes.style "top" (String.fromFloat (y - 14) ++ "px")
+        , Html.Attributes.style "left" (String.fromFloat x ++ "px")
+        , Html.Attributes.style "top" (String.fromFloat y ++ "px")
         , Html.Attributes.style "pointer-events" "none"
         , Html.Attributes.src ("/secret-santa-game/" ++ sprite)
         , Html.Attributes.style "transform" ("rotate(" ++ String.fromInt (modBy 360 rotation) ++ "deg)")
@@ -898,8 +898,13 @@ view app shared model =
                             ]
                             []
                         , List.map
-                            (\{ x, y, gunType } -> drawSprite "bullet-hole.png" x y (round x * 1000))
+                            (\{ x, y, gunType } -> drawSprite "bullet-hole.png" (x - 14) (y - 14) (round x * 1000))
                             game.bulletHoles
+                            |> List.reverse
+                            |> Html.div [ Html.Attributes.style "position" "absolute" ]
+                        , List.map
+                            (\{ x, y, createdAt } -> drawSprite "bomb.png" (x - 14) (y - 14) 0)
+                            game.bombs
                             |> List.reverse
                             |> Html.div [ Html.Attributes.style "position" "absolute" ]
                         , List.map
@@ -942,8 +947,8 @@ view app shared model =
                                      else
                                         "cursor.png"
                                     )
-                                    (cursor.x + offsetX)
-                                    (cursor.y + offsetY)
+                                    (cursor.x + offsetX - cursorWidth)
+                                    (cursor.y + offsetY - cursorHeight)
                                     (round rotation)
                             )
                             game.cursors
