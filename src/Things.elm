@@ -1487,13 +1487,13 @@ myTypeCodec =
       )
     , lamderaPackage "containers" LamderaContainers.content (date 2024 Sep 22) (date 2024 Sep 22) ""
     , ( "linux"
-      , { name = "Switched to Linux"
+      , { name = "Switching to Ubuntu"
         , website = Nothing
         , tags = []
         , description =
             [ Paragraph [ Text "This particular version of the Linux logo was found ", ExternalLink "here" "brandlogos.net/linux-logo-svg-92851.html", Text ". Thanks Jack!" ]
             , Section
-                "Before Linux"
+                "Before Ubuntu"
                 [ Paragraph
                     [ Text "Windows has been my primary OS for my entire life. However, with Microsoft planning on dropping support for Windows 10 soon, and the increasingly user hostile design of each Windows release, I decided it was time to leave Windows for good."
                     ]
@@ -1511,6 +1511,7 @@ myTypeCodec =
                     [ BulletList
                         [ Text "The rest of this article will just be issues I ran into in the order I encountered them." ]
                         [ Paragraph [ Text "There were two options for booting from my flash drive. One name started with \"UEFI\" and the other didn't. I picked the latter which got me stuck later at the harddrive partitioning step with no indication at all as to what I had done wrong. Fortuntately tech support friend managed to figure it out. If not for him this might have immediately ended my attempt." ]
+                        , Paragraph [ Text "The Ubuntu setup windows isn't resizable and is too small for large screens." ]
                         , Paragraph [ Text "Firefox comes pre-installed with Ubuntu. That would give me hope that it should just work. It however is laggy. And the lag is proportional to how large I made the window. I check about:support and yup, it's software rendering everything and I can't figure out how to make it use my GPU. Neither tech support friend nor another Linux friend could figure this out either." ]
                         , Paragraph [ Text "I installed Dropbox and started synching all the important files from my Windows partition. Despite have an internet download speed in the megabit range, Dropbox was syncing at 20kb/s and estimated it would take a full week to finish. I decided to just ditch Dropbox and asked tech support friend for an alternative. He suggested SyncThing which is an open source peer to peer file host. That saves me 100 USD/year in Dropbox fees!" ]
                         , Paragraph [ Text "While in the middle of the previous thing, I tried updating Firefox in case that would fix the lag. Clicking \"update\" for Firefox in the app center showed me this error instead \"We're sorry, we're not sure what the error is\" (I haven't seen that error ever again, I'm not sure what caused it)." ]
@@ -1523,8 +1524,51 @@ myTypeCodec =
                         , Paragraph [ Text "I guess this isn't really an issue either, but coming from Windows, I was annoyed that clicking the mouse wheel and then moving the mouse doesn't let me scroll." ]
                         , Paragraph [ Text "If I click \"Open\" in the app center to start an app, there's no indication that the app is opening. This causes me to click on it multiple times which then causes errors messages as multiple instances of the app start and presumably start fighting over file handles or something." ]
                         , Paragraph [ Text "Ubuntu automatically gives UUID folder names to partitions it finds (instead of something easy to remember and quick to type like ", Code "E:\\", Text " on Windows)" ]
+                        , Paragraph [ Text "I tried deleting a folder via the file explorer. I didn't see any visual feedback so I tried deleting it again and got a weird error message about not being able to access a file inside the folder. Turns Ubuntu was trying to delete the files twice and got confused." ]
+                        , Paragraph
+                            [ Text "The \"Show apps\" fullscreen menu that lets me quickly pick an app to start has tiny buttons for navigating to the next or previous page despite the enormous amount of empty space. If there were any hotkeys to do this they weren't obvious enough for me to find them."
+                            ]
+                        , Paragraph [ Text "The hover text that appears for folders in the file explorer sidebar is horizontally compressed and is impossible to read." ]
+                        , Paragraph [ Text "I increased the OS UI scaling to 150% to better fit my screen. This caused loads of visual artefacts for all the opened apps that wouldn't go away until I restarted them. Tech support friend suggested I switch from Gnome to KDE. As of writing I haven't tried this yet." ]
+                        , BulletList
+                            [ Text "I wanted to play Enigma (I have nostalgia for that old puzzle game) but the Debian version's page in the app center wouldn't load and the Snap version in the app center wouldn't open after I installed it. The solution was to run ", Code "apt install Enigma", Text " via the terminal." ]
+                            [ Paragraph [ Text "Related to this, there's too many ways to install apps. App center, apt, direct download from a website (and then also decide between Debian or Snap)." ] ]
+                        , Paragraph [ Text "I noticed that in some situations, buttons would just not work. After some clicking around, I realize the clickable area was offset. Turns out that changing OS zoom to 150% was a mistake and I had to switch it back to 100% and instead increase zoom individually in all apps that supported it." ]
+                        , Paragraph [ Text "The standard Ctrl + C and Ctrl + V copy paste commands don't work in the default terminal. A bit annoying to get used to different hotkeys." ]
+                        , BulletList
+                            [ Text "To make an app start when the computer starts, I need to go to \"Startup Application Preferences\" and then locate and add the path to that apps executable. I would have expected Ubuntu to just list all the of the installed apps and only have the file path option available for more advanced scenarios." ]
+                            [ Paragraph [ Text "Discord helpfully has a checkbox in the app to have it run on startup. Unfortunately it doesn't work." ] ]
+                        , BulletList
+                            [ Text "At startup, folders contained in other partitions aren't accessible to programs until I access that partition via the file explorer. This leads to problems for Intellij and Gitkraken when they try to automatically show the last project I was working on." ]
+                            [ Paragraph [ Text "Tech support friend solved this for me. It involved adding the partition to some mount config file. That also let me give it a better name than just a UUID string." ] ]
+                        , BulletList
+                            [ Text "Popup windows/modals sometimes appear behind other windows. This tripped me up when I was trying to do a screenshare on Discord and the window for selecting which screen to share wasn't visible because it was hidden behind Discord's main window." ]
+                            [ Paragraph [ Text "Later I noticed that clicking on a window sometimes doesn't bring it to front either. Usually clicking it a second time does the trick though." ] ]
+                        , Paragraph [ Text "When I restart Ubuntu, it doesn't remember if a window was on my primary or secondary screen." ]
+                        , Paragraph [ Text "Selecting \"Suspend\" instead of \"Power off\" is a mistake. When I tried to log in 30 minutes later, all the UI was corrupted with RGB noise and the UI was too laggy to interact with (10 seconds per frame)." ]
+                        ]
+                    , Section "Lets take a little break to list some positive things"
+                        [ BulletList
+                            []
+                            [ Paragraph [ Text "Unlike on Windows, snapping two windows to two halves of the screen actually works without one of them overlapping the other slightly." ]
+                            , Paragraph [ Text "My secondary screens speakers don't get lost when waking the computer. On Windows I would have to disable some random virtual speaker to get the OS to detect the secondary screen's speakers again." ]
+                            , Paragraph [ Text "No more Windows line endings (I have been burned so many times debugging code where this turned out to be the issue)." ]
+                            , Paragraph [ Text "No more case insensitive file paths" ]
+                            , Paragraph [ Text "Ubuntu feels less laggy than Windows" ]
+                            ]
+                        ]
+                    , Section "Last couple issues"
+                        [ BulletList
+                            []
+                            [ BulletList
+                                [ Text "Ubuntu actually started feeling more laggy suddenly. By random luck, I happened to check how much space was available on my primary partition and it only had a few GB left. Turns out Discord had been spamming syslog with a few KB of text every second for several days. Clearing out syslog fixed the lag and I decided to stop using Discord's native app and just run it from the browser." ]
+                                [ Paragraph [ Text "Narrowing down where all the file space was getting used up was its own challenge. The file explorer won't say how large a folder is. Tech support friend suggested I install filelight but that gave me a ", Code "QQmlApplicationEngine failed to load component qrc:/ui/main.qml:8:1: module \"org.kde.config\" is not installed", Text " error message (apparently it's only for KDE, not Gnome). Then we tried baobab which worked." ] ]
+                            , Paragraph [ Text "Ubuntu said there were OS updates ready. The next time I restarted Ubuntu they were applied. I'm not sure exactly what was in that update but it switched me from ", Code "NVIDIA driver metapackage from nvidia-driver-575 (proprietary, tested)", Text " to ", Code "NVIDIA driver metapackage from nvidia-driver-570 (proprietary)", Text " in the Software & Updates window. This in turn caused my secondary screen to no longer get detected and force my primary 4K screen to display 1024x768. Amazingly I managed to solve this one without help from tech support friend." ]
+                            , Paragraph [ Text "Every time I start my computer, Ubuntu asks if I want to submit a crash report for Gitkraken even though it hasn't started yet (maybe it tried to auto start and failed)" ]
+                            ]
                         ]
                     ]
+                , Paragraph [ Text "And that's everything I wrote down from over the span of a week or two. Most of these issues happened within the first couple days. Since then it's settled down and things are running smoothly. There's a good chance that some of these issues really are my own fault or at least not Ubuntu's fault. I listed them anyway because from a new user's perspective, they probably won't care too much who is to blame, just that things don't work how they expect." ]
                 ]
             ]
         , pageLastUpdated = websiteReleasedAt
