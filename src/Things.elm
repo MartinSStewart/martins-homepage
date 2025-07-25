@@ -860,7 +860,7 @@ thingsIHaveDone =
         , thingType =
             JobThing
                 { startedAt = date 2023 Aug 15
-                , endedAt = Nothing
+                , endedAt = date 2025 Aug 1 |> Just
                 , elmPercentage = 100
                 , columnIndex = 1
                 }
@@ -1486,6 +1486,70 @@ myTypeCodec =
         }
       )
     , lamderaPackage "containers" LamderaContainers.content (date 2024 Sep 22) (date 2024 Sep 22) ""
+    , ( "linux"
+      , { name = "Switched to Linux"
+        , website = Nothing
+        , tags = []
+        , description =
+            [ Paragraph [ Text "This particular version of the Linux logo was found ", ExternalLink "here" "brandlogos.net/linux-logo-svg-92851.html", Text ". Thanks Jack!" ]
+            , Section
+                "Before Linux"
+                [ Paragraph
+                    [ Text "Windows has been my primary OS for my entire life. However, with Microsoft planning on dropping support for Windows 10 soon, and the increasingly user hostile design of each Windows release, I decided it was time to leave Windows for good."
+                    ]
+                , Paragraph [ Text "This wasn't my first attempt, 9 years ago I set up dual boot on my Windows desktop so I could run Ubuntu along side it. A couple hours spent getting my brand new GTX 1080 GPU to work and then struggling with writing a bash script to force higher mouse sensitivity was enough to make me give up though." ]
+                , Paragraph
+                    [ Text "I was hopeful that 9 years later I could try Ubuntu again and have better luck (it was Ubuntu 16 then and Ubuntu 25 now, that's hopefully enough time to sort out drivers for my GTX 1080!). Also I had a "
+                    , ExternalLink "tech support friend" "github.com/miniBill"
+                    , Text " this time around to assist me. His name is Leo but I'm going to refer to him as tech support friend."
+                    ]
+                ]
+            , Section
+                "After Windows"
+                [ Paragraph [ Text "I'll drop the suspense and give the conclusion now. I ran into ", Italic "many", Text " issues ranging from small UI annoyances to an Ubuntu update unexpectedly downgrading my Nvidia drivers leading to a blurry horizontally stretched screen. Despite that I'm happy to have switched. I'm actually not sure why I'm so happy about the switch, maybe it's a feeling of less clutter (many years of haphazard file management and apps on Windows), or feeling less like I'm being spied on, or maybe Ubuntu is just less laggy. Hard to say. I'm told (after having already made the switch to Ubuntu) that Debian has more features and is more stable. Maybe in a month I'll try that and experience the same OS switching happiness for a second time." ]
+                , Section "The issues I ran into"
+                    [ BulletList
+                        [ Text "The rest of this article will just be issues I ran into in the order I encountered them." ]
+                        [ Paragraph [ Text "There were two options for booting from my flash drive. One name started with \"UEFI\" and the other didn't. I picked the latter which got me stuck later at the harddrive partitioning step with no indication at all as to what I had done wrong. Fortuntately tech support friend managed to figure it out. If not for him this might have immediately ended my attempt." ]
+                        , Paragraph [ Text "Firefox comes pre-installed with Ubuntu. That would give me hope that it should just work. It however is laggy. And the lag is proportional to how large I made the window. I check about:support and yup, it's software rendering everything and I can't figure out how to make it use my GPU. Neither tech support friend nor another Linux friend could figure this out either." ]
+                        , Paragraph [ Text "I installed Dropbox and started synching all the important files from my Windows partition. Despite have an internet download speed in the megabit range, Dropbox was syncing at 20kb/s and estimated it would take a full week to finish. I decided to just ditch Dropbox and asked tech support friend for an alternative. He suggested SyncThing which is an open source peer to peer file host. That saves me 100 USD/year in Dropbox fees!" ]
+                        , Paragraph [ Text "While in the middle of the previous thing, I tried updating Firefox in case that would fix the lag. Clicking \"update\" for Firefox in the app center showed me this error instead \"We're sorry, we're not sure what the error is\" (I haven't seen that error ever again, I'm not sure what caused it)." ]
+                        , BulletList
+                            [ Text "I installed Gitkraken, my favorite Git client. When trying to log in, it would consistently freeze and crash after typing a letter into the email address field. I solved this by installing Gitkraken via their homepage rather than through the app center." ]
+                            [ Paragraph [ Text "While doing this, I learned that in the Linux world, amd64 means x86_64. If tech support friend hadn't told me this I would have thought there was no .deb install available for my Intel CPU." ]
+                            , Paragraph [ Text "Also after downloading the .deb installer from Gitkraken's homepage, I ran into one last issue where it wouldn't start properly until I first closed the app center." ]
+                            ]
+                        , Paragraph [ Text "This isn't an issue but it was at this point tech support friend suggested maybe I should start making a list of all the issues so I can turn this into an article later. " ]
+                        , Paragraph [ Text "I guess this isn't really an issue either, but coming from Windows, I was annoyed that clicking the mouse wheel and then moving the mouse doesn't let me scroll." ]
+                        , Paragraph [ Text "If I click \"Open\" in the app center to start an app, there's no indication that the app is opening. This causes me to click on it multiple times which then causes errors messages as multiple instances of the app start and presumably start fighting over file handles or something." ]
+                        , Paragraph [ Text "Ubuntu automatically gives UUID folder names to partitions it finds (instead of something easy to remember and quick to type like ", Code "E:\\", Text " on Windows)" ]
+                        ]
+                    ]
+                ]
+            ]
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/linux-preview.svg"
+        , previewText = "After many years primarily as a Windows user, I finally switched to Linux"
+        , thingType =
+            OtherThing
+                { releasedAt = date 2025 Jul 5
+                , repo = Nothing
+                }
+        }
+      )
+    , elmPackage
+        "MartinSStewart"
+        "elm-email"
+        [ Paragraph
+            [ Text "Just a package for sending emails. It supports both Postmark and Sendgrid and superceeds my "
+            , Link "send-grid" (Route.Stuff__Slug_ { slug = "send-grid" })
+            , Text " package (which as the name suggests, only supports SendGrid)"
+            ]
+        ]
+        (date 2025 Jul 25)
+        (date 2025 Jul 25)
+        "A package for sending emails"
     ]
         |> Dict.fromList
 
@@ -1532,8 +1596,10 @@ qualityOrder =
     , "code-breakers"
     , "memo-2020-credits"
     , "surface-voyage"
+    , "linux"
     , "moment-of-the-month"
     , "question-and-answer"
+    , "elm-email"
     , "send-grid"
     , "ds-game-over"
     , "emils-turn"

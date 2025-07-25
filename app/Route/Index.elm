@@ -35,12 +35,11 @@ import View exposing (View)
 
 
 type alias Model =
-    { sortBy : SortBy, filter : Set String, worstTier : Line, topTier : Line }
+    { filter : Set String, worstTier : Line, topTier : Line }
 
 
 type Msg
     = ToggledTag Tag Bool
-    | PressedSortBy SortBy
     | GotWorstTierPosition (Result Browser.Dom.Error (List Browser.Dom.Element))
     | GotTopTierPosition (Result Browser.Dom.Error (List Browser.Dom.Element))
     | WindowResized
@@ -88,8 +87,13 @@ route =
 
 
 init : App data action routeParams -> Shared.Model -> ( Model, Effect Msg )
-init _ _ =
-    ( { sortBy = Quality, filter = Set.empty, worstTier = NoLine, topTier = NoLine }, getElements )
+init app _ =
+    ( { filter = Set.empty
+      , worstTier = NoLine
+      , topTier = NoLine
+      }
+    , getElements
+    )
 
 
 type Line
@@ -104,8 +108,39 @@ type Tier
     | WorstTier
 
 
+sortByFromApp : App Data ActionData RouteParams -> SortBy
+sortByFromApp app =
+    case app.url of
+        Just url ->
+            case Dict.get "sort" url.query of
+                Just [ "alphabetical" ] ->
+                    Alphabetical
+
+                Just [ "chronological" ] ->
+                    Chronological
+
+                _ ->
+                    Quality
+
+        Nothing ->
+            Quality
+
+
+sortByToString : SortBy -> String
+sortByToString sortBy =
+    case sortBy of
+        Quality ->
+            "quality"
+
+        Alphabetical ->
+            "alphabetical"
+
+        Chronological ->
+            "chronological"
+
+
 update : App Data ActionData RouteParams -> Shared.Model -> Msg -> Model -> ( Model, Effect Msg )
-update _ _ msg model =
+update app _ msg model =
     case msg of
         ToggledTag tag isChecked ->
             ( { model
@@ -119,18 +154,9 @@ update _ _ msg model =
             , Cmd.none
             )
 
-        PressedSortBy sortBy ->
-            ( { model | sortBy = sortBy }
-            , if sortBy == Quality then
-                getElements
-
-              else
-                Cmd.none
-            )
-
         WindowResized ->
             ( { model | worstTier = NoLine, topTier = NoLine }
-            , if model.sortBy == Quality then
+            , if sortByFromApp app == Quality then
                 getElements
 
               else
@@ -466,9 +492,13 @@ view app _ model =
                 thingsDone1
                 worstTier
 
+        sortBy : SortBy
+        sortBy =
+            sortByFromApp app
+
         thingsSorted : List ( String, ( Tier, Thing ) )
         thingsSorted =
-            case model.sortBy of
+            case sortBy of
                 Alphabetical ->
                     Dict.toList thingsDone2
 
@@ -511,7 +541,7 @@ view app _ model =
     { title = "Martin's homepage"
     , body =
         Ui.el
-            (if model.sortBy == Quality then
+            (if sortBy == Quality then
                 [ svgLine "Middle tier" "Worst tier" "orange" "red" model.worstTier |> Ui.inFront
                 , svgLine "Top tier" "Middle tier" "#1293d8" "orange" model.topTier |> Ui.inFront
                 ]
@@ -540,8 +570,8 @@ view app _ model =
                     (Ui.text "Stuff I've done that I don't want to forget")
                 , Ui.column
                     [ Ui.spacing 16 ]
-                    [ filterView model
-                    , if model.sortBy == Chronological then
+                    [ filterView sortBy model
+                    , if sortBy == Chronological then
                         timelineView app.data.thingsIHaveDone
 
                       else
@@ -552,7 +582,7 @@ view app _ model =
                             , Ui.Responsive.visible Shared.breakpoints [ NotMobile ]
                             ]
                             (List.filterMap (filterThings thingsViewNotMobile) thingsSorted)
-                    , if model.sortBy == Chronological then
+                    , if sortBy == Chronological then
                         Ui.none
 
                       else
@@ -571,11 +601,11 @@ view app _ model =
 timelineView : Dict String Thing -> Ui.Element msg
 timelineView things =
     let
-        things2 : Dict ( Int, Int ) (List Thing)
+        things2 : Dict ( Int, Int ) (List ( String, Thing ))
         things2 =
             List.foldl
-                (\( _, thing ) dict ->
-                    case thing.thingType of
+                (\thing dict ->
+                    case (Tuple.second thing).thingType of
                         OtherThing { releasedAt } ->
                             Dict.update
                                 ( Date.year releasedAt, Date.monthNumber releasedAt - 1 )
@@ -673,7 +703,7 @@ csharpEraEnd =
 
 
 currentDate2 =
-    yearAndMonthToCount 2024 Jul
+    yearAndMonthToCount 2025 Sep
 
 
 timelineBlock : Ui.Color -> String -> Int -> Int -> Int -> Maybe (Ui.Element msg)
@@ -683,7 +713,7 @@ timelineBlock color text startDate endDate count =
 
     else
         Ui.el
-            [ Ui.width (Ui.px 24)
+            [ Ui.width (Ui.px timelineBlockWidth)
             , Ui.height Ui.fill
             , Ui.background color
             , if endDate == count + 6 then
@@ -692,7 +722,7 @@ timelineBlock color text startDate endDate count =
                         [ Ui.rotate (Ui.turns 0.75)
                         , Ui.Font.exactWhitespace
                         , Ui.Font.color (Ui.rgb 255 255 255)
-                        , Ui.move { x = -2, y = 0, z = 0 }
+                        , Ui.move { x = 0, y = 0, z = 0 }
                         ]
                         (Ui.text text)
                     )
@@ -704,11 +734,16 @@ timelineBlock color text startDate endDate count =
             |> Just
 
 
+timelineBlockWidth : number
+timelineBlockWidth =
+    22
+
+
 timelineViewHelper :
     Int
     -> Int
     -> List (Ui.Element msg)
-    -> Dict ( Int, Int ) (List Thing)
+    -> Dict ( Int, Int ) (List ( String, Thing ))
     -> List { startedAt : Int, endedAt : Int, name : String, color : Ui.Color, columnIndex : Int }
     -> Ui.Element msg
 timelineViewHelper currentDate count list thingsSorted durations =
@@ -735,7 +770,15 @@ timelineViewHelper currentDate count list thingsSorted durations =
                 (List.repeat 2 Nothing)
                 durations
                 |> List.Extra.dropWhileRight (\a -> a == Nothing)
-                |> List.map (Maybe.withDefault (Ui.el [ Ui.width (Ui.px 24), Ui.height Ui.fill ] Ui.none))
+                |> List.map
+                    (Maybe.withDefault
+                        (Ui.el
+                            [ Ui.width (Ui.px timelineBlockWidth)
+                            , Ui.height Ui.fill
+                            ]
+                            Ui.none
+                        )
+                    )
     in
     if currentDate <= count then
         Ui.column [] list
@@ -778,11 +821,13 @@ timelineViewHelper currentDate count list thingsSorted durations =
                     ++ [ case Dict.get ( year, month ) thingsSorted of
                             Just things ->
                                 List.map
-                                    (\thing ->
+                                    (\( id, thing ) ->
                                         Ui.image
                                             [ Ui.width (Ui.px 39)
                                             , Ui.height (Ui.px 39)
                                             , Ui.alignBottom
+                                            , Html.Attributes.attribute "elm-pages:prefetch" "" |> Ui.htmlAttribute
+                                            , Ui.link (Route.toString (Route.Stuff__Slug_ { slug = id }))
                                             ]
                                             { source = thing.previewImage, description = thing.name, onLoad = Nothing }
                                     )
@@ -854,9 +899,9 @@ containerBorder =
     Ui.rgb 210 210 210
 
 
-sorByButtonAttributes : SortBy -> SortBy -> List (Ui.Attribute Msg)
-sorByButtonAttributes selected sortBy =
-    [ Ui.Input.button (PressedSortBy sortBy)
+sortByButtonAttributes : SortBy -> SortBy -> List (Ui.Attribute Msg)
+sortByButtonAttributes selected sortBy =
+    [ Ui.link (Route.toString Route.Index ++ "?sort=" ++ sortByToString sortBy)
     , Ui.border 1
     , Ui.paddingXY 8 2
     , Ui.borderColor containerBorder
@@ -875,8 +920,8 @@ tooltip text =
     Ui.htmlAttribute (Html.Attributes.title text)
 
 
-sortByView : Model -> Ui.Element Msg
-sortByView model =
+sortByView : SortBy -> Ui.Element Msg
+sortByView sortBy =
     Ui.row
         [ Ui.width Ui.shrink, Ui.spacing 4, Ui.Font.size 14 ]
         [ Ui.el [ Ui.Font.bold ] (Ui.text "Sort by")
@@ -886,32 +931,32 @@ sortByView model =
                 (Ui.roundedWith { topLeft = 16, topRight = 0, bottomLeft = 16, bottomRight = 0 }
                     :: Ui.border 1
                     :: tooltip "Sort by how important and high quality I think things are"
-                    :: sorByButtonAttributes model.sortBy Quality
+                    :: sortByButtonAttributes sortBy Quality
                 )
                 (Ui.text "Best to worst")
             , Ui.el
                 (Ui.borderWith { left = 0, right = 0, top = 1, bottom = 1 }
                     :: tooltip "Sort by title names"
-                    :: sorByButtonAttributes model.sortBy Alphabetical
+                    :: sortByButtonAttributes sortBy Alphabetical
                 )
                 (Ui.text "A to Z")
             , Ui.el
                 (Ui.roundedWith { topLeft = 0, topRight = 16, bottomLeft = 0, bottomRight = 16 }
                     :: Ui.border 1
                     :: tooltip "Sort by when things were released. For stuff that doesn't have a clear release date, this is when it first became known to or used by several people (or when I abandoned it)"
-                    :: sorByButtonAttributes model.sortBy Chronological
+                    :: sortByButtonAttributes sortBy Chronological
                 )
                 (Ui.text "Newest to oldest")
             ]
         ]
 
 
-filterView : Model -> Ui.Element Msg
-filterView model =
+filterView : SortBy -> Model -> Ui.Element Msg
+filterView sortBy model =
     Ui.column
         [ Ui.spacingWith { horizontal = 16, vertical = 8 }, Ui.wrap ]
-        [ sortByView model
-        , if model.sortBy == Chronological then
+        [ sortByView sortBy
+        , if sortBy == Chronological then
             Ui.none
 
           else
