@@ -1502,76 +1502,89 @@ myTypeCodec =
                     ]
                 , Paragraph [ Text "This wasn't my first attempt, 9 years ago I set up dual boot on my Windows desktop so I could run Ubuntu along side it. A couple hours spent getting my brand new GTX 1080 GPU to work and then struggling with writing a bash script to force higher mouse sensitivity was enough to make me give up though." ]
                 , Paragraph
-                    [ Text "I was hopeful that 9 years later I could try Ubuntu again and have better luck (it was Ubuntu 16 then and Ubuntu 25 now, that's hopefully enough time to sort out drivers for my GTX 1080!). Also I had a "
+                    [ Text "Hopefully 9 years later I'd have a better experience (it was Ubuntu 16 then and Ubuntu 25 now, that ought to be enough version numbers to sort out any driver issues for my GTX 1080!). Also I had a "
                     , ExternalLink "tech support friend" "github.com/miniBill"
                     , Text " this time around to assist me. His name is Leo but I'm going to refer to him as tech support friend."
                     ]
                 ]
             , Section
                 "After Windows"
-                [ Paragraph [ Text "I'll drop the suspense and give the conclusion now. I ran into ", Italic "many", Text " issues ranging from small UI annoyances to an Ubuntu update unexpectedly downgrading my Nvidia drivers leading to a blurry horizontally stretched screen. Despite that I'm happy to have switched. I'm actually not sure why I'm so happy about the switch, maybe it's a feeling of less clutter (many years of haphazard file management and apps on Windows), or feeling less like I'm being spied on, or maybe Ubuntu is just less laggy. Hard to say. I'm told (after having already made the switch to Ubuntu) that Debian has more features and is more stable. Maybe in a month I'll try that and experience the same OS switching happiness for a second time." ]
+                [ Paragraph
+                    [ Text "I'll drop the suspense and give the conclusion now. I ran into "
+                    , Italic "many"
+                    , Text " issues ranging from small UI annoyances to one time where on startup I was greeted by a blurry horizontally stretched desktop because an Ubuntu update downgraded my Nvidia drivers."
+                    ]
+                , Paragraph
+                    [ Text "Despite all that I'm happy to have switched. I'm actually not sure why I'm so happy about the switch. Maybe it's a feeling of "
+                    , AltText "less clutter" "(many years of haphazard file management, random apps everywhere, etc)"
+                    , Text ", or feeling less like I'm being spied on, or maybe Ubuntu is just less laggy. Hard to say. I'm told (after having already made the switch to Ubuntu) that Debian has more features and is more stable. Maybe in a month I'll try that and experience the same OS switching happiness for a second time."
+                    ]
                 , Section "The issues I ran into"
                     [ BulletList
                         [ Text "The rest of this article will just be issues I ran into in the order I encountered them." ]
-                        [ Paragraph [ Text "There were two options for booting from my flash drive. One name started with \"UEFI\" and the other didn't. I picked the latter which got me stuck later at the harddrive partitioning step with no indication at all as to what I had done wrong. Fortuntately tech support friend managed to figure it out. If not for him this might have immediately ended my attempt." ]
-                        , Paragraph [ Text "The Ubuntu setup windows isn't resizable and is too small for large screens." ]
-                        , Paragraph [ Text "Firefox comes pre-installed with Ubuntu. That would give me hope that it should just work. It however is laggy. And the lag is proportional to how large I made the window. I check about:support and yup, it's software rendering everything and I can't figure out how to make it use my GPU. Neither tech support friend nor another Linux friend could figure this out either." ]
-                        , Paragraph [ Text "I installed Dropbox and started synching all the important files from my Windows partition. Despite have an internet download speed in the megabit range, Dropbox was syncing at 20kb/s and estimated it would take a full week to finish. I decided to just ditch Dropbox and asked tech support friend for an alternative. He suggested SyncThing which is an open source peer to peer file host. That saves me 100 USD/year in Dropbox fees!" ]
-                        , Paragraph [ Text "While in the middle of the previous thing, I tried updating Firefox in case that would fix the lag. Clicking \"update\" for Firefox in the app center showed me this error instead \"We're sorry, we're not sure what the error is\" (I haven't seen that error ever again, I'm not sure what caused it)." ]
-                        , BulletList
-                            [ Text "I installed Gitkraken, my favorite Git client. When trying to log in, it would consistently freeze and crash after typing a letter into the email address field. I solved this by installing Gitkraken via their homepage rather than through the app center." ]
-                            [ Paragraph [ Text "While doing this, I learned that in the Linux world, amd64 means x86_64. If tech support friend hadn't told me this I would have thought there was no .deb install available for my Intel CPU." ]
-                            , Paragraph [ Text "Also after downloading the .deb installer from Gitkraken's homepage, I ran into one last issue where it wouldn't start properly until I first closed the app center." ]
+                        [ Paragraph [ Text "There were two options for booting from my flash drive. One had a name that started with \"UEFI\" and the other didn't. I picked the latter which got me stuck later at the harddrive partitioning step with no indication at all as to what I had done wrong. Fortunately tech support friend managed to figure out what I did wrong." ]
+                        , Paragraph [ Text "The Ubuntu setup menu is too small for large screens and isn't resizable." ]
+                        , Paragraph
+                            [ Text "Firefox comes pre-installed with Ubuntu. That gave me hope that it should just work. It, however, is laggy. And the lag is proportional to how large I make the window. I checked "
+                            , Code2 "about:support"
+                            , Text " and yup, it's in software rendering mode and I can't figure out how to make it use my GPU. Neither tech support friend nor another Linux friend could figure out either."
                             ]
-                        , Paragraph [ Text "This isn't an issue but it was at this point tech support friend suggested maybe I should start making a list of all the issues so I can turn this into an article later. " ]
+                        , Paragraph [ Text "I installed Dropbox and had it start downloading files. Despite have an internet speed in the megabit range, Dropbox was running at 20kb/s and estimated it would take a week to finish. I decided to just ditch Dropbox and asked tech support friend for an alternative. He suggested SyncThing which is an open source peer to peer file host. That saves me 100 USD/year in Dropbox fees!" ]
+                        , Paragraph [ Text "While in the middle of the previous thing, I tried updating Firefox in case that would fix the lag. Clicking \"update\" for Firefox in the app center gave me a \"We're sorry, we're not sure what the error is\"", AltText " popup" "(I haven't seen that error ever again, I'm not sure what caused it)", Text "." ]
+                        , BulletList
+                            [ Text "I installed Gitkraken, my favorite Git client. When logging in, it would consistently freeze and crash after typing a letter into the email address field. I solved this by installing Gitkraken the homepage rather than through the Ubuntu app center." ]
+                            [ Paragraph [ Text "While doing this, I learned that in the Linux world, amd64 means x86_64. If tech support friend hadn't told me this I would have thought there was no .deb install available for my Intel CPU." ]
+                            , Paragraph [ Text "Also after downloading the .deb installer from Gitkraken's homepage, I ran into one last issue where it wouldn't install until I first closed the app center." ]
+                            ]
+                        , Paragraph [ Text "This isn't an issue but it was at this point tech support friend suggested maybe I should start making a list of all the issues to turn into an article later. " ]
                         , Paragraph [ Text "I guess this isn't really an issue either, but coming from Windows, I was annoyed that clicking the mouse wheel and then moving the mouse doesn't let me scroll." ]
-                        , Paragraph [ Text "If I click \"Open\" in the app center to start an app, there's no indication that the app is opening. This causes me to click on it multiple times which then causes errors messages as multiple instances of the app start and presumably start fighting over file handles or something." ]
+                        , Paragraph [ Text "If I click \"Open\" in the app center to start an app, there's no indication that the app is opening. This caused me to click on it multiple times which then causes errors messages as multiple instances of the app start and presumably start fighting over file handles or something." ]
                         , Paragraph [ Text "Ubuntu automatically gives UUID folder names to partitions it finds (instead of something easy to remember and quick to type like ", Code "E:\\", Text " on Windows)" ]
                         , Paragraph [ Text "I tried deleting a folder via the file explorer. I didn't see any visual feedback so I tried deleting it again and got a weird error message about not being able to access a file inside the folder. Turns Ubuntu was trying to delete the files twice and got confused." ]
                         , Paragraph
-                            [ Text "The \"Show apps\" fullscreen menu that lets me quickly pick an app to start has tiny buttons for navigating to the next or previous page despite the enormous amount of empty space. If there were any hotkeys to do this they weren't obvious enough for me to find them."
+                            [ Text "The \"Show apps\" fullscreen menu for quickly picking an app to start has tiny buttons for navigating to the next or previous page despite the enormous amount of empty space available. If there were any hotkeys for this purpose then they weren't obvious enough for me to find them."
                             ]
-                        , Paragraph [ Text "The hover text that appears for folders in the file explorer sidebar is horizontally compressed and is impossible to read." ]
-                        , Paragraph [ Text "I increased the OS UI scaling to 150% to better fit my screen. This caused loads of visual artefacts for all the opened apps that wouldn't go away until I restarted them. Tech support friend suggested I switch from Gnome to KDE. As of writing I haven't tried this yet." ]
+                        , Paragraph [ Text "The tooltip that appears when hovering my cursor over folders in the file explorer sidebar is horizontally compressed and distorted, making it impossible to read." ]
+                        , Paragraph [ Text "I increased the OS UI scaling to 150% to better fit my screen. This caused loads of visual artefacts for all the opened apps that wouldn't go away until I restarted ", AltText "them." "Tech support friend suggested I switch from Gnome to KDE. As of writing I haven't tried this yet. Maybe doing so will solve many of the UI issues I've listed here." ]
                         , BulletList
-                            [ Text "I wanted to play Enigma (I have nostalgia for that old puzzle game) but the Debian version's page in the app center wouldn't load and the Snap version in the app center wouldn't open after I installed it. The solution was to run ", Code "apt install Enigma", Text " via the terminal." ]
-                            [ Paragraph [ Text "Related to this, there's too many ways to install apps. App center, apt, direct download from a website (and then also decide between Debian or Snap)." ] ]
-                        , Paragraph [ Text "I noticed that in some situations, buttons would just not work. After some clicking around, I realize the clickable area was offset. Turns out that changing OS zoom to 150% was a mistake and I had to switch it back to 100% and instead increase zoom individually in all apps that supported it." ]
+                            [ Text "I wanted to play ", AltText "Enigma." " My dad had Knoppix on a CD and I'd sometimes boot the family computer from it and play the games included, one of which was the puzzle game Enigma. This is all to say, I have nostalgia for that game.", Text " The app center has two versions available. Unfortunately the page wouldn't load for one and for the other it wouldn't open after installed. The solution was to run ", Code2 "apt install Enigma", Text " via the terminal." ]
+                            [ Paragraph [ Text "Related to this, there's too many ways to install apps. App center, apt, direct download from a website and then also decide between using the Debian or Snap version of each app." ] ]
+                        , Paragraph [ Text "I noticed that in some ", AltText "apps" "(Chromium for example)", Text ", buttons would just not work. After some clicking around, I realize the clickable area was offset based on how far the button was from the top left corner of the screen. Changing OS zoom to 150% was the culprit. I switched it back to 100% and instead increased the zoom amount individually in all apps that supported it." ]
                         , Paragraph [ Text "The standard Ctrl + C and Ctrl + V copy paste commands don't work in the default terminal. A bit annoying to get used to different hotkeys." ]
                         , BulletList
-                            [ Text "To make an app start when the computer starts, I need to go to \"Startup Application Preferences\" and then locate and add the path to that apps executable. I would have expected Ubuntu to just list all the of the installed apps and only have the file path option available for more advanced scenarios." ]
-                            [ Paragraph [ Text "Discord helpfully has a checkbox in the app to have it run on startup. Unfortunately it doesn't work." ] ]
+                            [ Text "To make an app start when the computer starts, I need to go to \"Startup Application Preferences\" and then provide the path to the app's executable file. I would have expected Ubuntu to just list all the of the installed apps and only have the file path option available for more advanced use cases." ]
+                            [ Paragraph [ Text "Discord helpfully has its own checkbox to have it run on startup. Unfortunately it doesn't work." ] ]
                         , BulletList
-                            [ Text "At startup, folders contained in other partitions aren't accessible to programs until I access that partition via the file explorer. This leads to problems for Intellij and Gitkraken when they try to automatically show the last project I was working on." ]
+                            [ Text "At startup, folders contained in other partitions aren't accessible to any apps until I access that partition via the file explorer. This leads to problems for Intellij and Gitkraken when they try to automatically show the last project I was working on." ]
                             [ Paragraph [ Text "Tech support friend solved this for me. It involved adding the partition to some mount config file. That also let me give it a better name than just a UUID string." ] ]
                         , BulletList
-                            [ Text "Popup windows/modals sometimes appear behind other windows. This tripped me up when I was trying to do a screenshare on Discord and the window for selecting which screen to share wasn't visible because it was hidden behind Discord's main window." ]
-                            [ Paragraph [ Text "Later I noticed that clicking on a window sometimes doesn't bring it to front either. Usually clicking it a second time does the trick though." ] ]
-                        , Paragraph [ Text "When I restart Ubuntu, it doesn't remember if a window was on my primary or secondary screen." ]
-                        , Paragraph [ Text "Selecting \"Suspend\" instead of \"Power off\" is a mistake. When I tried to log in 30 minutes later, all the UI was corrupted with RGB noise and the UI was too laggy to interact with (10 seconds per frame)." ]
+                            [ Text "Popup windows sometimes appear behind other windows. This tripped me up when I was trying to do a screenshare on Discord and the window for selecting which screen to share wasn't visible because it was hidden behind Discord's main window." ]
+                            [ Paragraph [ Text "I also noticed that clicking on a window sometimes doesn't bring it to front either. Usually clicking it a second time does the trick though." ] ]
+                        , Paragraph [ Text "When I restart Ubuntu, it doesn't remember if a window was on my primary or secondary screen and always opens it on my primary screen." ]
+                        , Paragraph [ Text "Selecting \"Suspend\" instead of \"Log Out...\" or \"Power Off...\" is a mistake. When I returned 30 minutes later, all the UI was corrupted with RGB noise and the UI was too laggy to interact ", AltText "with" " (it was running at a smooth 10 seconds per frame)", Text ". Restarting the computer fixed the issue." ]
                         ]
                     , Section "Lets take a little break to list some positive things"
                         [ BulletList
                             []
-                            [ Paragraph [ Text "Unlike on Windows, snapping two windows to two halves of the screen actually works without one of them overlapping the other slightly." ]
-                            , Paragraph [ Text "My secondary screens speakers don't get lost when waking the computer. On Windows I would have to disable some random virtual speaker to get the OS to detect the secondary screen's speakers again." ]
-                            , Paragraph [ Text "No more Windows line endings (I have been burned so many times debugging code where this turned out to be the issue)." ]
+                            [ Paragraph [ Text "Unlike on Windows, snapping two windows to separate halves of the screen actually works without one of them overlapping the other slightly." ]
+                            , Paragraph [ Text "My secondary screens speakers don't get lost when waking the computer from sleep mode. On Windows I would have to disable some random virtual speaker to get the OS to detect the secondary screen's speakers again." ]
+                            , Paragraph [ Text "No more Windows line endings. I have been burned so many times debugging code where this turned out to be the issue." ]
                             , Paragraph [ Text "No more case insensitive file paths" ]
                             , Paragraph [ Text "Ubuntu feels less laggy than Windows" ]
                             ]
                         ]
-                    , Section "Last couple issues"
+                    , Section "Last couple of issues"
                         [ BulletList
                             []
                             [ BulletList
-                                [ Text "Ubuntu actually started feeling more laggy suddenly. By random luck, I happened to check how much space was available on my primary partition and it only had a few GB left. Turns out Discord had been spamming syslog with a few KB of text every second for several days. Clearing out syslog fixed the lag and I decided to stop using Discord's native app and just run it from the browser." ]
-                                [ Paragraph [ Text "Narrowing down where all the file space was getting used up was its own challenge. The file explorer won't say how large a folder is. Tech support friend suggested I install filelight but that gave me a ", Code "QQmlApplicationEngine failed to load component qrc:/ui/main.qml:8:1: module \"org.kde.config\" is not installed", Text " error message (apparently it's only for KDE, not Gnome). Then we tried baobab which worked." ] ]
-                            , Paragraph [ Text "Ubuntu said there were OS updates ready. The next time I restarted Ubuntu they were applied. I'm not sure exactly what was in that update but it switched me from ", Code "NVIDIA driver metapackage from nvidia-driver-575 (proprietary, tested)", Text " to ", Code "NVIDIA driver metapackage from nvidia-driver-570 (proprietary)", Text " in the Software & Updates window. This in turn caused my secondary screen to no longer get detected and force my primary 4K screen to display 1024x768. Amazingly I managed to solve this one without help from tech support friend." ]
-                            , Paragraph [ Text "Every time I start my computer, Ubuntu asks if I want to submit a crash report for Gitkraken even though it hasn't started yet (maybe it tried to auto start and failed)" ]
+                                [ Text "Ubuntu started feeling more laggy suddenly. By random luck, I happened to check how much space was available on my primary partition and it only had a few GB left. Turns out Discord had been spamming syslog with a few KB of text every second for several days. Clearing out syslog fixed the lag and I decided to stop using Discord's native app and just run it from the browser." ]
+                                [ Paragraph [ Text "Narrowing down where all the diskspace was going was its own challenge. The file explorer won't say how large a folder is. Tech support friend suggested I install filelight but that gave me a ", Code2 "QQmlApplicationEngine failed to load component qrc:/ui/main.qml:8:1: module \"org.kde.config\" is not installed", Text " error message (apparently it's only for KDE, not Gnome). Finally we tried baobab which worked." ] ]
+                            , Paragraph [ Text "Ubuntu said there were OS updates ready. I'm not sure exactly what was in that update but it switched me from ", Code2 "NVIDIA driver metapackage from nvidia-driver-575 (proprietary, tested)", Text " to ", Code2 "NVIDIA driver metapackage from nvidia-driver-570 (proprietary)", Text " in the \"Software & Updates\" app. This in turn caused my secondary screen to no longer get detected and force my primary 4K screen to display 1024x768. Amazingly I managed to solve this one without help from tech support friend." ]
+                            , Paragraph [ Text "Each time after I start my computer, Ubuntu asks if I want to submit a crash report for Gitkraken. I guess Gitkraken is trying to automatically start and failing to do so. I can't figure out how to make Gitkraken stop doing that." ]
                             ]
                         ]
                     ]
-                , Paragraph [ Text "And that's everything I wrote down from over the span of a week or two. Most of these issues happened within the first couple days. Since then it's settled down and things are running smoothly. There's a good chance that some of these issues really are my own fault or at least not Ubuntu's fault. I listed them anyway because from a new user's perspective, they probably won't care too much who is to blame, just that things don't work how they expect." ]
+                , Paragraph [ Text "And that's everything I wrote down from over the span of a week or two. Most of these issues happened within the first couple days. Since then it's settled down and things are running smoothly. Some of these issues probably are my own fault or at least not Ubuntu's fault. I listed them anyway because from a new user's perspective they probably won't care who is to blame." ]
                 ]
             ]
         , pageLastUpdated = websiteReleasedAt
