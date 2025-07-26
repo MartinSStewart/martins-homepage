@@ -26,8 +26,10 @@ import Task
 import Things exposing (Tag(..), ThingType(..))
 import Time exposing (Month(..))
 import Ui
+import Ui.Events
 import Ui.Font
 import Ui.Input
+import Ui.Lazy
 import Ui.Responsive
 import Ui.Shadow
 import UrlPath
@@ -35,7 +37,7 @@ import View exposing (View)
 
 
 type alias Model =
-    { filter : Set String, worstTier : Line, topTier : Line }
+    { filter : Set String, worstTier : Line, topTier : Line, timelineEventHover : Maybe String }
 
 
 type Msg
@@ -43,6 +45,8 @@ type Msg
     | GotWorstTierPosition (Result Browser.Dom.Error (List Browser.Dom.Element))
     | GotTopTierPosition (Result Browser.Dom.Error (List Browser.Dom.Element))
     | WindowResized
+    | MouseEnterTimelineEvent String
+    | MouseLeaveTimelineEvent String
 
 
 type SortBy
@@ -91,6 +95,7 @@ init app _ =
     ( { filter = Set.empty
       , worstTier = NoLine
       , topTier = NoLine
+      , timelineEventHover = Nothing
       }
     , getElements
     )
@@ -168,6 +173,21 @@ update app _ msg model =
 
         GotTopTierPosition result ->
             ( { model | topTier = getLines result }, Cmd.none )
+
+        MouseEnterTimelineEvent id ->
+            ( { model | timelineEventHover = Just id }, Cmd.none )
+
+        MouseLeaveTimelineEvent id ->
+            ( { model
+                | timelineEventHover =
+                    if Just id == model.timelineEventHover then
+                        Nothing
+
+                    else
+                        model.timelineEventHover
+              }
+            , Cmd.none
+            )
 
 
 getLines : Result error (List Browser.Dom.Element) -> Line
@@ -572,7 +592,7 @@ view app _ model =
                     [ Ui.spacing 16 ]
                     [ filterView sortBy model
                     , if sortBy == Chronological then
-                        timelineView app.data.thingsIHaveDone
+                        timelineView app.data.thingsIHaveDone model
 
                       else
                         Ui.row
@@ -598,8 +618,8 @@ view app _ model =
     }
 
 
-timelineView : Dict String Thing -> Ui.Element msg
-timelineView things =
+timelineView : Dict String Thing -> Model -> Ui.Element Msg
+timelineView things model =
     let
         things2 : Dict ( Int, Int ) (List ( String, Thing ))
         things2 =
@@ -630,17 +650,18 @@ timelineView things =
                 Dict.empty
                 (Dict.toList things)
 
-        durations : List { startedAt : Int, endedAt : Int, name : String, color : Ui.Color, columnIndex : Int }
+        durations : List { id : Maybe String, startedAt : Int, endedAt : Int, name : String, color : Ui.Color, columnIndex : Int }
         durations =
             List.filterMap
-                (\( _, thing ) ->
+                (\( id, thing ) ->
                     case thing.thingType of
                         OtherThing { releasedAt } ->
                             Nothing
 
                         JobThing { startedAt, endedAt, columnIndex } ->
                             Just
-                                { startedAt = yearAndMonthToCount (Date.year startedAt) (Date.month startedAt)
+                                { id = Just id
+                                , startedAt = yearAndMonthToCount (Date.year startedAt) (Date.month startedAt)
                                 , endedAt =
                                     case endedAt of
                                         Just a ->
@@ -675,7 +696,7 @@ timelineView things =
                 )
                 (Dict.toList things)
     in
-    timelineViewHelper currentDate2 9 [] things2 durations
+    timelineViewHelper currentDate2 9 [] things2 durations model
 
 
 yearAndMonthToCount : Int -> Month -> Int
@@ -706,17 +727,17 @@ currentDate2 =
     yearAndMonthToCount 2025 Sep
 
 
-timelineBlock : Ui.Color -> String -> Int -> Int -> Int -> Maybe (Ui.Element msg)
-timelineBlock color text startDate endDate count =
+timelineBlock : Maybe String -> Ui.Color -> String -> Int -> Int -> Int -> Maybe (Ui.Element msg)
+timelineBlock maybeId color text startDate endDate count =
     if endDate <= count || startDate > count then
         Nothing
 
     else
         Ui.el
-            [ Ui.width (Ui.px timelineBlockWidth)
-            , Ui.height Ui.fill
-            , Ui.background color
-            , if endDate == count + 6 then
+            ([ Ui.width (Ui.px timelineBlockWidth)
+             , Ui.height Ui.fill
+             , Ui.background color
+             , if endDate == count + 6 then
                 Ui.inFront
                     (Ui.el
                         [ Ui.rotate (Ui.turns 0.75)
@@ -727,9 +748,19 @@ timelineBlock color text startDate endDate count =
                         (Ui.text text)
                     )
 
-              else
+               else
                 Ui.noAttr
-            ]
+             ]
+                ++ (case maybeId of
+                        Just id ->
+                            [ Html.Attributes.attribute "elm-pages:prefetch" "" |> Ui.htmlAttribute
+                            , Ui.link (Route.toString (Route.Stuff__Slug_ { slug = id }))
+                            ]
+
+                        Nothing ->
+                            []
+                   )
+            )
             Ui.none
             |> Just
 
@@ -742,11 +773,12 @@ timelineBlockWidth =
 timelineViewHelper :
     Int
     -> Int
-    -> List (Ui.Element msg)
+    -> List (Ui.Element Msg)
     -> Dict ( Int, Int ) (List ( String, Thing ))
-    -> List { startedAt : Int, endedAt : Int, name : String, color : Ui.Color, columnIndex : Int }
-    -> Ui.Element msg
-timelineViewHelper currentDate count list thingsSorted durations =
+    -> List { id : Maybe String, startedAt : Int, endedAt : Int, name : String, color : Ui.Color, columnIndex : Int }
+    -> Model
+    -> Ui.Element Msg
+timelineViewHelper currentDate count list thingsSorted durations model =
     let
         month : Int
         month =
@@ -756,13 +788,13 @@ timelineViewHelper currentDate count list thingsSorted durations =
         year =
             1993 + count // 12
 
-        columns : List (Ui.Element msg)
+        columns : List (Ui.Element Msg)
         columns =
             List.foldl
-                (\{ startedAt, endedAt, name, color, columnIndex } list2 ->
-                    case timelineBlock color name startedAt endedAt count of
-                        Just a ->
-                            List.Extra.setAt (columnIndex - 1) (Just a) list2
+                (\a list2 ->
+                    case timelineBlock a.id a.color a.name a.startedAt a.endedAt count of
+                        Just element ->
+                            List.Extra.setAt (a.columnIndex - 1) (Just element) list2
 
                         Nothing ->
                             list2
@@ -809,27 +841,20 @@ timelineViewHelper currentDate count list thingsSorted durations =
                         Ui.noAttr
                     ]
                     (Ui.text (String.fromInt year ++ " " ++ monthToString month))
-                 , timelineBlock (Ui.rgb 100 100 100) "No programming dark ages" bornAt darkAgesEnd count
+                 , timelineBlock Nothing (Ui.rgb 100 100 100) "No programming dark ages" bornAt darkAgesEnd count
                     |> Maybe.withDefault Ui.none
-                 , timelineBlock Things.gameMakerColor "GameMaker era" darkAgesEnd gameMakerEraEnd count
+                 , timelineBlock Nothing Things.gameMakerColor "GameMaker era" darkAgesEnd gameMakerEraEnd count
                     |> Maybe.withDefault Ui.none
-                 , timelineBlock Things.csharpColor "C# era" gameMakerEraEnd csharpEraEnd count
+                 , timelineBlock Nothing Things.csharpColor "C# era" gameMakerEraEnd csharpEraEnd count
                     |> Maybe.withDefault Ui.none
-                 , timelineBlock Things.elmColor "Elm era" csharpEraEnd currentDate count |> Maybe.withDefault Ui.none
+                 , timelineBlock Nothing Things.elmColor "Elm era" csharpEraEnd currentDate count |> Maybe.withDefault Ui.none
                  ]
                     ++ columns
                     ++ [ case Dict.get ( year, month ) thingsSorted of
                             Just things ->
                                 List.map
                                     (\( id, thing ) ->
-                                        Ui.image
-                                            [ Ui.width (Ui.px 39)
-                                            , Ui.height (Ui.px 39)
-                                            , Ui.alignBottom
-                                            , Html.Attributes.attribute "elm-pages:prefetch" "" |> Ui.htmlAttribute
-                                            , Ui.link (Route.toString (Route.Stuff__Slug_ { slug = id }))
-                                            ]
-                                            { source = thing.previewImage, description = thing.name, onLoad = Nothing }
+                                        Ui.Lazy.lazy3 timelineEvent id thing (Just id == model.timelineEventHover)
                                     )
                                     things
                                     |> Ui.row [ Ui.spacing 4 ]
@@ -842,6 +867,69 @@ timelineViewHelper currentDate count list thingsSorted durations =
             )
             thingsSorted
             durations
+            model
+
+
+timelineEvent : String -> Thing -> Bool -> Ui.Element Msg
+timelineEvent id thing showPreview =
+    Ui.image
+        [ Ui.width (Ui.px 39)
+        , Ui.height (Ui.px 39)
+        , Ui.alignBottom
+        , Html.Attributes.attribute "elm-pages:prefetch" "" |> Ui.htmlAttribute
+        , Ui.link (Route.toString (Route.Stuff__Slug_ { slug = id }))
+        , Ui.Events.onMouseEnter (MouseEnterTimelineEvent id)
+        , Ui.Events.onMouseLeave (MouseLeaveTimelineEvent id)
+        , if showPreview then
+            Ui.row
+                [ Ui.rounded 8
+                , Ui.spacing 16
+                , Ui.background (Ui.rgb 255 255 255)
+                , Ui.move { x = -150 + 20, y = 50, z = 0 }
+                , Ui.border 1
+                , Ui.width (Ui.px 300)
+                , Ui.htmlAttribute (Html.Attributes.style "z-index" "999")
+                , Ui.padding 8
+                , Ui.htmlAttribute (Html.Attributes.style "pointer-events" "none")
+                , Ui.el
+                    [ Ui.htmlAttribute (Html.Attributes.style "border-left" "10px solid transparent")
+                    , Ui.htmlAttribute (Html.Attributes.style "border-right" "10px solid transparent")
+                    , Ui.htmlAttribute (Html.Attributes.style "border-bottom" "10px solid white")
+                    , Ui.width (Ui.px 0)
+                    , Ui.centerX
+                    , Ui.move { x = 0, y = -9, z = 0 }
+                    ]
+                    Ui.none
+                    |> Ui.inFront
+                , Ui.el
+                    [ Ui.htmlAttribute (Html.Attributes.style "border-left" "10px solid transparent")
+                    , Ui.htmlAttribute (Html.Attributes.style "border-right" "10px solid transparent")
+                    , Ui.htmlAttribute (Html.Attributes.style "border-bottom" "10px solid black")
+                    , Ui.width (Ui.px 0)
+                    , Ui.centerX
+                    , Ui.move { x = 0, y = -10, z = 0 }
+                    ]
+                    Ui.none
+                    |> Ui.inFront
+                ]
+                [ Ui.image
+                    [ Ui.width (Ui.px 100) ]
+                    { source = thing.previewImage
+                    , description = "Preview image"
+                    , onLoad = Nothing
+                    }
+                , Ui.column
+                    []
+                    [ Ui.el [ Ui.Font.bold ] (Ui.text thing.name)
+                    , Ui.text thing.previewText
+                    ]
+                ]
+                |> Ui.inFront
+
+          else
+            Ui.noAttr
+        ]
+        { source = thing.previewImage, description = thing.name, onLoad = Nothing }
 
 
 monthToString : Int -> String

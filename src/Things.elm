@@ -63,6 +63,9 @@ tagData tag =
         Javascript ->
             { text = "JS", color = Ui.rgb 217 197 70, tooltip = "Made using JavaScript" }
 
+        OtherTag ->
+            { text = "Other", color = Ui.rgb 120 120 120, tooltip = "Other stuff" }
+
 
 gameMakerColor : Ui.Color
 gameMakerColor =
@@ -1486,7 +1489,7 @@ myTypeCodec =
         }
       )
     , lamderaPackage "containers" LamderaContainers.content (date 2024 Sep 22) (date 2024 Sep 22) ""
-    , ( "linux"
+    , ( "switching-to-ubuntu"
       , { name = "Switching to Ubuntu"
         , website = Nothing
         , tags = []
@@ -1574,7 +1577,7 @@ myTypeCodec =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/linux-preview.svg"
-        , previewText = "After many years primarily as a Windows user, I finally switched to Linux"
+        , previewText = "After many years as a Windows user, I finally switched to Linux"
         , thingType =
             OtherThing
                 { releasedAt = date 2025 Jul 5
@@ -1640,7 +1643,7 @@ qualityOrder =
     , "code-breakers"
     , "memo-2020-credits"
     , "surface-voyage"
-    , "linux"
+    , "switching-to-ubuntu"
     , "moment-of-the-month"
     , "question-and-answer"
     , "elm-email"
@@ -1706,6 +1709,7 @@ type Tag
     | FSharp
     | Javascript
     | GameJam
+    | OtherTag
 
 
 allTags : List Tag
@@ -1723,6 +1727,7 @@ allTags =
     , GameMaker
     , CSharp
     , Lamdera
+    , OtherTag
     ]
 
 
