@@ -14,6 +14,7 @@ import Set exposing (Set)
 import SyntaxHighlight
 import Ui
 import Ui.Font
+import Ui.Prose
 import Url
 
 
@@ -576,19 +577,21 @@ externalLinkHtml text url =
         , Html.Attributes.target "_blank"
         , Html.Attributes.rel "noopener noreferrer"
         ]
-        [ Html.text text
+        [ Html.text (text ++ "\u{2009}")
         , Icons.externaLinkHtml
         ]
 
 
 externalLink : Int -> String -> String -> Ui.Element msg
 externalLink fontSize text url =
-    Ui.row
+    Ui.Prose.paragraph
         [ Ui.linkNewTab ("https://" ++ url)
         , Ui.Font.color (Ui.rgb 20 100 255)
         , Ui.Font.size fontSize
+        , Ui.Font.lineHeight 1.2
+        , Ui.paddingXY 0 8
         ]
-        [ Ui.text text
+        [ Ui.text (text ++ "\u{2009}")
         , Ui.el [ Ui.Font.size (round (toFloat fontSize * 12 / 16)), Ui.paddingLeft 2 ] Icons.externaLink
         ]
 

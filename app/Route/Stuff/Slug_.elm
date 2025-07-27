@@ -251,12 +251,23 @@ title thing =
             { source = thing.previewImage, description = "Preview image", onLoad = Nothing }
         , Ui.column
             []
-            [ case thing.website of
+            [ Ui.image
+                [ Ui.width (Ui.px 200)
+                , Ui.centerX
+                , Ui.Responsive.visible Shared.breakpoints [ Mobile ]
+                , Ui.paddingBottom 16
+                ]
+                { source = thing.previewImage, description = "Preview image", onLoad = Nothing }
+            , case thing.website of
                 Just url ->
                     Formatting.externalLink 36 thing.name url
 
                 Nothing ->
-                    Ui.el [ Ui.Font.size 36 ] (Ui.text thing.name)
+                    Ui.el
+                        [ Ui.Font.size 36
+                        , Ui.Font.lineHeight 1.2
+                        ]
+                        (Ui.text thing.name)
             , Ui.row
                 [ Ui.wrap, Ui.spacing 16, Ui.Font.size 14 ]
                 [ case thing.thingType of
@@ -265,7 +276,7 @@ title thing =
 
                     JobThing { startedAt, endedAt, elmPercentage } ->
                         Ui.Prose.paragraph
-                            []
+                            [ Ui.paddingXY 0 4 ]
                             ([ Ui.text "Employed between "
                              , dateView startedAt
                              , Ui.text " and "

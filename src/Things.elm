@@ -220,7 +220,13 @@ thingsIHaveDone =
                     , Image "/ascii-collab/touhou.png" [ ExternalLink "Touhou girls by yosicat" "ascii-collab.app/?x=-762&y=87" ]
                     , Image "/ascii-collab/presentation2.png" [ ExternalLink "The second presentation I gave about how I designed ascii-collab (the first one is on the poster)." "ascii-collab.app/?x=3201&y=5943" ]
                     , Image "/ascii-collab/instruments.png" [ ExternalLink "Music instruments drawn by Tilly, me, and two anonymous people" "ascii-collab.app/?x=-826&y=-151" ]
-                    , PixelImage 492 156 "/ascii-collab/portraits.png" [ ExternalLink "Can you tell what these three portraits are?" "ascii-collab.app/?x=-184&y=169", AltText " Click here for answers" "American Gothic, The Scream, and Dos Equis's \"Most interesting man in the world\"" ]
+                    , PixelImage 492
+                        156
+                        "/ascii-collab/portraits.png"
+                        [ ExternalLink "Can you tell what these three portraits are?" "ascii-collab.app/?x=-184&y=169"
+                        , AltText " Click here for answers" "American Gothic, The Scream, and Dos Equis's "
+                        , Quote "Most interesting man in the world"
+                        ]
                     , PixelImage 385 309 "/ascii-collab/sandwich.png" [ ExternalLink "A sandwich by me" "ascii-collab.app/?x=-722&y=-150" ]
                     , PixelImage 765 414 "/ascii-collab/moon.png" [ ExternalLink "[A] man on the moon by me" "ascii-collab.app/?x=92&y=-244" ]
                     , PixelImage 356 144 "/ascii-collab/sleeping.png" [ ExternalLink "Sleeping creature by Mushex" "ascii-collab.app/?x=1178&y=-48" ]
@@ -517,7 +523,13 @@ thingsIHaveDone =
         , tags = [ Elm, Lamdera ]
         , description =
             [ Paragraph [ Text "A game played with a group of friends where everyone is given the same list of questions and in secret everyone tries to pick the same answers as everyone else. Once everyone is done, for each question you count the number of answers that match your own. Whoever has the most matches in total wins." ]
-            , Paragraph [ Text "I didn't come up with this idea, it's probably a pretty old concept. But I did make this app to speed up the process of collecting answers and displaying the results. My friends and I play it twice a year. I organize the \"summer sheep game\" and a friend organizes the \"winter sheep game\" (that way we both get once chance to participate each year)." ]
+            , Paragraph
+                [ Text "I didn't come up with this idea, it's probably a pretty old concept. But I did make this app to speed up the process of collecting answers and displaying the results. My friends and I play it twice a year. I organize the "
+                , Quote "summer sheep game"
+                , Text " and a friend organizes the "
+                , Quote "winter sheep game"
+                , Text " (that way we both get once chance to participate each year)."
+                ]
             , Paragraph [ ExternalLink "Here's an example" "sheep-game.lamdera.app/join/a217210861", Text " of what it looks like when I played it with some Elm community members" ]
             ]
         , pageLastUpdated = websiteReleasedAt
@@ -619,7 +631,13 @@ thingsIHaveDone =
       , { name = "Sanctum"
         , website = Nothing
         , tags = [ Game, GameMaker, GameJam ]
-        , description = [ Paragraph [ Text "I created this for the Game Maker Community game jam #3. Everyone had 3 days to make a game themed around the word \"live\". There were 56 entries and I placed 16th." ] ]
+        , description =
+            [ Paragraph
+                [ Text "I created this for the Game Maker Community game jam #3. Everyone had 3 days to make a game themed around the word "
+                , Quote "live"
+                , Text ". There were 56 entries and I placed 16th."
+                ]
+            ]
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/game-maker-preview.png"
@@ -1120,9 +1138,18 @@ myTypeCodec =
         , website = Nothing
         , tags = [ Game, GameMaker, GameJam ]
         , description =
-            [ Paragraph [ Text "A puzzle game I made for the 5th Game Maker Community game jam (aka GMC Jam). Participants had 72 hours to make a game themed around the word \"facade\"." ]
+            [ Paragraph
+                [ Text "A puzzle game I made for the 5th Game Maker Community game jam (aka GMC Jam). Participants had 72 hours to make a game themed around the word "
+                , Quote "facade"
+                , Text "."
+                ]
             , Video "res.cloudinary.com/dqqkfcvf6/video/upload/f_auto:video,q_auto/v1/martins-homepage/xfbuk6m7ilq4y9oywldj"
-            , Paragraph [ Link "Last time I participated in the GMC Jam" (Stuff__Slug_ { slug = "sanctum" }), Text " I got 16th place, but this time I tied for 1st! As a result, I won a ", AltText "Mr.\u{00A0}Karoshi tshirt" "(Mr.\u{00A0}Karoshi is a rather grim puzzle game where you help an office worker kill themselves)", Text ", a coffee mug with YoYo Games branding, and free copy of Game Maker Studio pro!" ]
+            , Paragraph
+                [ Link "Last time I participated in the GMC Jam" (Stuff__Slug_ { slug = "sanctum" })
+                , Text " I got 16th place, but this time I tied for 1st! As a result, I won a "
+                , AltText "Mr.\u{00A0}Karoshi tshirt" "(Mr.\u{00A0}Karoshi is a rather grim puzzle game where you help an office worker kill themselves)"
+                , Text ", a coffee mug with YoYo Games branding, and free copy of Game Maker Studio pro!"
+                ]
             , Image "/break-the-facade/mr-karoshi.jpg" [ Text "The Mr.\u{00A0}Karoshi t-shirt I won" ]
             , Paragraph [ Text "I think my favorite thing to come out of that years GMC Jam was a Youtuber named raocow deciding to play every game ", AltText "made for it" "(I believe that was the only GMC Jam he did. I can't find the source but I think he said it was too much work playing 60 or so mostly bad video games)", Text ". ", ExternalLink "Here he is playing Break the Facade" "www.youtube.com/watch?v=7ITH8CZXkbk", Text ". Judging by his comments towards the end of the video and the video description being ", Quote "I've oft repeated how much I like this general sort of both game and looks, so it'd be useless to repeat, even if I pretty much just did.", Text " I think it's safe to say he enjoyed playing it!" ]
             , Image "/break-the-facade/zig-winna-banner.png" [ Text "Someone drew banners for the top 3 places (or perhaps more, not sure). Here's mine! And yes, I picked Ziggler1 as my username on the GMC forums. Thanks past me." ]
@@ -1211,7 +1238,14 @@ myTypeCodec =
         , website = Nothing
         , tags = [ Elm ]
         , description =
-            [ Paragraph [ Text "I made a simple website that lists my friends birthdays ordered by how soon it will be. When it is someone's birthday, the website will show ", Quote "Happy Birthday <name>!", Text " with a image of a party hat. For a while me and my friends used this. Eventually though ", Link "my discord bot" (Stuff__Slug_ { slug = "discord-bot" }), Text " took over keeping track of birthdays." ]
+            [ Paragraph
+                [ Text "I made a simple website that lists my friends birthdays ordered by how soon it will be. When it is someone's birthday, the website shows "
+                , Quote "Happy Birthday <name>!"
+                , Text " with an image of a party hat. For a while me and my friends used this. Eventually though "
+                , Link "my discord bot" (Stuff__Slug_ { slug = "discord-bot" })
+                , Text " took over keeping track of birthdays."
+                ]
+            , Image "/birthday-list/party-hat.png" [ Text "Party hat!" ]
             , Paragraph [ Text "Unfortunately I can't show the website itself or the code since it has personal information." ]
             ]
         , pageLastUpdated = websiteReleasedAt
@@ -1492,7 +1526,7 @@ myTypeCodec =
     , ( "switching-to-ubuntu"
       , { name = "Switching to Ubuntu"
         , website = Nothing
-        , tags = []
+        , tags = [ OtherTag ]
         , description =
             [ Paragraph [ Text "This particular version of the Linux logo was found ", ExternalLink "here" "brandlogos.net/linux-logo-svg-92851.html", Text ". Thanks Jack!" ]
             , Section
@@ -1522,7 +1556,11 @@ myTypeCodec =
                 , Section "The issues I ran into"
                     [ BulletList
                         [ Text "The rest of this article will just be issues I ran into in the order I encountered them." ]
-                        [ Paragraph [ Text "There were two options for booting from my flash drive. One had a name that started with \"UEFI\" and the other didn't. I picked the latter which got me stuck later at the harddrive partitioning step with no indication at all as to what I had done wrong. Fortunately tech support friend managed to figure out what I did wrong." ]
+                        [ Paragraph
+                            [ Text "There were two options for booting from my flash drive. One had a name that started with"
+                            , Quote "UEFI"
+                            , Text " and the other didn't. I picked the latter which got me stuck later at the harddrive partitioning step with no indication at all as to what I had done wrong. Fortunately tech support friend managed to figure out what I did wrong."
+                            ]
                         , Paragraph [ Text "The Ubuntu setup menu is too small for large screens and isn't resizable." ]
                         , Paragraph
                             [ Text "Firefox comes pre-installed with Ubuntu. That gave me hope that it should just work. It, however, is laggy. And the lag is proportional to how large I make the window. I checked "
@@ -1530,7 +1568,14 @@ myTypeCodec =
                             , Text " and yup, it's in software rendering mode and I can't figure out how to make it use my GPU. Neither tech support friend nor another Linux friend could figure out either."
                             ]
                         , Paragraph [ Text "I installed Dropbox and had it start downloading files. Despite have an internet speed in the megabit range, Dropbox was running at 20kb/s and estimated it would take a week to finish. I decided to just ditch Dropbox and asked tech support friend for an alternative. He suggested SyncThing which is an open source peer to peer file host. That saves me 100 USD/year in Dropbox fees!" ]
-                        , Paragraph [ Text "While in the middle of the previous thing, I tried updating Firefox in case that would fix the lag. Clicking \"update\" for Firefox in the app center gave me a \"We're sorry, we're not sure what the error is\"", AltText " popup" "(I haven't seen that error ever again, I'm not sure what caused it)", Text "." ]
+                        , Paragraph
+                            [ Text "While in the middle of the previous thing, I tried updating Firefox in case that would fix the lag. Clicking "
+                            , Quote "update"
+                            , Text " for Firefox in the app center gave me a "
+                            , Quote "We're sorry, we're not sure what the error is"
+                            , AltText " popup" "(I haven't seen that error ever again, I'm not sure what caused it)"
+                            , Text "."
+                            ]
                         , BulletList
                             [ Text "I installed Gitkraken, my favorite Git client. When logging in, it would consistently freeze and crash after typing a letter into the email address field. I solved this by installing Gitkraken the homepage rather than through the Ubuntu app center." ]
                             [ Paragraph [ Text "While doing this, I learned that in the Linux world, amd64 means x86_64. If tech support friend hadn't told me this I would have thought there was no .deb install available for my Intel CPU." ]
@@ -1538,21 +1583,36 @@ myTypeCodec =
                             ]
                         , Paragraph [ Text "This isn't an issue but it was at this point tech support friend suggested maybe I should start making a list of all the issues to turn into an article later. " ]
                         , Paragraph [ Text "I guess this isn't really an issue either, but coming from Windows, I was annoyed that clicking the mouse wheel and then moving the mouse doesn't let me scroll." ]
-                        , Paragraph [ Text "If I click \"Open\" in the app center to start an app, there's no indication that the app is opening. This caused me to click on it multiple times which then causes errors messages as multiple instances of the app start and presumably start fighting over file handles or something." ]
+                        , Paragraph
+                            [ Text "If I click "
+                            , Quote "Open"
+                            , Text " in the app center to start an app, there's no indication that the app is opening. This caused me to click on it multiple times which then causes errors messages as multiple instances of the app start and presumably start fighting over file handles or something."
+                            ]
                         , Paragraph [ Text "Ubuntu automatically gives UUID folder names to partitions it finds (instead of something easy to remember and quick to type like ", Code "E:\\", Text " on Windows)" ]
                         , Paragraph [ Text "I tried deleting a folder via the file explorer. I didn't see any visual feedback so I tried deleting it again and got a weird error message about not being able to access a file inside the folder. Turns out Ubuntu was trying to delete the files twice and got confused." ]
                         , Paragraph
-                            [ Text "The \"Show apps\" fullscreen menu for quickly picking an app to start has tiny buttons for navigating to the next or previous page despite the enormous amount of empty space available. If there were any hotkeys for this purpose then they weren't obvious enough for me to find them."
+                            [ Text "The "
+                            , Quote "Show apps"
+                            , Text " fullscreen menu for quickly picking an app to start has tiny buttons for navigating to the next or previous page despite the enormous amount of empty space available. If there were any hotkeys for this purpose then they weren't obvious enough for me to find them."
                             ]
                         , Paragraph [ Text "The tooltip that appears when hovering my cursor over folders in the file explorer sidebar is horizontally compressed and distorted, making it impossible to read." ]
                         , Paragraph [ Text "I increased the OS UI scaling to 150% to better fit my screen. This caused loads of visual artefacts for all the opened apps that wouldn't go away until I restarted ", AltText "them." "Tech support friend suggested I switch from Gnome to KDE. As of writing I haven't tried this yet. Maybe doing so will solve many of the UI issues I've listed here." ]
                         , BulletList
-                            [ Text "I wanted to play ", AltText "Enigma." " My dad had Knoppix on a CD and I'd sometimes boot the family computer from it and play the games included, one of which was the puzzle game Enigma. This is all to say, I have nostalgia for that game.", Text " The app center has two versions available. Unfortunately the page wouldn't load for one and for the other it wouldn't open after installed. The solution was to run ", Code2 "apt install Enigma", Text " via the terminal." ]
+                            [ Text "I wanted to play "
+                            , AltText "Enigma." " My dad had Knoppix on a CD and I'd sometimes boot the family computer from it and play the games included, one of which was the puzzle game Enigma. This is all to say, I have nostalgia for that game."
+                            , Text " The app center has two versions available. Unfortunately the page wouldn't load for one and for the other it wouldn't open after installed. The solution was to run "
+                            , Code2 "apt install Enigma"
+                            , Text " via the terminal."
+                            ]
                             [ Paragraph [ Text "Related to this, there's too many ways to install apps. App center, apt, direct download from a website and then also decide between using the Debian or Snap version of each app." ] ]
-                        , Paragraph [ Text "I noticed that in some ", AltText "apps" "(Chromium for example)", Text ", buttons would just not work. After some clicking around, I realize the clickable area was offset based on how far the button was from the top left corner of the screen. Changing OS zoom to 150% was the culprit. I switched it back to 100% and instead increased the zoom amount individually in all apps that supported it." ]
+                        , Paragraph
+                            [ Text "I noticed that in some "
+                            , AltText "apps" "(Chromium for example)"
+                            , Text ", buttons would just not work. After some clicking around, I realize the clickable area was offset based on how far the button was from the top left corner of the screen. Changing OS zoom to 150% was the culprit. I switched it back to 100% and instead increased the zoom amount individually in all apps that supported it."
+                            ]
                         , Paragraph [ Text "The standard Ctrl + C and Ctrl + V copy paste commands don't work in the default terminal. A bit annoying to get used to different hotkeys." ]
                         , BulletList
-                            [ Text "To make an app start when the computer starts, I need to go to \"Startup Application Preferences\" and then provide the path to the app's executable file. I would have expected Ubuntu to just list all the of the installed apps and only have the file path option available for more advanced use cases." ]
+                            [ Text "To make an app start when the computer starts, I need to go to ", Quote "Startup Application Preferences", Text " and then provide the path to the app's executable file. I would have expected Ubuntu to just list all the of the installed apps and only have the file path option available for more advanced use cases." ]
                             [ Paragraph [ Text "Discord helpfully has its own checkbox to have it run on startup. Unfortunately it doesn't work." ] ]
                         , BulletList
                             [ Text "At startup, folders contained in other partitions aren't accessible to any apps until I access that partition via the file explorer. This leads to problems for Intellij and Gitkraken when they try to automatically show the last project I was working on." ]
@@ -1561,7 +1621,17 @@ myTypeCodec =
                             [ Text "Popup windows sometimes appear behind other windows. This tripped me up when I was trying to do a screenshare on Discord and the window for selecting which screen to share wasn't visible because it was hidden behind Discord's main window." ]
                             [ Paragraph [ Text "I also noticed that clicking on a window sometimes doesn't bring it to front either. Usually clicking it a second time does the trick though." ] ]
                         , Paragraph [ Text "When I restart Ubuntu, it doesn't remember if a window was on my primary or secondary screen and always opens it on my primary screen." ]
-                        , Paragraph [ Text "Selecting \"Suspend\" instead of \"Log Out...\" or \"Power Off...\" is a mistake. When I returned 30 minutes later, all the UI was corrupted with RGB noise and the UI was too laggy to interact ", AltText "with" " (it was running at a smooth 10 seconds per frame)", Text ". Restarting the computer fixed the issue." ]
+                        , Paragraph
+                            [ Text "Selecting "
+                            , Quote "Suspend"
+                            , Text " instead of "
+                            , Quote "Log Out..."
+                            , Text " or "
+                            , Quote "Power Off..."
+                            , Text " is a mistake. When I returned 30 minutes later, all the UI was corrupted with RGB noise and the UI was too laggy to interact "
+                            , AltText "with" " (it was running at a smooth 10 seconds per frame)"
+                            , Text ". Restarting the computer fixed the issue."
+                            ]
                         ]
                     , Section "Lets take a little break to list some positive things"
                         [ BulletList
@@ -1578,8 +1648,21 @@ myTypeCodec =
                             []
                             [ BulletList
                                 [ Text "Ubuntu started feeling more laggy suddenly. By random luck, I happened to check how much space was available on my primary partition and it only had a few GB left. Turns out Discord had been spamming syslog with a few KB of text every second for several days. Clearing out syslog fixed the lag and I decided to stop using Discord's native app and just run it from the browser." ]
-                                [ Paragraph [ Text "Narrowing down where all the diskspace was going was its own challenge. The file explorer won't say how large a folder is. Tech support friend suggested I install filelight but that gave me a ", Code2 "QQmlApplicationEngine failed to load component qrc:/ui/main.qml:8:1: module \"org.kde.config\" is not installed", Text " error message (apparently it's only for KDE, not Gnome). Finally we tried baobab which worked." ] ]
-                            , Paragraph [ Text "Ubuntu said there were OS updates ready. I'm not sure exactly what was in that update but it switched me from ", Code2 "NVIDIA driver metapackage from nvidia-driver-575 (proprietary, tested)", Text " to ", Code2 "NVIDIA driver metapackage from nvidia-driver-570 (proprietary)", Text " in the \"Software & Updates\" app. This in turn caused my secondary screen to no longer get detected and caused my primary 4K screen to display at 1024x768. Amazingly I managed to solve this one without help from tech support friend." ]
+                                [ Paragraph
+                                    [ Text "Narrowing down where all the diskspace was going was its own challenge. The file explorer won't say how large a folder is. Tech support friend suggested I install filelight but that gave me a "
+                                    , Code2 "QQmlApplicationEngine failed to load component qrc:/ui/main.qml:8:1: module \"org.kde.config\" is not installed"
+                                    , Text " error message (apparently it's only for KDE, not Gnome). Finally we tried baobab which worked."
+                                    ]
+                                ]
+                            , Paragraph
+                                [ Text "Ubuntu said there were OS updates ready. I'm not sure exactly what was in that update but it switched me from "
+                                , Code2 "NVIDIA driver metapackage from nvidia-driver-575 (proprietary, tested)"
+                                , Text " to "
+                                , Code2 "NVIDIA driver metapackage from nvidia-driver-570 (proprietary)"
+                                , Text " in the "
+                                , Quote "Software & Updates"
+                                , Text " app. This in turn caused my secondary screen to no longer get detected and caused my primary 4K screen to display at 1024x768. Amazingly I managed to solve this one without help from tech support friend."
+                                ]
                             , Paragraph [ Text "Each time after I start my computer, Ubuntu asks if I want to submit a crash report for Gitkraken. I guess Gitkraken is trying to automatically start and failing to do so. I can't figure out how to make Gitkraken stop doing that." ]
                             ]
                         ]

@@ -91,7 +91,7 @@ route =
 
 
 init : App data action routeParams -> Shared.Model -> ( Model, Effect Msg )
-init app _ =
+init _ _ =
     ( { filter = Set.empty
       , worstTier = NoLine
       , topTier = NoLine
