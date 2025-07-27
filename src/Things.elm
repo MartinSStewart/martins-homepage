@@ -1567,7 +1567,7 @@ myTypeCodec =
                         [ BulletList
                             []
                             [ Paragraph [ Text "Unlike on Windows, snapping two windows to separate halves of the screen actually works without one of them overlapping the other slightly." ]
-                            , Paragraph [ Text "My secondary screens speakers don't get lost when waking the computer from sleep mode. On Windows I would have to disable some random virtual speaker to get the OS to detect the secondary screen's speakers again." ]
+                            , Paragraph [ Text "My secondary screen's speakers don't get lost when the computer leaves sleep mode. On Windows I would have to disable some random virtual speaker to get the OS to detect the secondary screen's speakers again." ]
                             , Paragraph [ Text "No more Windows line endings. I have been burned so many times debugging code where this turned out to be the issue." ]
                             , Paragraph [ Text "No more case insensitive file paths" ]
                             , Paragraph [ Text "Ubuntu feels less laggy than Windows" ]
