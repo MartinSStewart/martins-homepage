@@ -7,6 +7,8 @@ module Route.AboutMe exposing (Model, Msg, RouteParams, route, Data, ActionData)
 -}
 
 import BackendTask
+import BackendTask.Time
+import Date exposing (Date)
 import Effect
 import FatalError
 import Formatting exposing (Formatting(..), Inline(..))
@@ -16,6 +18,7 @@ import Route exposing (Route(..))
 import RouteBuilder
 import Set exposing (Set)
 import Shared exposing (Breakpoints(..))
+import Time
 import Ui
 import Ui.Font
 import Ui.Responsive
@@ -84,29 +87,40 @@ type alias ActionData =
     BackendTask.BackendTask FatalError.FatalError (List RouteParams)
 
 
+birthday : Date
+birthday =
+    Date.fromCalendarDate 1993 Time.Oct 9
+
+
 data : BackendTask.BackendTask FatalError.FatalError Data
 data =
-    BackendTask.succeed
-        { description =
-            [ Paragraph
-                [ Text "I'm Martin Stewart! I'm a Swedish American (American Swede?) living in Stockholm." ]
-            , Paragraph
-                [ Text "I like making things, mostly computer programs, and this website is an attempt at keeping track of all the stuff that I've made. Some of that stuff is "
-                , Link "cool" (Stuff__Slug_ { slug = "circuit-breaker" })
-                , Text ", other stuff is "
-                , Link "cringey garbage" (Stuff__Slug_ { slug = "demon-clutched-walkaround" })
-                , Text " but worth remembering anyway."
+    BackendTask.map
+        (\time ->
+            { description =
+                [ Paragraph
+                    [ Text "I'm Martin Stewart! I'm "
+                    , Date.diff Date.Years birthday (Date.fromPosix Time.utc time) |> String.fromInt |> Text
+                    , Text " years old and I live in Stockholm."
+                    ]
+                , Paragraph
+                    [ Text "I like making things, mostly computer programs, and this website is an attempt at keeping track of all the stuff that I've made. Some of that stuff is "
+                    , Link "cool" (Stuff__Slug_ { slug = "circuit-breaker" })
+                    , Text ", other stuff is "
+                    , Link "cringey garbage" (Stuff__Slug_ { slug = "demon-clutched-walkaround" })
+                    , Text " but worth remembering anyway."
+                    ]
+                , Paragraph
+                    [ Text "I also like biking, jogging, walking, bouldering, and board games (ordered by velocity)."
+                    ]
+                , Paragraph
+                    [ Text "If you want to say hello, I'm Martin Stewart on Elm Slack and "
+                    , ExternalLink "MartinS" "discourse.elm-lang.org/u/martins"
+                    , Text " on Elm Discourse."
+                    ]
                 ]
-            , Paragraph
-                [ Text "I also like biking, jogging, walking, bouldering, and board games (ordered by velocity)."
-                ]
-            , Paragraph
-                [ Text "If you want to say hello, I'm Martin Stewart on Elm Slack and "
-                , ExternalLink "MartinS" "discourse.elm-lang.org/u/martins"
-                , Text " on Elm Discourse."
-                ]
-            ]
-        }
+            }
+        )
+        BackendTask.Time.now
 
 
 head : RouteBuilder.App Data ActionData RouteParams -> List Head.Tag
@@ -132,7 +146,7 @@ view app shared model =
                 [ Ui.widthMin 250
                 , Ui.Responsive.visible Shared.breakpoints [ NotMobile ]
                 ]
-                { source = "/about-me.jpg"
+                { source = "/about-me/about-me.jpg"
                 , description = "A photo of me pretending to steal a bag of money"
                 , onLoad = Nothing
                 }
