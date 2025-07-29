@@ -13,7 +13,12 @@ import Effect
 import FatalError
 import Formatting exposing (Formatting(..), Inline(..))
 import Head
-import PagesMsg
+import Html
+import Html.Attributes
+import Icons
+import List.Extra
+import List.Nonempty exposing (Nonempty(..))
+import PagesMsg exposing (PagesMsg)
 import Route exposing (Route(..))
 import RouteBuilder
 import Set exposing (Set)
@@ -21,17 +26,20 @@ import Shared exposing (Breakpoints(..))
 import Time
 import Ui
 import Ui.Font
+import Ui.Input
 import Ui.Responsive
 import UrlPath
 import View
 
 
 type alias Model =
-    { selectedAltText : Set String }
+    { selectedAltText : Set String, photoIndex : Int }
 
 
 type Msg
     = PressedAltText String
+    | PressedNextPhoto
+    | PressedPreviousPhoto
     | StartedVideo
 
 
@@ -56,7 +64,7 @@ init :
     -> Shared.Model
     -> ( Model, Effect.Effect Msg )
 init _ _ =
-    ( { selectedAltText = Set.empty }, Effect.none )
+    ( { selectedAltText = Set.empty, photoIndex = 0 }, Effect.none )
 
 
 update :
@@ -70,6 +78,14 @@ update _ _ msg model =
         PressedAltText altText ->
             ( { model | selectedAltText = Set.insert altText model.selectedAltText }, Effect.none )
 
+        PressedNextPhoto ->
+            ( { model | photoIndex = model.photoIndex + 1 |> min (List.Nonempty.length photos - 1) }
+            , Effect.none
+            )
+
+        PressedPreviousPhoto ->
+            ( { model | photoIndex = model.photoIndex - 1 |> max 0 }, Effect.none )
+
         StartedVideo ->
             ( model, Effect.none )
 
@@ -77,6 +93,77 @@ update _ _ msg model =
 subscriptions : RouteParams -> UrlPath.UrlPath -> Shared.Model -> Model -> Sub Msg
 subscriptions _ _ _ _ =
     Sub.none
+
+
+photos : Nonempty ( String, List Inline )
+photos =
+    Nonempty
+        ( "tretton37-meetup-photo.jpg"
+        , [ Text "Taken at a "
+          , Link "tretton37" (Route.Stuff__Slug_ { slug = "tretton37" })
+          , Text " after work meetup."
+          ]
+        )
+        [ ( "about-me.jpg"
+          , [ Text "We had a contest at "
+            , Link "Insurello" (Route.Stuff__Slug_ { slug = "insurello" })
+            , Text " to take a photo of something starting with "
+            , Quote "S"
+            , Text ". I chose "
+            , Quote "Stealing"
+            , Text " and my photo won."
+            ]
+          )
+        , ( "resume-photo.jpg", [ Text "22 year old me posing in the bathroom for a resume photo." ] )
+        , ( "hair-pizza.jpg", [ Text "There's hair in my pizza." ] )
+        , ( "hair-pizza-2.jpg", [ Text "My goodness that's a lot of hair." ] )
+        ]
+        |> List.Nonempty.map (\( url, a ) -> ( "/about-me/" ++ url, a ))
+
+
+imageCollection : Int -> Nonempty ( String, List Inline ) -> Model -> Ui.Element (PagesMsg Msg)
+imageCollection index images model =
+    let
+        ( imageUrl, altText ) =
+            List.Nonempty.get index images
+    in
+    Ui.row
+        []
+        [ Ui.el
+            [ Ui.height Ui.fill
+            , Ui.background (Ui.rgb 240 240 240)
+            , Ui.Input.button (PagesMsg.fromMsg PressedPreviousPhoto)
+            ]
+            (Ui.html Icons.chevronLeft)
+        , Html.figure
+            [ Html.Attributes.style "padding-bottom" "16px", Html.Attributes.style "margin" "0" ]
+            [ Html.img
+                [ Html.Attributes.src imageUrl
+                , Html.Attributes.style "max-width" "500px"
+                , Html.Attributes.style "max-height" "500px"
+                , Html.Attributes.style "border-radius" "4px"
+                ]
+                []
+            , Html.figcaption
+                [ Html.Attributes.style "font-size" "14px"
+                , Html.Attributes.style "padding" "0 8px 0 8px "
+                ]
+                (List.map
+                    (Formatting.inlineView
+                        { pressedAltText = \text -> PressedAltText text |> PagesMsg.fromMsg }
+                        model
+                    )
+                    altText
+                )
+            ]
+            |> Ui.html
+        , Ui.el
+            [ Ui.height Ui.fill
+            , Ui.background (Ui.rgb 240 240 240)
+            , Ui.Input.button (PagesMsg.fromMsg PressedNextPhoto)
+            ]
+            (Ui.html Icons.chevronRight)
+        ]
 
 
 type alias Data =
@@ -136,20 +223,13 @@ view :
 view app shared model =
     { title = "About me"
     , body =
-        Ui.row
+        Ui.column
             [ Ui.widthMax 1000
             , Ui.centerX
             , Ui.contentTop
             , Ui.height Ui.fill
             ]
-            [ Ui.image
-                [ Ui.widthMin 250
-                , Ui.Responsive.visible Shared.breakpoints [ NotMobile ]
-                ]
-                { source = "/about-me/about-me.jpg"
-                , description = "A photo of me pretending to steal a bag of money"
-                , onLoad = Nothing
-                }
+            [ imageCollection model.photoIndex photos model
             , Ui.column
                 [ Ui.spacing 64, Ui.height Ui.fill ]
                 [ Ui.column
@@ -175,14 +255,6 @@ view app shared model =
                         model
                         app.data.description
                     ]
-                , Ui.image
-                    [ Ui.Responsive.visible Shared.breakpoints [ Mobile ]
-                    , Ui.alignBottom
-                    ]
-                    { source = "/about-me-mobile.jpg"
-                    , description = "A photo of me pretending to steal a bag of money from someone's house"
-                    , onLoad = Nothing
-                    }
                 ]
             ]
     }

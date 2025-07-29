@@ -1,4 +1,4 @@
-module Formatting exposing (Formatting(..), Inline(..), Model, checkFormatting, contentWidthMax, downloadLink, externalLink, sidePaddingMobile, sidePaddingNotMobile, view)
+module Formatting exposing (Formatting(..), Inline(..), Model, checkFormatting, contentWidthMax, downloadLink, externalLink, inlineView, sidePaddingMobile, sidePaddingNotMobile, view)
 
 import Html exposing (Html)
 import Html.Attributes
@@ -500,7 +500,7 @@ sidePaddingNotMobile =
     16
 
 
-inlineView : Config msg -> Model a -> Inline -> Html msg
+inlineView : { b | pressedAltText : String -> msg } -> Model a -> Inline -> Html msg
 inlineView config model inline =
     case inline of
         Bold text ->
