@@ -1693,6 +1693,29 @@ myTypeCodec =
         (date 2025 Jul 25)
         (date 2025 Jul 25)
         "A package for sending emails"
+    , ( "tabby-loops"
+      , { name = "Tabby Loops"
+        , website = Just "tabbyloops.com/"
+        , tags = [ Elm, ElmPages ]
+        , description =
+            [ Paragraph [ Text "A website for a friend to show off her crochet." ]
+            , Paragraph [ Text "Below are two things she made for me as thanks. I gave them to my sister as ", AltText "birthday presents." "Don't worry, the friend who made the crochet knew I was going to use them as gifts. I didn't just regifted them." ]
+            , Image "/tabby-loops/jellyfish2.jpg" [ Text "A transflag colored jellyfish on a keyring" ]
+            , Image "/tabby-loops/transflag.jpg" [ Text "A mobile phone sized transflag. So you can put your phone on it I guess." ]
+            , Paragraph [ Text "Note that I didn't draw the logo, she provided me it (it's AI generated), but I did draw the cat present at the bottom of the website." ]
+            , Image "/tabby-loops/cat-footer.png" [ Text "Made using Blender 3D's grease pencil tool and colored in GIMP. Yes, I know that's a really strange workflow for 2D art." ]
+            ]
+        , pageLastUpdated = websiteReleasedAt
+        , pageCreatedAt = websiteReleasedAt
+        , previewImage = "/tabby-loops/logo.png"
+        , previewText = ""
+        , thingType =
+            OtherThing
+                { releasedAt = date 2025 Apr 5
+                , repo = Just "github.com/MartinSStewart/crochet"
+                }
+        }
+      )
     ]
         |> Dict.fromList
 
@@ -1718,6 +1741,7 @@ qualityOrder =
     , "break-the-facade"
     , "state-of-elm-2022"
     , "sheep-game"
+    , "tabby-loops"
     , "secret-santa-game"
     , "air-hockey-racing"
     , "lamdera-websocket"
