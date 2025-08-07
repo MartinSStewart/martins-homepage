@@ -1708,7 +1708,7 @@ myTypeCodec =
         , pageLastUpdated = websiteReleasedAt
         , pageCreatedAt = websiteReleasedAt
         , previewImage = "/tabby-loops/logo.png"
-        , previewText = ""
+        , previewText = "A website to show off a friend's crochet work"
         , thingType =
             OtherThing
                 { releasedAt = date 2025 Apr 5
