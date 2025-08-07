@@ -38,7 +38,7 @@ type Inline
     | Code String
     | Code2 String
     | Text String
-    | AltText String String
+    | AltText String (List Inline)
     | ExternalLink String String
     | Quote String
 
@@ -539,15 +539,15 @@ inlineView config model inline =
         AltText text altText ->
             let
                 showAltText =
-                    Set.member altText model.selectedAltText
+                    Set.member text model.selectedAltText
             in
             Html.span
                 (if showAltText then
                     []
 
                  else
-                    [ Html.Attributes.title altText
-                    , Html.Events.onClick (config.pressedAltText altText)
+                    [ Html.Attributes.title "click to show footnote"
+                    , Html.Events.onClick (config.pressedAltText text)
                     , Html.Attributes.style "cursor" "pointer"
                     ]
                 )
@@ -558,7 +558,7 @@ inlineView config model inline =
                                 [ Html.Attributes.style "background" "#dff2ff"
                                 , Html.Attributes.style "padding" "0 2px 2px 2px"
                                 ]
-                                [ Html.text altText ]
+                                (List.map (inlineView config model) altText)
                             ]
 
                         else

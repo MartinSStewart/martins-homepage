@@ -9,10 +9,10 @@ content =
         [ Text "This package was released along with "
         , ExternalLink "version 1.3" "dashboard.lamdera.app/releases/v1-3-0"
         , Text " of the Lamdera compiler. It uses "
-        , AltText "kernel code" "(a term used by the Elm community when referring to JavaScript code directly invoked from Elm code instead of via ports. It's not possible for ordinary apps or packages to contain their own kernel code)"
+        , AltText "kernel code" [ Text "(a term used by the Elm community when referring to JavaScript code directly invoked from Elm code instead of via ports. It's not possible for ordinary apps or packages to contain their own kernel code)" ]
         , Text " to allow Elm programmers to finally have a Dict and Set type that does not require "
         , Code "comparable"
-        , AltText " keys" "(the only comparable types in Elm are String, Int, and Float, along with List and Tuple when they have comparable type parameters)"
+        , AltText " keys" [ Text "(the only comparable types in Elm are String, Int, and Float, along with List and Tuple when they have comparable type parameters)" ]
         , Text " or require any workarounds, while also being similar in performance to the "
         , ExternalLink "built-in Dict" "package.elm-lang.org/packages/elm/core/latest/Dict"
         , Text " and "
@@ -66,9 +66,14 @@ toList : Dict key value -> List (key, value)
                 , Text " where "
                 , Code "f"
                 , Text " can be any "
-                , AltText "function" "(I believe in mathematics, something that has this property is referred to as being well-defined)"
+                , AltText "function" [ Text "(in math, something that has this property is referred to as being well-defined)" ]
                 ]
-            , Paragraph [ Text "Renaming/reordering record fields or ", AltText "custom type variants" "(custom types is Elm's word for discriminated unions. And a variant is one of the possible values for the discriminated union)", Text " should never change the order of key-value pairs returned from ", Code "toList" ]
+            , Paragraph
+                [ Text "Renaming/reordering record fields or "
+                , AltText "custom type variants" [ Text "(custom types is Elm's word for discriminated unions. And a variant is one of the possible values for the discriminated union)" ]
+                , Text " should never change the order of key-value pairs returned from "
+                , Code "toList"
+                ]
             ]
         , Paragraph
             [ Text "My discovery is that, as far as I can tell, regardless of what programming language you use or performance characteristics you allow for, "
@@ -95,7 +100,13 @@ toList : Dict key value -> List (key, value)
                     , Text " to introduce some kernel code that violates this!"
                     ]
                 ]
-            , Paragraph [ Text "People often mention that when refactoring in Elm, they feel safe making large changes to their code. Part of why this is true is because renaming or reordering functions/types/fields/variants will never affect the runtime behavior of Elm code (with the sole exception being field order affecting ", AltText " record constructors" "Record constructors are functions that are created for any record type the user defines. The order of parameters is determined by the order of the record fields", Text "). It would be a shame to lose this just because, ", Code "Dict.toList", Text " would change when renaming/reordering record fields or custom type variants." ]
+            , Paragraph
+                [ Text "People often mention that when refactoring in Elm, they feel safe making large changes to their code. Part of why this is true is because renaming or reordering functions/types/fields/variants will never affect the runtime behavior of Elm code (with the sole exception being field order affecting "
+                , AltText " record constructors" [ Text "Record constructors are functions that are created for any record type the user defines. The order of parameters is determined by the order of the record fields" ]
+                , Text "). It would be a shame to lose this just because, "
+                , Code "Dict.toList"
+                , Text " would change when renaming/reordering record fields or custom type variants."
+                ]
             ]
         ]
     , Section "Rock solid mathematical proof"
@@ -240,9 +251,20 @@ sortBy = Debug.todo "How do I sort an opaque type that doesn't expose any data I
         ]
     , Section "Conclusion"
         [ Paragraph [ Text "It wasn't at all obvious to me from the start that I'd encounter so many trade-offs when all I wanted was a Dict type that didn't demand ", Code "comparable", Text " keys. While I independently discovered this, I'm sure either other people have also figured this out, or alternatively, I've made a mistake somewhere and my conclusions are incorrect. I sure hope it's the latter. I ", Italic "really", Text " want all 4 of those properties in a dict package..." ]
-        , NumberList [ Text "Oh. And you probably want to know which properties I ended up choosing for the Dict and Set type in ", Code2 "lamdera/containers", Text ". It was difficult to decide but here's what I settled on:" ]
+        , NumberList
+            [ Text "Oh. And you probably want to know which properties I ended up choosing for the Dict and Set type in "
+            , Code2 "lamdera/containers"
+            , Text ". It was difficult to decide but here's what I settled on:"
+            ]
             [ Paragraph [ Text "Obviously I included support for non-comparable keys. This whole package would be pointless without it." ]
-            , Paragraph [ Text "I gave up ", Code """fromList [ ("X", 0), ("Y", 1) ] == fromList [ ("Y", 1), ("X", 0) ]""", Text ". This means if you want to check if two Dicts or Sets are equal, you'll need to use an extra function called ", Code "unorderedEquals", Text ". This isn't ideal since you can't use it on a larger data structure that contains ", AltText "a Set." "With kernel code it would be possible to implement an unorderedEquals function that works on any type but it would involve even more kernel code. I'd rather not resort to that unless people find they regularly need such a function." ]
+            , Paragraph
+                [ Text "I gave up "
+                , Code """fromList [ ("X", 0), ("Y", 1) ] == fromList [ ("Y", 1), ("X", 0) ]"""
+                , Text ". This means if you want to check if two Dicts or Sets are equal, you'll need to use an extra function called "
+                , Code "unorderedEquals"
+                , Text ". This isn't ideal since you can't use it on a larger data structure that contains "
+                , AltText "a Set." [ Text "With kernel code it would be possible to implement an unorderedEquals function that works on any type but it would involve even more kernel code. I'd rather not resort to that unless people find they regularly need such a function." ]
+                ]
             , Paragraph [ Text "I kept 3." ]
             , Group [ Paragraph [ Text "I kept 4." ] ]
             ]
@@ -259,7 +281,15 @@ sortBy = Debug.todo "How do I sort an opaque type that doesn't expose any data I
             , Paragraph [ Text "And of course, you can pick fewer than three properties. Elm is rare in that it guarantees properties 3 and 4 for any user code. Most languages don't and that probably extends to their respective Dict types." ]
             ]
         , Section "Can this package be used with the normal Elm compiler?"
-            [ Paragraph [ Text "This package is only supported by the ", AltText "Lamdera compiler" "(the Lamdera compiler is a backwards compatible fork of the Elm compiler)", Text ". In part this is because it contains kernel code and it's unlikely I'd be allowed to publish it to the Elm package ecosystem. But even if I was allowed, it also overrides ", Code "Debug.toString", Text " and ", Code "==", Text " which is only possible due to some changes to the compiler." ]
+            [ Paragraph
+                [ Text "This package is only supported by the "
+                , AltText "Lamdera compiler" [ Text "(the Lamdera compiler is a backwards compatible fork of the Elm compiler)" ]
+                , Text ". In part this is because it contains kernel code and it's unlikely I'd be allowed to publish it to the Elm package ecosystem. But even if I was allowed, it also overrides "
+                , Code "Debug.toString"
+                , Text " and "
+                , Code "=="
+                , Text " which is only possible due to some changes to the compiler."
+                ]
             ]
         ]
     ]

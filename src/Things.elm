@@ -189,7 +189,7 @@ thingsIHaveDone =
                 , Paragraph [ Text "Real quick though, some of you might be thinking, ", Quote "Lots of quality ascii art? Easy! Copy-paste it from elsewhere!", Text " And yes, some ascii art is copied from elsewhere. I ask people to prefer drawing original stuff but I don't enforce it." ]
                 , Paragraph [ Text "I'd say 80% of it is original art however! How do I know that? Ascii-collab lets you color code changes people have made. Using this tool we can tell that this is probably copied due to the unnaturally placed space characters." ]
                 , PixelImage 200 306 "/ascii-collab/copied.png" [ ExternalLink "A chess knight" "ascii-collab.app/?x=-184&y=291" ]
-                , Paragraph [ Text "And this, on the other hand, is an ", AltText "original drawing." " There are cases that are ambiguous. If there's a solid colored rectangle, that could be original art that has then been moved with the box selection tool." ]
+                , Paragraph [ Text "And this, on the other hand, is an ", AltText "original drawing." [ Text " There are cases that are ambiguous. If there's a solid colored rectangle, that could be original art that has then been moved with the box selection tool." ] ]
                 , PixelImage 290 162 "/ascii-collab/legit.png" [ ExternalLink "A large cat enjoying some ramen, drawn by Tilly" "ascii-collab.app/?x=-856&y=-354" ]
                 , Paragraph [ Text "Anyway, lets see some ascii art!" ]
                 , Section "Posters"
@@ -197,7 +197,7 @@ thingsIHaveDone =
                     , Image "/ascii-collab/poster.png" [ Text "The poster region of the ascii-collab canvas" ]
                     , Paragraph
                         [ Text "And here is the color coded version. The green text represents changes "
-                        , AltText "I've made." " Note that as admin for the site, I do also clean up vandalism and move around art sometimes, which makes it look like I drew a thing when it was someone else. 99% of the time it's my own art though."
+                        , AltText "I've made." [ Text " Note that as admin for the site, I do also clean up vandalism and move around art sometimes, which makes it look like I drew a thing when it was someone else. 99% of the time it's my own art though." ]
                         ]
                     , Image "/ascii-collab/poster-color.png" [ Text "The poster region of the ascii-collab canvas but color coded by user" ]
                     , Paragraph [ Text "There's no sign-up so once someone's session cookie expires (which happens after a few weeks) they get a new color. So there are fewer unique contributors than there are colors." ]
@@ -224,8 +224,10 @@ thingsIHaveDone =
                         156
                         "/ascii-collab/portraits.png"
                         [ ExternalLink "Can you tell what these three portraits are?" "ascii-collab.app/?x=-184&y=169"
-                        , AltText " Click here for answers" "American Gothic, The Scream, and Dos Equis's "
-                        , Quote "Most interesting man in the world"
+                        , AltText " Click here for answers"
+                            [ Text "American Gothic, The Scream, and Dos Equis's "
+                            , Quote "Most interesting man in the world"
+                            ]
                         ]
                     , PixelImage 385 309 "/ascii-collab/sandwich.png" [ ExternalLink "A sandwich by me" "ascii-collab.app/?x=-722&y=-150" ]
                     , PixelImage 765 414 "/ascii-collab/moon.png" [ ExternalLink "[A] man on the moon by me" "ascii-collab.app/?x=92&y=-244" ]
@@ -1147,11 +1149,21 @@ myTypeCodec =
             , Paragraph
                 [ Link "Last time I participated in the GMC Jam" (Stuff__Slug_ { slug = "sanctum" })
                 , Text " I got 16th place, but this time I tied for 1st! As a result, I won a "
-                , AltText "Mr.\u{00A0}Karoshi tshirt" "(Mr.\u{00A0}Karoshi is a rather grim puzzle game where you help an office worker kill themselves)"
+                , AltText
+                    "Mr.\u{00A0}Karoshi tshirt"
+                    [ Text "(Mr.\u{00A0}Karoshi is a rather grim puzzle game where you help an office worker kill himself)" ]
                 , Text ", a coffee mug with YoYo Games branding, and free copy of Game Maker Studio pro!"
                 ]
             , Image "/break-the-facade/mr-karoshi.jpg" [ Text "The Mr.\u{00A0}Karoshi t-shirt I won" ]
-            , Paragraph [ Text "I think my favorite thing to come out of that years GMC Jam was a Youtuber named raocow deciding to play every game ", AltText "made for it" "(I believe that was the only GMC Jam he did. I can't find the source but I think he said it was too much work playing 60 or so mostly bad video games)", Text ". ", ExternalLink "Here he is playing Break the Facade" "www.youtube.com/watch?v=7ITH8CZXkbk", Text ". Judging by his comments towards the end of the video and the video description being ", Quote "I've oft repeated how much I like this general sort of both game and looks, so it'd be useless to repeat, even if I pretty much just did.", Text " I think it's safe to say he enjoyed playing it!" ]
+            , Paragraph
+                [ Text "I think my favorite thing to come out of that years GMC Jam was a Youtuber named raocow deciding to play every game "
+                , AltText "made for it" [ Text "(I believe that was the only GMC Jam he did. I can't find the source but I think he said it was too much work playing 60 or so mostly bad video games)" ]
+                , Text ". "
+                , ExternalLink "Here he is playing Break the Facade" "www.youtube.com/watch?v=7ITH8CZXkbk"
+                , Text ". Judging by his comments towards the end of the video and the video description being "
+                , Quote "I've oft repeated how much I like this general sort of both game and looks, so it'd be useless to repeat, even if I pretty much just did."
+                , Text " I think it's safe to say he enjoyed playing it!"
+                ]
             , Image "/break-the-facade/zig-winna-banner.png" [ Text "Someone drew banners for the top 3 places (or perhaps more, not sure). Here's mine! And yes, I picked Ziggler1 as my username on the GMC forums. Thanks past me." ]
             ]
         , pageLastUpdated = websiteReleasedAt
@@ -1550,7 +1562,7 @@ myTypeCodec =
                     ]
                 , Paragraph
                     [ Text "Despite all that I'm happy to have switched. I'm actually not sure why I'm so happy about the switch. Maybe it's a feeling of "
-                    , AltText "less clutter" "(many years of haphazard file management, random apps everywhere, etc)"
+                    , AltText "less clutter" [ Text "(many years of haphazard file management, random apps everywhere, etc)" ]
                     , Text ", or feeling less like I'm being spied on, or maybe Ubuntu is just less laggy. Hard to say. I'm told (after having already made the switch to Ubuntu) that Debian has more features and is more stable. Maybe in a month I'll try that and experience the same OS switching happiness for a second time."
                     ]
                 , Section "The issues I ran into"
@@ -1573,7 +1585,7 @@ myTypeCodec =
                             , Quote "update"
                             , Text " for Firefox in the app center gave me a "
                             , Quote "We're sorry, we're not sure what the error is"
-                            , AltText " popup" "(I haven't seen that error ever again, I'm not sure what caused it)"
+                            , AltText " popup" [ Text "(I haven't seen that error ever again, I'm not sure what caused it)" ]
                             , Text "."
                             ]
                         , BulletList
@@ -1596,10 +1608,13 @@ myTypeCodec =
                             , Text " fullscreen menu for quickly picking an app to start has tiny buttons for navigating to the next or previous page despite the enormous amount of empty space available. If there were any hotkeys for this purpose then they weren't obvious enough for me to find them."
                             ]
                         , Paragraph [ Text "The tooltip that appears when hovering my cursor over folders in the file explorer sidebar is horizontally compressed and distorted, making it impossible to read." ]
-                        , Paragraph [ Text "I increased the OS UI scaling to 150% to better fit my screen. This caused loads of visual artefacts for all the opened apps that wouldn't go away until I restarted ", AltText "them." "Tech support friend suggested I switch from Gnome to KDE. As of writing I haven't tried this yet. Maybe doing so will solve many of the UI issues I've listed here." ]
+                        , Paragraph
+                            [ Text "I increased the OS UI scaling to 150% to better fit my screen. This caused loads of visual artefacts for all the opened apps that wouldn't go away until I restarted "
+                            , AltText "them." [ Text "Tech support friend suggested I switch from Gnome to KDE. As of writing I haven't tried this yet. Maybe doing so will solve many of the UI issues I've listed here." ]
+                            ]
                         , BulletList
                             [ Text "I wanted to play "
-                            , AltText "Enigma." " My dad had Knoppix on a CD and I'd sometimes boot the family computer from it and play the games included, one of which was the puzzle game Enigma. This is all to say, I have nostalgia for that game."
+                            , AltText "Enigma." [ Text " My dad had Knoppix on a CD and I'd sometimes boot the family computer from it and play the games included, one of which was the puzzle game Enigma. This is all to say, I have nostalgia for that game." ]
                             , Text " The app center has two versions available. Unfortunately the page wouldn't load for one and for the other it wouldn't open after installed. The solution was to run "
                             , Code2 "apt install Enigma"
                             , Text " via the terminal."
@@ -1607,7 +1622,7 @@ myTypeCodec =
                             [ Paragraph [ Text "Related to this, there's too many ways to install apps. App center, apt, direct download from a website and then also decide between using the Debian or Snap version of each app." ] ]
                         , Paragraph
                             [ Text "I noticed that in some "
-                            , AltText "apps" "(Chromium for example)"
+                            , AltText "apps" [ Text "(Chromium for example)" ]
                             , Text ", buttons would just not work. After some clicking around, I realize the clickable area was offset based on how far the button was from the top left corner of the screen. Changing OS zoom to 150% was the culprit. I switched it back to 100% and instead increased the zoom amount individually in all apps that supported it."
                             ]
                         , Paragraph [ Text "The standard Ctrl + C and Ctrl + V copy paste commands don't work in the default terminal. A bit annoying to get used to different hotkeys." ]
@@ -1629,7 +1644,7 @@ myTypeCodec =
                             , Text " or "
                             , Quote "Power Off..."
                             , Text " is a mistake. When I returned 30 minutes later, all the UI was corrupted with RGB noise and the UI was too laggy to interact "
-                            , AltText "with" " (it was running at a smooth 10 seconds per frame)"
+                            , AltText "with" [ Text " (it was running at a smooth 10 seconds per frame)" ]
                             , Text ". Restarting the computer fixed the issue."
                             ]
                         ]
@@ -1699,7 +1714,10 @@ myTypeCodec =
         , tags = [ Elm, ElmPages ]
         , description =
             [ Paragraph [ Text "A website for a friend to show off her crochet." ]
-            , Paragraph [ Text "Below are two things she made for me as thanks. I gave them to my sister as ", AltText "birthday presents." "Don't worry, the friend who made the crochet knew I was going to use them as gifts. I didn't just regifted them." ]
+            , Paragraph
+                [ Text "Below are two things she made for me as thanks. I gave them to my sister as "
+                , AltText "birthday presents." [ Text "Don't worry, the friend who made the crochet knew I was going to use them as gifts. I didn't just regifted them." ]
+                ]
             , Image "/tabby-loops/jellyfish2.jpg" [ Text "A transflag colored jellyfish on a keyring" ]
             , Image "/tabby-loops/transflag.jpg" [ Text "A mobile phone sized transflag. So you can put your phone on it I guess." ]
             , Paragraph [ Text "Note that I didn't draw the logo, she provided me it (it's AI generated), but I did draw the cat present at the bottom of the website." ]
