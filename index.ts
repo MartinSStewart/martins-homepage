@@ -26,6 +26,10 @@ const config: ElmPagesInit = {
     {
         app.ports.gotDevicePixelRatio.send(window.devicePixelRatio);
     });
+    app.ports.playSong.subscribe((a) =>
+    {
+
+    });
   },
   flags: function () {
     return { dpr: window.devicePixelRatio, windowWidth: window.innerWidth };

@@ -189,6 +189,9 @@ checkInlineFormatting inline =
                 Route.Index ->
                     Ok ()
 
+                Route.Mixtape2025 ->
+                    Ok ()
+
         Code _ ->
             Ok ()
 

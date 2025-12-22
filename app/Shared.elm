@@ -8,6 +8,7 @@ port module Shared exposing
     , headerHeight
     , maxColumns
     , pagePadding
+    , playSong
     , template
     , tileSpacing
     , tileWidth
@@ -36,6 +37,9 @@ port getDevicePixelRatio : () -> Cmd msg
 
 
 port gotDevicePixelRatio : (Float -> msg) -> Sub msg
+
+
+port playSong : String -> Cmd msg
 
 
 template : SharedTemplate Msg Model Data msg
