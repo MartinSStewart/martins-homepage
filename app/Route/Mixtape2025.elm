@@ -40,8 +40,8 @@ type alias Song =
     }
 
 
-names : Array Song
-names =
+songs : Array Song
+songs =
     [ { url = "A Million Miles Away"
       , name = "Mars Express OST - A Million Miles Away"
       , description = "I happened to be reading Dan Olson's reddit comments and randomly saw that he recommended the movie Mars Express. I like his Folding Ideas youtube channel so I figured I'd give the movie a watch. I liked it. This song plays during the credits and I like it too."
@@ -199,13 +199,13 @@ update :
     -> Msg
     -> Model
     -> ( Model, Effect.Effect Msg )
-update _ _ msg model =
+update app _ msg model =
     case msg of
         NoOp ->
             ( model, Effect.none )
 
         SongEnded songIndex ->
-            case Array.get (songIndex + 1) names of
+            case Array.get (songIndex + 1) app.data.songs of
                 Just song ->
                     ( model, Shared.playSong song.url )
 
@@ -213,7 +213,7 @@ update _ _ msg model =
                     ( model, Effect.none )
 
         PressedAlbumArt songIndex ->
-            case Array.get songIndex names of
+            case Array.get songIndex app.data.songs of
                 Just song ->
                     ( model, Shared.playSong song.url )
 
@@ -221,7 +221,7 @@ update _ _ msg model =
                     ( model, Effect.none )
 
         SongStarted songIndex ->
-            case Array.get songIndex names of
+            case Array.get songIndex app.data.songs of
                 Just song ->
                     ( model, Shared.songStarted song.url )
 
@@ -235,21 +235,16 @@ subscriptions _ _ _ _ =
 
 
 type alias Data =
-    {}
+    { songs : Array Song }
 
 
 type alias ActionData =
     BackendTask.BackendTask FatalError.FatalError (List RouteParams)
 
 
-birthday : Date
-birthday =
-    Date.fromCalendarDate 1993 Time.Oct 9
-
-
 data : BackendTask.BackendTask FatalError.FatalError Data
 data =
-    BackendTask.succeed {}
+    BackendTask.succeed { songs = songs }
 
 
 head : RouteBuilder.App Data ActionData RouteParams -> List Head.Tag
@@ -297,7 +292,7 @@ view app shared model =
                             , Ui.column [ Ui.height Ui.fill ] [ audio index song, description index song ]
                             ]
                     )
-                    (Array.toList names)
+                    (Array.toList app.data.songs)
                     |> Ui.column
                         [ Ui.spacing 24
                         , Ui.Font.color (Ui.rgb 255 255 255)
@@ -316,7 +311,7 @@ view app shared model =
                             , Ui.row [ Ui.height Ui.fill ] [ coverImage index song 128, description index song ]
                             ]
                     )
-                    (Array.toList names)
+                    (Array.toList app.data.songs)
                     |> Ui.column
                         [ Ui.spacing 16
                         , Ui.Font.color (Ui.rgb 255 255 255)
