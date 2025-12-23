@@ -26,6 +26,34 @@ const config: ElmPagesInit = {
     {
         app.ports.gotDevicePixelRatio.send(window.devicePixelRatio);
     });
+    app.ports.playSong.subscribe((a) =>
+    {
+        var element = document.getElementById(a);
+
+        if (element.paused) {
+            element.play();
+        }
+        else
+        {
+            element.pause();
+        }
+    });
+    app.ports.songStarted.subscribe((a) =>
+    {
+        var element = document.getElementById(a);
+
+        const audioElements = document.querySelectorAll('audio');
+
+        audioElements.forEach(audio => {
+            if (audio === element) {
+            }
+            else
+            {
+                audio.pause();
+            }
+        });
+
+    });
   },
   flags: function () {
     return { dpr: window.devicePixelRatio, windowWidth: window.innerWidth };

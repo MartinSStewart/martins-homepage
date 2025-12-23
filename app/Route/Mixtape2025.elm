@@ -1,0 +1,359 @@
+module Route.Mixtape2025 exposing (..)
+
+{-|
+
+@docs Model, Msg, RouteParams, route, Data, ActionData
+
+-}
+
+import Array exposing (Array)
+import BackendTask
+import BackendTask.Time
+import Date exposing (Date)
+import Effect
+import FatalError
+import Formatting exposing (Formatting(..), Inline(..))
+import Head
+import Html
+import Html.Attributes
+import Html.Events
+import Json.Decode
+import PagesMsg
+import Route exposing (Route(..))
+import RouteBuilder
+import Set exposing (Set)
+import Shared exposing (Breakpoints(..))
+import Time
+import Ui
+import Ui.Font
+import Ui.Input
+import Ui.Responsive
+import Ui.Shadow
+import UrlPath
+import View
+
+
+type alias Song =
+    { url : String
+    , name : String
+    , description : String
+    }
+
+
+songs : Array Song
+songs =
+    [ { url = "A Million Miles Away"
+      , name = "Mars Express OST - A Million Miles Away"
+      , description = "I happened to be reading Dan Olson's reddit comments and randomly saw that he recommended the movie Mars Express. I like his Folding Ideas youtube channel so I figured I'd give the movie a watch. I liked it. This song plays during the credits and I like it too."
+      }
+    , { url = "Anish Kumar & Barry Can’t Swim - 'Blackpool Boulevard' (Official Audio)"
+      , name = "Anish Kumar & Barry Can’t Swim - 'Blackpool Boulevard' (Official Audio)"
+      , description = "This song played a couple times at the bouldering gym. I asked the person running the playlist what it was called so I could listen to it again."
+      }
+    , { url = "Birth of the Yamato (feat. Wind Loop Case)"
+      , name = "Yusuke Shima - Birth of the Yamato (feat. Wind Loop Case)"
+      , description = "Found while listening to music on youtube. Nice calm song."
+      }
+    , { url = "Carol Brown"
+      , name = "Flight of the Conchords - Carol Brown"
+      , description = "One of the less well known Flight of the Conchord songs that I enjoy listening to."
+      }
+    , { url = "Color Your Night"
+      , name = "Persona 3 Reload OST - Color Your Night"
+      , description = "From a soundtrack a friend would constantly sing back in high school. I wasn't into to the songs then but now I've grown to like some of them."
+      }
+    , { url = "Concert Boy (Original 12＂ Version)"
+      , name = "Cube - Concert Boy"
+      , description = "The \"Original 12 inch Version\" according to the youtube video I downloaded it from. I heard this one playing at the bouldering gym as well. One of the employees (David) really likes this song."
+      }
+    , { url = "Fitz and the Tantrums - HandClap [Official Video]"
+      , name = "Fitz and the Tantrums - HandClap"
+      , description = "Someone made a Beat Saber map using this song which is how I ended up listening to it."
+      }
+    , { url = "John Newman - Love Me Again (Lyrics)"
+      , name = "John Newman - Love Me Again"
+      , description = "Someone *tried* to make a Beat Saber map using this song but it wouldn't load for me (or rather, it crashed the game when I tried loading it). Still the song preview sounded good so I went and listened to it on youtube."
+      }
+    , { url = "Lizzo - About Damn Time (Lyrics)"
+      , name = "Lizzo - About Damn Time"
+      , description = "Not the kind of song I would have expected to like. I found this one while, once again, playing Beat Saber. It makes for a really good FitBeat map."
+      }
+    , { url = "Magdalena Bay - Image (Official Video)"
+      , name = "Magdalena Bay - Image"
+      , description = "Thea showed me this song. Most of the songs by this artist I'm not into but this song and a couple others are good."
+      }
+    , { url = "Mazie - Dumb Dumb (Lyrics)"
+      , name = "Mazie - Dumb Dumb"
+      , description = "Yet another song I found while playing BeatSaber. It's very silly."
+      }
+    , { url = "Song for Sienna"
+      , name = "Brian Crain - Song for Sienna"
+      , description = "Found while listening to piano music playlist on youtube."
+      }
+    , { url = "New Mjondalen Disco Swingers - Eurodans"
+      , name = "New Mjondalen Disco Swingers - Eurodans"
+      , description = "Another silly song but a different kind of silly. I found it on youtube while listening to Todd Terje music, he also has a song called Eurodans. I'm not sure in what way they are related."
+      }
+    , { url = "seinwave"
+      , name = "Abelard - ☆ＳＥＩＮＷＡＶＥ☆２０００☆"
+      , description = "I'm not into Vaporwave music but the Seinfeld crossover and excellent name make this one stand out for me."
+      }
+    , { url = "Staff Credits - Mario Kart  Double Dash!!"
+      , name = "Mario Kart: Double Dash OST - Staff Credits"
+      , description = "There is a debate to be had whether Mario Kart Double Dash is the best Mario Kart. There is however, no debate as to which Mario Kart credits song is the best."
+      }
+    , { url = "The Whisper"
+      , name = "Laika: Aged Through Blood OST - The Whisper"
+      , description = "Theme song for a video game set in a post-apocalypse. I heard it while watching a friend live-stream the game. He wasn't very good at the game but the song is good."
+      }
+    , { url = "Vulfmon & Evangeline - Got To Be Mine (Official Video)"
+      , name = "Vulfmon & Evangeline - Got To Be Mine"
+      , description = "Good song. I like the music video for it too though it makes me miss the summer."
+      }
+    , { url = "Water Ripples"
+      , name = "Enno Aare - Water Ripples"
+      , description = "Another piano song I like. I think I found it at the same time as Song for Sienna."
+      }
+    , { url = "Camel by Camel - Mix Vocal"
+      , name = "Sandy Marton - Camel by Camel"
+      , description = "I think this has become a meme song thanks to his silly face and a crossover with an Egyptian character from the Animal Crossing games."
+      }
+    , { url = "Riders Of The Ancient Winds"
+      , name = "Craig Chaquico & Russ Freeman - Riders Of The Ancient Winds"
+      , description = "Very relaxing song"
+      }
+    , { url = "Double Exposure (feat. Russ Freeman)"
+      , name = "Double Exposure (feat. Russ Freeman)"
+      , description = "I have a rule about not including a band or musician more than once in a mixtape. I'm making an exception for Russ Freeman because he's only featured in this song so I can still include Riders Of The Ancient Winds."
+      }
+    , { url = "Empire Of The Sun - Wandering star (HQ)"
+      , name = "Empire Of The Sun - Wandering star"
+      , description = "Thea showed me this song while I was visiting her old leased apartment up in Kungsängen. The song is apparently from Dumb and Dumber To which is a shockingly different tone compared to the song."
+      }
+    , { url = "FUTURE WORLD ORCHESTRA - Don't Go (Part 1) - 1985"
+      , name = "FUTURE WORLD ORCHESTRA - Don't Go (Part 1)"
+      , description = "There's a part 2 that seems to be part 1 but with sections of the song reordered. I think I slightly like part 1 more."
+      }
+    , { url = "No Straight Roads OST - vs. DJ Subatomic Supernova"
+      , name = "No Straight Roads OST - vs. DJ Subatomic Supernova"
+      , description = "Plays during a boss fight in the game No Straight Roads. The game has a lot of good songs but this one is my favorite."
+      }
+    , { url = "Paolo Nutini - New Shoes"
+      , name = "Paolo Nutini - New Shoes"
+      , description = "Connor showed me this song! Paolo Nutini is Scottish so it makes sense that he'd know about this musician."
+      }
+    , { url = "Red Parker - Born To Run"
+      , name = "Red Parker - Born To Run"
+      , description = "Given the name \"Born to Run\" it seems like I'd find this song relatable. Tragically, running in this song refers to driving a car at high speed."
+      }
+    , { url = "Super Flu - Selee (official video)"
+      , name = "Super Flu - Selee"
+      , description = "I found this song while watching Line Rider videos (an old game where you draw lines that a man on a sled can slide down on). This song has a music video that's one big, very impressive, Line Rider map."
+      }
+    , { url = "You And I (Radio Edit)"
+      , name = "Tony Betties - You And I"
+      , description = "As far as I can tell, this musician has only published two songs. This one and a song called So Cool. I guess they wanted to stop on a high note."
+      }
+    ]
+        |> Array.fromList
+
+
+type alias Model =
+    {}
+
+
+type Msg
+    = NoOp
+    | SongEnded Int
+    | PressedAlbumArt Int
+    | SongStarted Int
+
+
+type alias RouteParams =
+    {}
+
+
+route : RouteBuilder.StatefulRoute RouteParams Data ActionData Model Msg
+route =
+    RouteBuilder.single
+        { data = data, head = head }
+        |> RouteBuilder.buildWithLocalState
+            { view = view
+            , init = init
+            , update = update
+            , subscriptions = subscriptions
+            }
+
+
+init :
+    RouteBuilder.App Data ActionData RouteParams
+    -> Shared.Model
+    -> ( Model, Effect.Effect Msg )
+init _ _ =
+    ( {}, Effect.none )
+
+
+update :
+    RouteBuilder.App Data ActionData RouteParams
+    -> Shared.Model
+    -> Msg
+    -> Model
+    -> ( Model, Effect.Effect Msg )
+update app _ msg model =
+    case msg of
+        NoOp ->
+            ( model, Effect.none )
+
+        SongEnded songIndex ->
+            case Array.get (songIndex + 1) app.data.songs of
+                Just song ->
+                    ( model, Shared.playSong song.url )
+
+                Nothing ->
+                    ( model, Effect.none )
+
+        PressedAlbumArt songIndex ->
+            case Array.get songIndex app.data.songs of
+                Just song ->
+                    ( model, Shared.playSong song.url )
+
+                Nothing ->
+                    ( model, Effect.none )
+
+        SongStarted songIndex ->
+            case Array.get songIndex app.data.songs of
+                Just song ->
+                    ( model, Shared.songStarted song.url )
+
+                Nothing ->
+                    ( model, Effect.none )
+
+
+subscriptions : RouteParams -> UrlPath.UrlPath -> Shared.Model -> Model -> Sub Msg
+subscriptions _ _ _ _ =
+    Sub.none
+
+
+type alias Data =
+    { songs : Array Song }
+
+
+type alias ActionData =
+    BackendTask.BackendTask FatalError.FatalError (List RouteParams)
+
+
+data : BackendTask.BackendTask FatalError.FatalError Data
+data =
+    BackendTask.succeed { songs = songs }
+
+
+head : RouteBuilder.App Data ActionData RouteParams -> List Head.Tag
+head _ =
+    []
+
+
+view :
+    RouteBuilder.App Data ActionData RouteParams
+    -> Shared.Model
+    -> Model
+    -> View.View (PagesMsg.PagesMsg Msg)
+view app shared model =
+    { title = "Merry Mixtape 2025"
+    , body =
+        Ui.column
+            [ Ui.widthMax 1000
+            , Ui.centerX
+            , Ui.Responsive.paddingXY Shared.breakpoints
+                (\label ->
+                    if label == Mobile then
+                        { x = Ui.Responsive.value 8, y = Ui.Responsive.value 16 }
+
+                    else
+                        { x = Ui.Responsive.value 16, y = Ui.Responsive.value 16 }
+                )
+            ]
+            [ Ui.column
+                [ Ui.spacing 8 ]
+                [ Ui.el [ Ui.Font.size 48 ] (Ui.text "Merry Mixtape 2025 📼")
+                , Ui.el
+                    [ Ui.paddingBottom 16, Ui.Font.size 18 ]
+                    (Ui.text "Merry Christmas Mama and Papa! Here are some new songs I like and want to share.")
+                ]
+            , if shared.windowWidth > 700 then
+                List.indexedMap
+                    (\index song ->
+                        Ui.row
+                            [ Ui.Shadow.shadows [ { x = 0, y = 2, size = 0, blur = 8, color = Ui.rgba 0 0 0 0.2 } ]
+                            , Ui.rounded 8
+                            , Ui.clip
+                            , Ui.background (Ui.rgb 40 40 40)
+                            ]
+                            [ coverImage index song 256
+                            , Ui.column [ Ui.height Ui.fill ] [ audio index song, description index song ]
+                            ]
+                    )
+                    (Array.toList app.data.songs)
+                    |> Ui.column
+                        [ Ui.spacing 24
+                        , Ui.Font.color (Ui.rgb 255 255 255)
+                        ]
+
+              else
+                List.indexedMap
+                    (\index song ->
+                        Ui.column
+                            [ Ui.Shadow.shadows [ { x = 0, y = 2, size = 0, blur = 8, color = Ui.rgba 0 0 0 0.2 } ]
+                            , Ui.rounded 8
+                            , Ui.clip
+                            , Ui.background (Ui.rgb 40 40 40)
+                            ]
+                            [ audio index song
+                            , Ui.row [ Ui.height Ui.fill ] [ coverImage index song 128, description index song ]
+                            ]
+                    )
+                    (Array.toList app.data.songs)
+                    |> Ui.column
+                        [ Ui.spacing 16
+                        , Ui.Font.color (Ui.rgb 255 255 255)
+                        ]
+            ]
+            |> Ui.map PagesMsg.fromMsg
+    }
+
+
+audio : Int -> Song -> Ui.Element Msg
+audio index song =
+    Html.audio
+        [ Html.Attributes.src ("/mixtape2025/" ++ song.url ++ ".mp3")
+        , Html.Attributes.controls True
+        , Html.Events.on "ended" (Json.Decode.succeed (SongEnded index))
+        , Html.Events.on "play" (Json.Decode.succeed (SongStarted index))
+        , Html.Attributes.id song.url
+        ]
+        []
+        |> Ui.html
+
+
+description index song =
+    Ui.column
+        [ Ui.padding 16, Ui.spacing 8, Ui.alignTop ]
+        [ Ui.row
+            [ Ui.spacing 8 ]
+            [ Ui.el [ Ui.alignTop, Ui.width Ui.shrink ] (Ui.text (String.fromInt (index + 1) ++ ". "))
+            , Ui.el [ Ui.Font.bold ] (Ui.text song.name)
+            ]
+        , Ui.text song.description
+        ]
+
+
+coverImage : Int -> Song -> Int -> Ui.Element Msg
+coverImage index song size =
+    Ui.image
+        [ Ui.width (Ui.px size)
+        , Ui.height (Ui.px size)
+        , Ui.Input.button (PressedAlbumArt index)
+        ]
+        { source = "/mixtape2025/" ++ song.url ++ ".jpg"
+        , description = "Cover art for " ++ song.name
+        , onLoad = Nothing
+        }
