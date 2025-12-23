@@ -1,4 +1,4 @@
-module Route.Mixtape2025 exposing (..)
+module Route.Mixtape2025 exposing (Model, Msg(..), RouteParams, route, Data, ActionData)
 
 {-|
 
@@ -157,7 +157,7 @@ songs =
 
 
 type alias Model =
-    {}
+    { currentlyPlaying : Maybe Int }
 
 
 type Msg
@@ -188,7 +188,7 @@ init :
     -> Shared.Model
     -> ( Model, Effect.Effect Msg )
 init _ _ =
-    ( {}, Effect.none )
+    ( { currentlyPlaying = Nothing }, Effect.none )
 
 
 update :
@@ -208,7 +208,7 @@ update app _ msg model =
                     ( model, Shared.playSong song.url )
 
                 Nothing ->
-                    ( model, Effect.none )
+                    ( { model | currentlyPlaying = Nothing }, Effect.none )
 
         PressedAlbumArt songIndex ->
             case Array.get songIndex app.data.songs of
@@ -221,7 +221,7 @@ update app _ msg model =
         SongStarted songIndex ->
             case Array.get songIndex app.data.songs of
                 Just song ->
-                    ( model, Shared.songStarted song.url )
+                    ( { model | currentlyPlaying = Just songIndex }, Shared.songStarted song.url )
 
                 Nothing ->
                     ( model, Effect.none )
@@ -277,68 +277,107 @@ view :
 view app shared model =
     { title = "Merry Mixtape 2025"
     , body =
-        Ui.column
-            [ Ui.widthMax 1000
-            , Ui.centerX
-            , Ui.Responsive.paddingXY Shared.breakpoints
-                (\label ->
-                    if label == Mobile then
-                        { x = Ui.Responsive.value 8, y = Ui.Responsive.value 16 }
-
-                    else
-                        { x = Ui.Responsive.value 16, y = Ui.Responsive.value 16 }
-                )
-            ]
-            [ Ui.column
-                [ Ui.spacing 8 ]
-                [ Ui.el
-                    [ Ui.Font.size 48
-                    , Ui.Font.bold
+        Ui.el
+            [ Ui.backgroundGradient
+                [ Ui.Gradient.linear
+                    (Ui.turns 0.5)
+                    [ Ui.Gradient.percent 0 (Ui.rgb 255 255 255)
+                    , Ui.Gradient.percent 100 (Ui.rgb 140 200 182)
                     ]
-                    (colorText "Merry  Mixtape  2025 📼")
-                , Ui.el
-                    [ Ui.paddingBottom 16, Ui.Font.size 18 ]
-                    (Ui.text "Merry Christmas Mama and Papa! Here are some new songs I like and want to share.")
                 ]
-            , if shared.windowWidth > 700 then
-                List.indexedMap
-                    (\index song ->
-                        Ui.row
-                            [ Ui.Shadow.shadows [ { x = 0, y = 2, size = 0, blur = 8, color = Ui.rgba 0 0 0 0.2 } ]
-                            , Ui.rounded 8
-                            , Ui.clip
-                            , Ui.background (Ui.rgb 40 40 40)
-                            ]
-                            [ coverImage index song 256
-                            , Ui.column [ Ui.height Ui.fill ] [ audio index song, description index song ]
-                            ]
-                    )
-                    (Array.toList app.data.songs)
-                    |> Ui.column
-                        [ Ui.spacing 24
-                        , Ui.Font.color (Ui.rgb 255 255 255)
-                        ]
-
-              else
-                List.indexedMap
-                    (\index song ->
-                        Ui.column
-                            [ Ui.Shadow.shadows [ { x = 0, y = 2, size = 0, blur = 8, color = Ui.rgba 0 0 0 0.2 } ]
-                            , Ui.rounded 8
-                            , Ui.clip
-                            , Ui.background (Ui.rgb 40 40 40)
-                            ]
-                            [ audio index song
-                            , Ui.row [ Ui.height Ui.fill ] [ coverImage index song 128, description index song ]
-                            ]
-                    )
-                    (Array.toList app.data.songs)
-                    |> Ui.column
-                        [ Ui.spacing 16
-                        , Ui.Font.color (Ui.rgb 255 255 255)
-                        ]
             ]
-            |> Ui.map PagesMsg.fromMsg
+            (Ui.column
+                [ Ui.widthMax 1000
+                , Ui.centerX
+                , Ui.Responsive.paddingXY Shared.breakpoints
+                    (\label ->
+                        if label == Mobile then
+                            { x = Ui.Responsive.value 8, y = Ui.Responsive.value 0 }
+
+                        else
+                            { x = Ui.Responsive.value 16, y = Ui.Responsive.value 0 }
+                    )
+                ]
+                [ Ui.column
+                    [ Ui.spacing 16, Ui.paddingXY 0 32 ]
+                    [ Ui.el
+                        [ Ui.Font.size 48
+                        , Ui.Font.bold
+                        ]
+                        (colorText "Merry  Mixtape  2025 📼")
+                    , Ui.Prose.paragraph
+                        [ Ui.Font.size 20, Ui.paddingXY 0 16 ]
+                        [ Ui.el [ Ui.Font.bold ] (Ui.text "Merry Christmas Mama and Papa! ")
+                        , Ui.text "After a long hiatus, here's a mixtape with a bunch of songs I've found over the past few\u{00A0}years."
+                        ]
+                    ]
+                , if shared.windowWidth > 700 then
+                    List.indexedMap
+                        (\index song ->
+                            Ui.row
+                                [ Ui.Shadow.shadows
+                                    [ { x = 0
+                                      , y = 2
+                                      , size =
+                                            if model.currentlyPlaying == Just index then
+                                                2
+
+                                            else
+                                                0
+                                      , blur =
+                                            if model.currentlyPlaying == Just index then
+                                                16
+
+                                            else
+                                                8
+                                      , color =
+                                            if model.currentlyPlaying == Just index then
+                                                Ui.rgba 0 0 0 0.5
+
+                                            else
+                                                Ui.rgba 0 0 0 0.2
+                                      }
+                                    ]
+                                , Ui.rounded 8
+                                , Ui.clip
+                                , Ui.background (Ui.rgb 40 40 40)
+                                , Ui.border 1
+                                , Ui.borderColor (Ui.rgb 0 0 0)
+                                ]
+                                [ coverImage index song 256
+                                , Ui.column [ Ui.height Ui.fill ] [ audio index song, description index song ]
+                                ]
+                        )
+                        (Array.toList app.data.songs)
+                        |> Ui.column
+                            [ Ui.spacing 24
+                            , Ui.Font.color (Ui.rgb 255 255 255)
+                            ]
+
+                  else
+                    List.indexedMap
+                        (\index song ->
+                            Ui.column
+                                [ Ui.Shadow.shadows [ { x = 0, y = 2, size = 0, blur = 8, color = Ui.rgba 0 0 0 0.2 } ]
+                                , Ui.rounded 8
+                                , Ui.clip
+                                , Ui.background (Ui.rgb 40 40 40)
+                                ]
+                                [ audio index song
+                                , Ui.row [ Ui.height Ui.fill ] [ coverImage index song 128, description index song ]
+                                ]
+                        )
+                        (Array.toList app.data.songs)
+                        |> Ui.column
+                            [ Ui.spacing 16
+                            , Ui.Font.color (Ui.rgb 255 255 255)
+                            ]
+                , Ui.el
+                    [ Ui.Font.size 18, Ui.Font.italic, Ui.centerX, Ui.padding 24, Ui.Font.bold ]
+                    (Ui.text "That's all folks!")
+                ]
+                |> Ui.map PagesMsg.fromMsg
+            )
     }
 
 
@@ -363,7 +402,7 @@ description index song =
         [ Ui.row
             [ Ui.spacing 8 ]
             [ Ui.el [ Ui.alignTop, Ui.width Ui.shrink ] (Ui.text (String.fromInt (index + 1) ++ ". "))
-            , Ui.el [ Ui.Font.bold ] (Ui.text song.name)
+            , Ui.el [ Ui.Font.bold ] (Ui.text (String.replace "-" "\u{00A0}–\u{00A0}" song.name))
             ]
         , Ui.text song.description
         ]
