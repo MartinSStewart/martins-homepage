@@ -28,7 +28,25 @@ const config: ElmPagesInit = {
     });
     app.ports.playSong.subscribe((a) =>
     {
+        var element = document.getElementById(a);
 
+        if (element.paused) {
+            const audioElements = document.querySelectorAll('audio');
+
+            audioElements.forEach(audio => {
+                if (audio === element) {
+                    audio.play();
+                }
+                else
+                {
+                    audio.pause();
+                }
+            });
+        }
+        else
+        {
+            element.pause();
+        }
     });
   },
   flags: function () {
