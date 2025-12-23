@@ -26,7 +26,9 @@ import Shared exposing (Breakpoints(..))
 import Time
 import Ui
 import Ui.Font
+import Ui.Gradient
 import Ui.Input
+import Ui.Prose
 import Ui.Responsive
 import Ui.Shadow
 import UrlPath
@@ -70,13 +72,9 @@ songs =
       , name = "Fitz and the Tantrums - HandClap"
       , description = "Someone made a Beat Saber map using this song which is how I ended up listening to it."
       }
-    , { url = "John Newman - Love Me Again (Lyrics)"
-      , name = "John Newman - Love Me Again"
-      , description = "Someone *tried* to make a Beat Saber map using this song but it wouldn't load for me (or rather, it crashed the game when I tried loading it). Still the song preview sounded good so I went and listened to it on youtube."
-      }
     , { url = "Lizzo - About Damn Time (Lyrics)"
       , name = "Lizzo - About Damn Time"
-      , description = "Not the kind of song I would have expected to like. I found this one while, once again, playing Beat Saber. It makes for a really good FitBeat map."
+      , description = "Not the kind of song I would have expected to like. I found this one as well while playing Beat Saber. It makes for a really good FitBeat map."
       }
     , { url = "Magdalena Bay - Image (Official Video)"
       , name = "Magdalena Bay - Image"
@@ -252,6 +250,25 @@ head _ =
     []
 
 
+colorText text =
+    String.toList text
+        |> List.indexedMap
+            (\index char ->
+                Ui.el
+                    [ Ui.Font.color
+                        (case modBy 2 index of
+                            0 ->
+                                Ui.rgb 180 0 0
+
+                            _ ->
+                                Ui.rgb 0 150 0
+                        )
+                    ]
+                    (Ui.text (String.fromChar char))
+            )
+        |> Ui.Prose.paragraph [ Ui.Font.lineHeight 1.1 ]
+
+
 view :
     RouteBuilder.App Data ActionData RouteParams
     -> Shared.Model
@@ -274,7 +291,11 @@ view app shared model =
             ]
             [ Ui.column
                 [ Ui.spacing 8 ]
-                [ Ui.el [ Ui.Font.size 48 ] (Ui.text "Merry Mixtape 2025 📼")
+                [ Ui.el
+                    [ Ui.Font.size 48
+                    , Ui.Font.bold
+                    ]
+                    (colorText "Merry Mixtape 2025 📼")
                 , Ui.el
                     [ Ui.paddingBottom 16, Ui.Font.size 18 ]
                     (Ui.text "Merry Christmas Mama and Papa! Here are some new songs I like and want to share.")
@@ -329,11 +350,13 @@ audio index song =
         , Html.Events.on "ended" (Json.Decode.succeed (SongEnded index))
         , Html.Events.on "play" (Json.Decode.succeed (SongStarted index))
         , Html.Attributes.id song.url
+        , Html.Attributes.style "width" "100%"
         ]
         []
         |> Ui.html
 
 
+description : Int -> { a | name : String, description : String } -> Ui.Element msg
 description index song =
     Ui.column
         [ Ui.padding 16, Ui.spacing 8, Ui.alignTop ]
