@@ -258,10 +258,10 @@ colorText text =
                     [ Ui.Font.color
                         (case modBy 2 index of
                             0 ->
-                                Ui.rgb 180 0 0
+                                Ui.rgb 120 0 0
 
                             _ ->
-                                Ui.rgb 0 150 0
+                                Ui.rgb 0 100 0
                         )
                     ]
                     (Ui.text (String.fromChar char))
@@ -295,7 +295,7 @@ view app shared model =
                     [ Ui.Font.size 48
                     , Ui.Font.bold
                     ]
-                    (colorText "Merry Mixtape 2025 📼")
+                    (colorText "Merry  Mixtape  2025 📼")
                 , Ui.el
                     [ Ui.paddingBottom 16, Ui.Font.size 18 ]
                     (Ui.text "Merry Christmas Mama and Papa! Here are some new songs I like and want to share.")
