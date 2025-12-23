@@ -31,22 +31,28 @@ const config: ElmPagesInit = {
         var element = document.getElementById(a);
 
         if (element.paused) {
-            const audioElements = document.querySelectorAll('audio');
-
-            audioElements.forEach(audio => {
-                if (audio === element) {
-                    audio.play();
-                }
-                else
-                {
-                    audio.pause();
-                }
-            });
+            element.play();
         }
         else
         {
             element.pause();
         }
+    });
+    app.ports.songStarted.subscribe((a) =>
+    {
+        var element = document.getElementById(a);
+
+        const audioElements = document.querySelectorAll('audio');
+
+        audioElements.forEach(audio => {
+            if (audio === element) {
+            }
+            else
+            {
+                audio.pause();
+            }
+        });
+
     });
   },
   flags: function () {

@@ -9,6 +9,7 @@ port module Shared exposing
     , maxColumns
     , pagePadding
     , playSong
+    , songStarted
     , template
     , tileSpacing
     , tileWidth
@@ -40,6 +41,9 @@ port gotDevicePixelRatio : (Float -> msg) -> Sub msg
 
 
 port playSong : String -> Cmd msg
+
+
+port songStarted : String -> Cmd msg
 
 
 template : SharedTemplate Msg Model Data msg
