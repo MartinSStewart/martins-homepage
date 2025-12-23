@@ -92,7 +92,7 @@ songs =
       }
     , { url = "New Mjondalen Disco Swingers - Eurodans"
       , name = "New Mjondalen Disco Swingers - Eurodans"
-      , description = "Another silly song but a different kind of silly. I found it on youtube while listening to Todd Terje music, he also has a song called Eurodans. I'm not sure in what way they are related."
+      , description = "Another silly song but a different kind of silly. I found it on youtube while listening to Todd Terje music. He also has a song called Eurodans though I'm not sure in what way they are related."
       }
     , { url = "seinwave"
       , name = "Abelard - ☆ＳＥＩＮＷＡＶＥ☆２０００☆"
@@ -123,7 +123,7 @@ songs =
       , description = "Very relaxing song"
       }
     , { url = "Double Exposure (feat. Russ Freeman)"
-      , name = "Double Exposure (feat. Russ Freeman)"
+      , name = "Brian Culbertson - Double Exposure (feat. Russ Freeman)"
       , description = "I have a rule about not including a band or musician more than once in a mixtape. I'm making an exception for Russ Freeman because he's only featured in this song so I can still include Riders Of The Ancient Winds."
       }
     , { url = "Empire Of The Sun - Wandering star (HQ)"
@@ -148,11 +148,11 @@ songs =
       }
     , { url = "Super Flu - Selee (official video)"
       , name = "Super Flu - Selee"
-      , description = "I found this song while watching Line Rider videos (an old game where you draw lines that a man on a sled can slide down on). This song has a music video that's one big, very impressive, Line Rider map."
+      , description = "I found this song while watching Line Rider videos (an old game where you draw lines that a man on a sled can slide down on). This song's official music video a very impressive Line Rider map."
       }
     , { url = "You And I (Radio Edit)"
       , name = "Tony Betties - You And I"
-      , description = "As far as I can tell, this musician has only published two songs. This one and a song called So Cool. I guess they wanted to stop on a high note."
+      , description = "As far as I can tell, this musician has published this song and another song called So Cool around 2012. Nothing else since then. I guess they wanted to leave on a high note."
       }
     ]
         |> Array.fromList
