@@ -254,19 +254,21 @@ colorText text =
     String.toList text
         |> List.indexedMap
             (\index char ->
-                Ui.el
-                    [ Ui.Font.color
+                Html.span
+                    [ Html.Attributes.style
+                        "color"
                         (case modBy 2 index of
                             0 ->
-                                Ui.rgb 120 0 0
+                                "rgb(120,0,0)"
 
                             _ ->
-                                Ui.rgb 0 100 0
+                                "rgb(0,100,0)"
                         )
                     ]
-                    (Ui.text (String.fromChar char))
+                    [ Html.text (String.fromChar char) ]
             )
-        |> Ui.Prose.paragraph [ Ui.Font.lineHeight 1.1 ]
+        |> Html.div []
+        |> Ui.html
 
 
 view :
