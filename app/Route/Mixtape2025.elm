@@ -46,7 +46,7 @@ songs : Array Song
 songs =
     [ { url = "A Million Miles Away"
       , name = "Mars Express OST - A Million Miles Away"
-      , description = "I happened to be reading Dan Olson's reddit comments and randomly saw that he recommended the movie Mars Express. I like his Folding Ideas youtube channel so I figured I'd give the movie a watch. I liked it. This song plays during the credits and I like it too."
+      , description = "Someone on reddit recommended the movie Mars Express. On a whim I decided to watch it. I liked it. This song plays during the credits and I like it too."
       }
     , { url = "Anish Kumar & Barry Can’t Swim - 'Blackpool Boulevard' (Official Audio)"
       , name = "Anish Kumar & Barry Can’t Swim - 'Blackpool Boulevard' (Official Audio)"
@@ -314,7 +314,7 @@ view app shared model =
                         [ Ui.Font.color (Ui.rgb 0 100 230)
                         , Ui.Font.size 18
                         , Ui.Font.bold
-                        , Ui.download "/mixtape2025/mixtape2025.zip"
+                        , Ui.linkNewTab "https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2FMartinSStewart%2Fmartins-homepage%2Ftree%2Fmaster%2Fpublic%2Fmixtape2025"
                         , Ui.Font.underline
                         ]
                         (Ui.text "Download all")
