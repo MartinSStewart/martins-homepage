@@ -282,7 +282,7 @@ view app shared model =
                 [ Ui.Gradient.linear
                     (Ui.turns 0.5)
                     [ Ui.Gradient.percent 0 (Ui.rgb 255 255 255)
-                    , Ui.Gradient.percent 100 (Ui.rgb 140 200 182)
+                    , Ui.Gradient.percent 100 (Ui.rgb 173 214 202)
                     ]
                 ]
             ]
@@ -301,15 +301,23 @@ view app shared model =
                 [ Ui.column
                     [ Ui.spacing 16, Ui.paddingXY 0 32 ]
                     [ Ui.el
-                        [ Ui.Font.size 48
+                        [ Ui.Font.size 36
                         , Ui.Font.bold
                         ]
                         (colorText "Merry  Mixtape  2025 📼")
                     , Ui.Prose.paragraph
-                        [ Ui.Font.size 20, Ui.paddingXY 0 16 ]
+                        [ Ui.Font.size 18, Ui.paddingXY 0 16 ]
                         [ Ui.el [ Ui.Font.bold ] (Ui.text "Merry Christmas Mama and Papa! ")
-                        , Ui.text "After a long hiatus, here's a mixtape with a bunch of songs I've found over the past few\u{00A0}years."
+                        , Ui.text "After a long hiatus, here's a new mixtape with a bunch of songs I've found over the past few\u{00A0}years."
                         ]
+                    , Ui.el
+                        [ Ui.Font.color (Ui.rgb 0 100 230)
+                        , Ui.Font.size 18
+                        , Ui.Font.bold
+                        , Ui.download "/mixtape2025/mixtape2025.zip"
+                        , Ui.Font.underline
+                        ]
+                        (Ui.text "Download all")
                     ]
                 , if shared.windowWidth > 700 then
                     List.indexedMap
